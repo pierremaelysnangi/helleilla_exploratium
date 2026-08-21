@@ -1,0 +1,90 @@
+// db/queries/bands.ts
+import { db } from '@/db';
+import { bands } from '@/db/schema';
+import { eq, ilike, desc } from 'drizzle-orm';
+
+export async function getBandById(id: string) {
+  const [band] = await db
+    .select()
+    .from(bands)
+    .where(eq(bands.id, id));
+  return band ?? null;
+}
+
+export async function getBandBySlug(slug: string) {
+  const [band] = await db
+    .select()
+    .from(bands)
+    .where(eq(bands.slug, slug));
+  return band ?? null;
+}
+
+export async function listBands(limit = 20) {
+  return db
+    .select()
+    .from(bands)
+    .orderBy(desc(bands.createdAt))
+    .limit(limit);
+}
+
+export async function searchBandsByName(query: string) {
+  return db
+    .select()
+    .from(bands)
+    .where(ilike(bands.name, `%${query}%`))
+    .limit(20);
+}
+
+export async function createBandWithGenres(
+  bandData: typeof bands.$inferInsert,
+  genreIds: string[]
+) {
+  return db.transaction(async (tx) => {
+    const [band] = await tx.insert(bands).values(bandData).returning();
+
+    if (genreIds.length > 0) {
+      await tx.insert(bandGenres).values(
+        genreIds.map((genreId) => ({ bandId: band.id, genreId }))
+      );
+    }
+
+    return band;
+  });
+}
+
+export async function getBandWithAlbumsAndGenres(id: string) {
+  return db.query.bands.findFirst({
+    where: (bands, { eq }) => eq(bands.id, id),
+    with: {
+      albums: {
+        with: { tracks: true },
+      },
+      bandGenres: {
+        with: { genre: true },
+      },
+    },
+  });
+}
+
+export async function createBand(data: {
+  name: string;
+  slug: string;
+  country?: string;
+  formedYear?: number;
+}) {
+  const [band] = await db.insert(bands).values(data).returning();
+  return band;
+}
+
+export async function updateBand(id: string, data: Partial<typeof bands.$inferInsert>) {
+  const [band] = await db
+    .update(bands)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(bands.id, id))
+    .returning();
+  return band;
+}
+
+export async function deleteBand(id: string) {
+  await db.delete(bands).where(eq(bands.id, id));
+}

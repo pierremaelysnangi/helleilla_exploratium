@@ -5,7 +5,7 @@ config({ path: '.env.local' });
 
 export default defineConfig({
   schema: './db/schema/index.ts',
-  out: './src/db/migrations',
+  out: './db/migrations',
   dialect: 'postgresql',
   dbCredentials: {
     // Session pooler (5432) — nécessaire pour le DDL
