@@ -13,7 +13,9 @@
     "db:studio": "drizzle-kit studio",
     "minio:init": "tsx --env-file=.env.local scripts/init-minio.ts",
     "meili:init": "tsx --env-file=.env.local scripts/init-meili.ts",
-    "test:db": "tsx --env-file=.env.local scripts/test-db.ts"
+    "test:db": "tsx --env-file=.env.local scripts/test-db.ts",
+    "workers": "tsx --env-file=.env.local scripts/start-workers.ts",
+    "smoke": "tsx --env-file=.env.local scripts/smoke-test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1114.0",

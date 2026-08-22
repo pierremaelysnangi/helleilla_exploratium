@@ -35,7 +35,7 @@ export const PERMISSIONS: PermissionMatrix = {
   },
 };
 
-export function can(role: Role, action: Action, resource: Resource): boolean {
+export function can(role: Role, resource: Resource, action: Action): boolean {
   const allowed = PERMISSIONS[role]?.[resource];
   return allowed?.includes(action) ?? false;
 }

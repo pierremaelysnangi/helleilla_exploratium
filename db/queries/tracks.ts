@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { tracks } from '@/db/schema';
-import { eq, ilike, desc } from 'drizzle-orm';
+import { eq, ilike, desc, inArray } from 'drizzle-orm';
+
 
 export async function getTrackById(id: string) {
   const [track] = await db
@@ -35,4 +36,21 @@ export async function getTrackWithAlbum(id: string) {
       },
     },
   });
+}
+
+export async function listTrackIdsByAlbumId(albumId: string) {
+  const rows = await db
+    .select({ id: tracks.id })
+    .from(tracks)
+    .where(eq(tracks.albumId, albumId));
+  return rows.map((r) => r.id);
+}
+
+export async function listTrackIdsByAlbumIds(albumIds: string[]) {
+  if (albumIds.length === 0) return [];
+  const rows = await db
+    .select({ id: tracks.id })
+    .from(tracks)
+    .where(inArray(tracks.albumId, albumIds));
+  return rows.map((r) => r.id);
 }

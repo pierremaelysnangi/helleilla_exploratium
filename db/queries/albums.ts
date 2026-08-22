@@ -51,3 +51,11 @@ export async function getAlbumWithTracks(id: string) {
     },
   });
 }
+
+export async function listAlbumIdsByBandId(bandId: string) {
+  const rows = await db
+    .select({ id: albums.id })
+    .from(albums)
+    .where(eq(albums.bandId, bandId));
+  return rows.map((r) => r.id);
+}
