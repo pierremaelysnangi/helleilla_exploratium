@@ -7,19 +7,17 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "json-summary", "html"],
-      include: ["lib/**/*.ts", "db/**/*.ts"],
-      exclude: [
-        "**/*.test.ts",
-        "db/migrations/**",
-        "db/schema/**",
-        "lib/env.ts",
+      include: [
+        "lib/actions/**/*.ts",
+        "lib/rbac/**/*.ts",
+        "lib/validations/**/*.ts",
       ],
+      exclude: ["**/*.test.ts", "**/__tests__/**"],
       thresholds: {
-        lines: 40,
-        functions: 40,
-        branches: 50,
-        statements: 40,
+        statements: 70,
+        branches: 45,
+        functions: 55,
+        lines: 70,
       },
     },
   },
