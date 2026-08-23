@@ -18,7 +18,8 @@ export const metadata: Metadata = {
     default: "Helleilla Exploratium",
     template: "%s | Helleilla Exploratium",
   },
-  description: "L'encyclopédie collaborative du metal — genres, groupes, albums, membres.",
+  description:
+    "L'encyclopédie collaborative du metal — genres, groupes, albums, membres.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -28,11 +29,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-
-      <body className="min-h-full flex flex-col">
-        <Providers>
-          {children}
-        </Providers>
+      <body className="flex min-h-full flex-col">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

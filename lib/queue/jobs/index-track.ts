@@ -7,7 +7,10 @@ export type TrackIndexJobData = {
   action: "index" | "delete";
 };
 
-export async function enqueueTrackIndex(trackId: string, action: "index" | "delete" = "index") {
+export async function enqueueTrackIndex(
+  trackId: string,
+  action: "index" | "delete" = "index",
+) {
   await trackIndexQueue.add(
     `track-${action}`,
     { trackId, action },
@@ -19,7 +22,7 @@ export async function enqueueTrackIndex(trackId: string, action: "index" | "dele
       },
       removeOnComplete: true,
       removeOnFail: false,
-    }
+    },
   );
 }
 

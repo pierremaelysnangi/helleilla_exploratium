@@ -7,7 +7,7 @@ export default function NotFound() {
       <p className="text-muted-foreground mt-2">
         Cette page n&apos;existe pas ou plus.
       </p>
-      <Link href="/" className="text-primary underline mt-4 inline-block">
+      <Link href="/" className="text-primary mt-4 inline-block underline">
         Retour à l&apos;accueil
       </Link>
     </div>

@@ -1,20 +1,14 @@
-import { db } from '@/db';
-import { albums } from '@/db/schema';
-import { eq, ilike, desc } from 'drizzle-orm';
+import { db } from "@/db";
+import { albums } from "@/db/schema";
+import { eq, ilike, desc } from "drizzle-orm";
 
 export async function getAlbumById(id: string) {
-  const [album] = await db
-    .select()
-    .from(albums)
-    .where(eq(albums.id, id));
+  const [album] = await db.select().from(albums).where(eq(albums.id, id));
   return album ?? null;
 }
 
 export async function getAlbumBySlug(slug: string) {
-  const [album] = await db
-    .select()
-    .from(albums)
-    .where(eq(albums.slug, slug));
+  const [album] = await db.select().from(albums).where(eq(albums.slug, slug));
   return album ?? null;
 }
 

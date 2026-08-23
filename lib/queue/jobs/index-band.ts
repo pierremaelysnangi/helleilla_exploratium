@@ -7,7 +7,10 @@ export type BandIndexJobData = {
   action: "index" | "delete";
 };
 
-export async function enqueueBandIndex(bandId: string, action: "index" | "delete" = "index") {
+export async function enqueueBandIndex(
+  bandId: string,
+  action: "index" | "delete" = "index",
+) {
   await bandIndexQueue.add(
     `band-${action}`,
     { bandId, action },
@@ -19,7 +22,7 @@ export async function enqueueBandIndex(bandId: string, action: "index" | "delete
       },
       removeOnComplete: true,
       removeOnFail: false,
-    }
+    },
   );
 }
 
@@ -49,4 +52,3 @@ export async function processBandIndex(data: BandIndexJobData) {
 
   console.log(`✅ Band ${band.name} indexé dans Meilisearch`);
 }
-

@@ -1,13 +1,9 @@
-import { db } from '@/db';
-import { tracks } from '@/db/schema';
-import { eq, ilike, desc, inArray } from 'drizzle-orm';
-
+import { db } from "@/db";
+import { tracks } from "@/db/schema";
+import { eq, ilike, inArray } from "drizzle-orm";
 
 export async function getTrackById(id: string) {
-  const [track] = await db
-    .select()
-    .from(tracks)
-    .where(eq(tracks.id, id));
+  const [track] = await db.select().from(tracks).where(eq(tracks.id, id));
   return track ?? null;
 }
 

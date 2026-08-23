@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  boolean,
-  pgEnum,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
 
 // Les 4 rôles du RBAC
 export const userRoleEnum = pgEnum("user_role", [
@@ -20,6 +14,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  issuer: text("issuer"),
 
   // Champ custom : rôle RBAC
   role: userRoleEnum("role").notNull().default("user"),

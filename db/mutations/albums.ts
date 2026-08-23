@@ -1,6 +1,6 @@
-import { db } from '@/db';
-import { albums } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "@/db";
+import { albums } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function createAlbum(data: typeof albums.$inferInsert) {
   const [album] = await db.insert(albums).values(data).returning();
@@ -9,7 +9,7 @@ export async function createAlbum(data: typeof albums.$inferInsert) {
 
 export async function updateAlbum(
   id: string,
-  data: Partial<typeof albums.$inferInsert>
+  data: Partial<typeof albums.$inferInsert>,
 ) {
   const [album] = await db
     .update(albums)

@@ -13,7 +13,7 @@ import { listTrackIdsByAlbumId } from "@/db/queries/tracks";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
 export async function createAlbumAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createAlbum>>>> {
   try {
     await requirePermission("album", "create");
@@ -49,7 +49,7 @@ export async function createAlbumAction(
 }
 
 export async function updateAlbumAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateAlbum>>>> {
   try {
     await requirePermission("album", "update");
@@ -87,13 +87,13 @@ export async function updateAlbumAction(
 }
 
 export async function deleteAlbumAction(
-  id: string
+  id: string,
 ): Promise<ActionResult<{ id: string }>> {
   try {
-    // 1. Récupérer les tracks AVANT la suppression cascade
-    const trackIds = await listTrackIdsByAlbumId(id);
-
     await requirePermission("album", "delete");
+
+    // Récupérer les tracks AVANT la suppression cascade
+    const trackIds = await listTrackIdsByAlbumId(id);
 
     const existing = await getAlbumById(id);
     if (!existing) {
@@ -103,14 +103,12 @@ export async function deleteAlbumAction(
     if (existing.coverUrl) await deleteImage(existing.coverUrl);
     await deleteAlbum(id);
 
-    
-
     // Supprime de l'index
     await enqueueAlbumIndex(id, "delete");
     await Promise.all(
-      trackIds.map((trackId) => enqueueTrackIndex(trackId, "delete"))
+      trackIds.map((trackId) => enqueueTrackIndex(trackId, "delete")),
     );
-    
+
     revalidatePath("/albums");
     return { success: true, data: { id } };
   } catch (err) {

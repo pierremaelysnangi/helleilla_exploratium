@@ -8,7 +8,7 @@ import { getGenreById } from "@/db/queries/genres";
 import { handleActionError, type ActionResult } from "./utils";
 
 export async function createGenreAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createGenre>>>> {
   try {
     await requirePermission("genre", "create");
@@ -28,7 +28,7 @@ export async function createGenreAction(
 }
 
 export async function updateGenreAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateGenre>>>> {
   try {
     await requirePermission("genre", "update");
@@ -49,7 +49,8 @@ export async function updateGenreAction(
 
     revalidatePath("/genres");
     revalidatePath(`/genres/${genre.slug}`);
-    if (existing.slug !== genre.slug) revalidatePath(`/genres/${existing.slug}`);
+    if (existing.slug !== genre.slug)
+      revalidatePath(`/genres/${existing.slug}`);
 
     return { success: true, data: genre };
   } catch (err) {
@@ -58,7 +59,7 @@ export async function updateGenreAction(
 }
 
 export async function deleteGenreAction(
-  id: string
+  id: string,
 ): Promise<ActionResult<{ id: string }>> {
   try {
     await requirePermission("genre", "delete");

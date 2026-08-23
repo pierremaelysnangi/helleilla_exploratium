@@ -12,12 +12,12 @@ export class ImageValidationError extends Error {}
 function assertValidImage(file: File) {
   if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
     throw new ImageValidationError(
-      `Type de fichier non autorisé : ${file.type}. Formats acceptés : JPEG, PNG, WEBP.`
+      `Type de fichier non autorisé : ${file.type}. Formats acceptés : JPEG, PNG, WEBP.`,
     );
   }
   if (file.size > MAX_SIZE_BYTES) {
     throw new ImageValidationError(
-      `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Max 5 Mo.`
+      `Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(1)} Mo). Max 5 Mo.`,
     );
   }
 }
@@ -30,7 +30,10 @@ function extFromMime(mime: string) {
  * Upload une image vers MinIO dans le dossier donné (logos/ ou covers/).
  * Retourne l'URL publique complète.
  */
-export async function uploadImage(file: File, folder: ImageFolder): Promise<string> {
+export async function uploadImage(
+  file: File,
+  folder: ImageFolder,
+): Promise<string> {
   assertValidImage(file);
 
   const ext = extFromMime(file.type);
@@ -44,7 +47,7 @@ export async function uploadImage(file: File, folder: ImageFolder): Promise<stri
       Body: buffer,
       ContentType: file.type,
       CacheControl: "public, max-age=31536000, immutable",
-    })
+    }),
   );
 
   return `${process.env.MINIO_ENDPOINT}/${BUCKET}/${key}`;
@@ -54,7 +57,9 @@ export async function uploadImage(file: File, folder: ImageFolder): Promise<stri
  * Supprime une image à partir de son URL publique complète.
  * Ne throw pas si l'objet n'existe pas / URL invalide — juste un warn.
  */
-export async function deleteImage(url: string | null | undefined): Promise<void> {
+export async function deleteImage(
+  url: string | null | undefined,
+): Promise<void> {
   if (!url) return;
 
   try {

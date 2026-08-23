@@ -7,7 +7,10 @@ export type AlbumIndexJobData = {
   action: "index" | "delete";
 };
 
-export async function enqueueAlbumIndex(albumId: string, action: "index" | "delete" = "index") {
+export async function enqueueAlbumIndex(
+  albumId: string,
+  action: "index" | "delete" = "index",
+) {
   await albumIndexQueue.add(
     `album-${action}`,
     { albumId, action },
@@ -19,7 +22,7 @@ export async function enqueueAlbumIndex(albumId: string, action: "index" | "dele
       },
       removeOnComplete: true,
       removeOnFail: false,
-    }
+    },
   );
 }
 

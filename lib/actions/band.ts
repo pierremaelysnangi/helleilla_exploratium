@@ -1,50 +1,23 @@
 "use server";
 
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { can } from "@/lib/rbac/permissions";
-import type { Role } from "@/lib/rbac/roles";
 import { createBandSchema, updateBandSchema } from "@/lib/validations/band";
 import { uploadImage, deleteImage } from "@/lib/storage/images";
 import { createBand, updateBand, deleteBand } from "@/db/mutations/bands";
-import { getBandById } from "@/db/queries/bands";  
+import { getBandById } from "@/db/queries/bands";
 import { enqueueBandIndex } from "@/lib/queue/jobs/index-band";
-import { handleActionError } from "./utils";
+import { requirePermission } from "@/lib/rbac/guards";
+import { handleActionError, type ActionResult } from "./utils";
 import { listAlbumIdsByBandId } from "@/db/queries/albums";
 import { listTrackIdsByAlbumIds } from "@/db/queries/tracks";
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
-class ActionError extends Error {}
-
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new ActionError("Non authentifié.");
-  return session;
-}
-
-function assertPermission(
-  role: Role,
-  action: "create" | "update" | "delete",
-  resource: "band"
-) {
-  if (!can(role, resource, action)) {
-    throw new ActionError("Permission refusée.");
-  }
-}
-
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string | Record<string, unknown> };
-
 export async function createBandAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createBand>>>> {
   try {
-    const session = await requireSession();
-    const role = session.user.role as Role;
-    assertPermission(role, "create", "band");
+    await requirePermission("band", "create");
 
     const raw = Object.fromEntries(formData.entries());
     const parsed = createBandSchema.safeParse(raw);
@@ -71,12 +44,10 @@ export async function createBandAction(
 }
 
 export async function updateBandAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateBand>>>> {
   try {
-    const session = await requireSession();
-    const role = session.user.role as Role;
-    assertPermission(role, "update", "band");
+    await requirePermission("band", "update");
 
     const raw = Object.fromEntries(formData.entries());
     const parsed = updateBandSchema.safeParse(raw);
@@ -111,12 +82,10 @@ export async function updateBandAction(
 }
 
 export async function deleteBandAction(
-  id: string
+  id: string,
 ): Promise<ActionResult<{ id: string }>> {
   try {
-    const session = await requireSession();
-    const role = session.user.role as Role;
-    assertPermission(role, "delete", "band");
+    await requirePermission("band", "delete");
 
     // 1. Collecter toute la descendance AVANT suppression
     const albumIds = await listAlbumIdsByBandId(id);

@@ -4,13 +4,13 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/rbac/guards";
 import { createTrackSchema, updateTrackSchema } from "@/lib/validations/track";
 import { createTrack, updateTrack, deleteTrack } from "@/db/mutations/tracks";
-import { getTrackById, getTrackWithAlbum } from "@/db/queries/tracks";
+import { getTrackWithAlbum } from "@/db/queries/tracks";
 import { getAlbumById } from "@/db/queries/albums";
 import { handleActionError, type ActionResult } from "./utils";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
 export async function createTrackAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createTrack>>>> {
   try {
     await requirePermission("track", "create");
@@ -41,7 +41,7 @@ export async function createTrackAction(
 }
 
 export async function updateTrackAction(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateTrack>>>> {
   try {
     await requirePermission("track", "update");
@@ -72,7 +72,7 @@ export async function updateTrackAction(
 }
 
 export async function deleteTrackAction(
-  id: string
+  id: string,
 ): Promise<ActionResult<{ id: string }>> {
   try {
     await requirePermission("track", "delete");

@@ -58,18 +58,36 @@ const bandShape = {
 
 const bandObject = z.object(bandShape);
 
-function withYearRule<T extends z.ZodTypeAny>(schema: T) {
+type YearFields = {
+  formedYear?: number | null;
+  dissolvedYear?: number | null;
+};
+
+function withYearRule<T extends z.ZodType<YearFields>>(schema: T) {
   return schema.refine(
-    (data: any) =>
+    (data) =>
       !data.dissolvedYear ||
       !data.formedYear ||
       data.dissolvedYear >= data.formedYear,
     {
-      message: "L'année de dissolution doit être postérieure à l'année de formation",
+      message:
+        "L'année de dissolution doit être postérieure à l'année de formation",
       path: ["dissolvedYear"],
-    }
+    },
   );
 }
+
+/* 
+function withYearRule<T extends z.ZodTypeAny>(schema: T) {
+  return schema.refine(
+    (data: z.output<T> & YearFields) =>
+      data.dissolvedYear 
+      data.formedYear 
+      data.dissolvedYear >= data.formedYear,
+    { message: "…", path: ["dissolvedYear"] },
+  );
+}
+*/
 
 // Fichier image optionnel — validé côté serveur dans la Server Action
 export const imageFileSchema = z
@@ -78,7 +96,7 @@ export const imageFileSchema = z
   .refine((f) => f.size <= MAX_IMAGE_SIZE, "Image trop volumineuse (max 5 Mo)")
   .refine(
     (f) => ACCEPTED_IMAGE_TYPES.includes(f.type),
-    "Format d'image non supporté (JPEG, PNG, WEBP uniquement)"
+    "Format d'image non supporté (JPEG, PNG, WEBP uniquement)",
   )
   .optional();
 
@@ -87,7 +105,7 @@ export const createBandSchema = withYearRule(bandObject);
 export const updateBandSchema = withYearRule(
   bandObject.partial().extend({
     id: z.string().uuid("ID de bande invalide"),
-  })
+  }),
 );
 
 export type CreateBandInput = z.infer<typeof createBandSchema>;

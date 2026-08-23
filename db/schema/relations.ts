@@ -1,8 +1,8 @@
-import { relations } from 'drizzle-orm';
-import { bands } from './bands';
-import { albums } from './albums';
-import { tracks } from './tracks';
-import { genres, bandGenres } from './genres';
+import { relations } from "drizzle-orm";
+import { bands } from "./bands";
+import { albums } from "./albums";
+import { tracks } from "./tracks";
+import { genres, bandGenres } from "./genres";
 
 export const bandsRelations = relations(bands, ({ many }) => ({
   albums: many(albums),

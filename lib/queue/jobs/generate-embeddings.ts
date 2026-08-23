@@ -13,7 +13,7 @@ export async function enqueueEmbeddings(bandId: string, text: string) {
       attempts: 2,
       removeOnComplete: true,
       removeOnFail: false,
-    }
+    },
   );
 }
 

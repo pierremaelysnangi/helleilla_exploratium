@@ -1,6 +1,6 @@
-import { db } from '@/db';
-import { genres } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "@/db";
+import { genres } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function createGenre(data: typeof genres.$inferInsert) {
   const [genre] = await db.insert(genres).values(data).returning();
@@ -9,7 +9,7 @@ export async function createGenre(data: typeof genres.$inferInsert) {
 
 export async function updateGenre(
   id: string,
-  data: Partial<typeof genres.$inferInsert>
+  data: Partial<typeof genres.$inferInsert>,
 ) {
   const [genre] = await db
     .update(genres)

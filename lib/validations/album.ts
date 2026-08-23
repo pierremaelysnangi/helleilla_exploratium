@@ -3,7 +3,14 @@ import { z } from "zod";
 const CURRENT_YEAR = new Date().getFullYear();
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const albumTypeEnum = z.enum(["album", "ep", "single", "compilation", "live", "demo"]);
+const albumTypeEnum = z.enum([
+  "album",
+  "ep",
+  "single",
+  "compilation",
+  "live",
+  "demo",
+]);
 
 const albumShape = {
   bandId: z.string().uuid("ID de groupe invalide"),

@@ -1,6 +1,6 @@
-import { db } from '@/db';
-import { tracks } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "@/db";
+import { tracks } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function createTrack(data: typeof tracks.$inferInsert) {
   const [track] = await db.insert(tracks).values(data).returning();
@@ -9,7 +9,7 @@ export async function createTrack(data: typeof tracks.$inferInsert) {
 
 export async function updateTrack(
   id: string,
-  data: Partial<typeof tracks.$inferInsert>
+  data: Partial<typeof tracks.$inferInsert>,
 ) {
   const [track] = await db
     .update(tracks)

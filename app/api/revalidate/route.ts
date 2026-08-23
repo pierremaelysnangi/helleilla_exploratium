@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function POST(_request: Request) {
   return NextResponse.json({ message: "Not implemented yet" });
 }

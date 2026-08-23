@@ -28,11 +28,7 @@ const trackShape = {
     .nullable(),
 
   // URL externe (YouTube, Spotify, Bandcamp, Qobuz, etc.)
-  audioUrl: z
-    .string()
-    .url("URL invalide")
-    .optional()
-    .nullable(),
+  audioUrl: z.string().url("URL invalide").optional().nullable(),
 };
 
 const trackObject = z.object(trackShape);

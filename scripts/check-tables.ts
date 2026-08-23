@@ -1,4 +1,4 @@
-import postgres from 'postgres';
+import postgres from "postgres";
 
 const sql = postgres(process.env.DIRECT_URL!, { prepare: false });
 

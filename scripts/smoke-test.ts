@@ -57,7 +57,9 @@ async function main() {
   await sleep(3000);
 
   const after = await meilisearch.index("bands").search("Necrofrost");
-  console.log(`🔍 Après suppression → ${after.hits.length} hit(s) (attendu: 0)`);
+  console.log(
+    `🔍 Après suppression → ${after.hits.length} hit(s) (attendu: 0)`,
+  );
 
   process.exit(0);
 }

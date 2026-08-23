@@ -1,6 +1,6 @@
-import { db } from '@/db';
-import { bands, bandGenres } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "@/db";
+import { bands, bandGenres } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function createBand(data: typeof bands.$inferInsert) {
   const [band] = await db.insert(bands).values(data).returning();
@@ -9,7 +9,7 @@ export async function createBand(data: typeof bands.$inferInsert) {
 
 export async function createBandWithGenres(
   bandData: typeof bands.$inferInsert,
-  genreIds: string[]
+  genreIds: string[],
 ) {
   return db.transaction(async (tx) => {
     const [band] = await tx.insert(bands).values(bandData).returning();
@@ -26,7 +26,7 @@ export async function createBandWithGenres(
 
 export async function updateBand(
   id: string,
-  data: Partial<typeof bands.$inferInsert>
+  data: Partial<typeof bands.$inferInsert>,
 ) {
   const [band] = await db
     .update(bands)
