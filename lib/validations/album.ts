@@ -55,5 +55,9 @@ export const updateAlbumSchema = albumObject.partial().extend({
   id: z.string().uuid("ID d'album invalide"),
 });
 
+// Pour les routes API : l'id vient des params, pas du body
+export const updateAlbumBodySchema = albumObject.partial();
+
 export type CreateAlbumInput = z.infer<typeof createAlbumSchema>;
 export type UpdateAlbumInput = z.infer<typeof updateAlbumSchema>;
+export type UpdateAlbumBodyInput = z.infer<typeof updateAlbumBodySchema>;

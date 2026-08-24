@@ -39,5 +39,8 @@ export const updateTrackSchema = trackObject.partial().extend({
   id: z.string().uuid("ID de piste invalide"),
 });
 
+export const updateTrackBodySchema = trackObject.partial();
+
 export type CreateTrackInput = z.infer<typeof createTrackSchema>;
 export type UpdateTrackInput = z.infer<typeof updateTrackSchema>;
+export type UpdateTrackBodyInput = z.infer<typeof updateTrackBodySchema>;

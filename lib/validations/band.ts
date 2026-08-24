@@ -102,6 +102,8 @@ export const imageFileSchema = z
 
 export const createBandSchema = withYearRule(bandObject);
 
+export const updateBandBodySchema = withYearRule(bandObject.partial());
+
 export const updateBandSchema = withYearRule(
   bandObject.partial().extend({
     id: z.string().uuid("ID de bande invalide"),
