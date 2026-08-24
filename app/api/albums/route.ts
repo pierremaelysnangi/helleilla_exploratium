@@ -13,35 +13,41 @@ const SORT_COLUMNS = {
   year: albums.releaseYear,
 } as const;
 
-export const GET = route({ query: searchQuerySchema }, async ({ query }) => {
-  const { page, perPage, q, sort, order } = query;
-  const offset = (page - 1) * perPage;
-  const where: SQL | undefined = q ? ilike(albums.title, `%${q}%`) : undefined;
-  const dir = order === "asc" ? asc : desc;
-  const column =
-    SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? albums.createdAt;
+export const GET = route(
+  { query: searchQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  async ({ query }) => {
+    const { page, perPage, q, sort, order } = query;
+    const offset = (page - 1) * perPage;
+    const where: SQL | undefined = q
+      ? ilike(albums.title, `%${q}%`)
+      : undefined;
+    const dir = order === "asc" ? asc : desc;
+    const column =
+      SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? albums.createdAt;
 
-  const [items, counts] = await Promise.all([
-    db
-      .select()
-      .from(albums)
-      .where(where)
-      .orderBy(dir(column))
-      .limit(perPage)
-      .offset(offset),
-    db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(albums)
-      .where(where),
-  ]);
+    const [items, counts] = await Promise.all([
+      db
+        .select()
+        .from(albums)
+        .where(where)
+        .orderBy(dir(column))
+        .limit(perPage)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(albums)
+        .where(where),
+    ]);
 
-  return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
-});
+    return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
+  },
+);
 
 export const POST = route(
   {
     body: createAlbumSchema,
     permission: { resource: "album", action: "create" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ body }) => {
     const [album] = await db.insert(albums).values(body).returning();

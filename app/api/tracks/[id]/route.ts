@@ -7,21 +7,25 @@ import { tracks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { trackIndexQueue } from "@/lib/queue/client";
 
-export const GET = route({ params: idParamSchema }, async ({ params }) => {
-  const [track] = await db
-    .select()
-    .from(tracks)
-    .where(eq(tracks.id, params.id))
-    .limit(1);
-  if (!track) return fail("NOT_FOUND", "Piste introuvable");
-  return ok(track);
-});
+export const GET = route(
+  { params: idParamSchema, rateLimit: { limit: 60, window: 60 } },
+  async ({ params }) => {
+    const [track] = await db
+      .select()
+      .from(tracks)
+      .where(eq(tracks.id, params.id))
+      .limit(1);
+    if (!track) return fail("NOT_FOUND", "Piste introuvable");
+    return ok(track);
+  },
+);
 
 export const PATCH = route(
   {
     params: idParamSchema,
     body: updateTrackBodySchema,
     permission: { resource: "track", action: "update" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ params, body }) => {
     const [track] = await db
@@ -40,6 +44,7 @@ export const DELETE = route(
   {
     params: idParamSchema,
     permission: { resource: "track", action: "delete" },
+    rateLimit: { limit: 5, window: 60, failMode: "closed" },
   },
   async ({ params }) => {
     const [track] = await db

@@ -8,21 +8,25 @@ import { eq } from "drizzle-orm";
 import { albumIndexQueue, trackIndexQueue } from "@/lib/queue/client";
 import { listTrackIdsByAlbumId } from "@/db/queries/tracks";
 
-export const GET = route({ params: idParamSchema }, async ({ params }) => {
-  const [album] = await db
-    .select()
-    .from(albums)
-    .where(eq(albums.id, params.id))
-    .limit(1);
-  if (!album) return fail("NOT_FOUND", "Album introuvable");
-  return ok(album);
-});
+export const GET = route(
+  { params: idParamSchema, rateLimit: { limit: 60, window: 60 } },
+  async ({ params }) => {
+    const [album] = await db
+      .select()
+      .from(albums)
+      .where(eq(albums.id, params.id))
+      .limit(1);
+    if (!album) return fail("NOT_FOUND", "Album introuvable");
+    return ok(album);
+  },
+);
 
 export const PATCH = route(
   {
     params: idParamSchema,
     body: updateAlbumBodySchema,
     permission: { resource: "album", action: "update" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ params, body }) => {
     const [album] = await db
@@ -41,6 +45,7 @@ export const DELETE = route(
   {
     params: idParamSchema,
     permission: { resource: "album", action: "delete" },
+    rateLimit: { limit: 5, window: 60, failMode: "closed" },
   },
   async ({ params }) => {
     // Collecter la descendance AVANT suppression (cascade DB)

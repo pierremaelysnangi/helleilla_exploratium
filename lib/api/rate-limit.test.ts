@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { __resetScriptCache } from "./rate-limit";
 
 const redisMock = vi.hoisted(() => ({
   script: vi.fn(async () => "fakesha123"),
@@ -6,9 +7,12 @@ const redisMock = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/redis", () => ({ redis: redisMock }));
 
+vi.unmock("@/lib/api/rate-limit");
+
 const { rateLimit, clientIp } = await import("./rate-limit");
 
 beforeEach(() => {
+  __resetScriptCache();
   vi.clearAllMocks();
   redisMock.script.mockResolvedValue("fakesha123");
 });
@@ -34,9 +38,11 @@ describe("rateLimit", () => {
     redisMock.evalsha
       .mockRejectedValueOnce(new Error("NOSCRIPT No matching script"))
       .mockResolvedValueOnce([1, 5, Date.now() + 60000]);
-    /* const res = await rateLimit({ key: "test", limit: 10, window: 60 });
-    expect(res).toBeNull();
-    expect(redisMock.script).toHaveBeenCalledTimes(2); // 1er load + reload après NOSCRIPT */
+
+    const res = await rateLimit({ key: "test", limit: 10, window: 60 });
+
+    expect(res).toBeNull(); // sous la limite -> pas de blocage
+    expect(redisMock.script).toHaveBeenCalledTimes(2); // 1er load + reload après NOSCRIPT
   });
 
   it("fail-open par défaut si Redis est down", async () => {

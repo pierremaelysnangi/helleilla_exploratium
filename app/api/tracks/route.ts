@@ -13,35 +13,41 @@ const SORT_COLUMNS = {
   trackNumber: tracks.trackNumber,
 } as const;
 
-export const GET = route({ query: searchQuerySchema }, async ({ query }) => {
-  const { page, perPage, q, sort, order } = query;
-  const offset = (page - 1) * perPage;
-  const where: SQL | undefined = q ? ilike(tracks.title, `%${q}%`) : undefined;
-  const dir = order === "asc" ? asc : desc;
-  const column =
-    SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? tracks.createdAt;
+export const GET = route(
+  { query: searchQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  async ({ query }) => {
+    const { page, perPage, q, sort, order } = query;
+    const offset = (page - 1) * perPage;
+    const where: SQL | undefined = q
+      ? ilike(tracks.title, `%${q}%`)
+      : undefined;
+    const dir = order === "asc" ? asc : desc;
+    const column =
+      SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? tracks.createdAt;
 
-  const [items, counts] = await Promise.all([
-    db
-      .select()
-      .from(tracks)
-      .where(where)
-      .orderBy(dir(column))
-      .limit(perPage)
-      .offset(offset),
-    db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(tracks)
-      .where(where),
-  ]);
+    const [items, counts] = await Promise.all([
+      db
+        .select()
+        .from(tracks)
+        .where(where)
+        .orderBy(dir(column))
+        .limit(perPage)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(tracks)
+        .where(where),
+    ]);
 
-  return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
-});
+    return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
+  },
+);
 
 export const POST = route(
   {
     body: createTrackSchema,
     permission: { resource: "track", action: "create" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ body }) => {
     const [track] = await db.insert(tracks).values(body).returning();

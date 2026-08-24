@@ -7,21 +7,28 @@ import { bands } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { bandIndexQueue } from "@/lib/queue/client";
 
-export const GET = route({ params: idParamSchema }, async ({ params }) => {
-  const [band] = await db
-    .select()
-    .from(bands)
-    .where(eq(bands.id, params.id))
-    .limit(1);
-  if (!band) return fail("NOT_FOUND", "Groupe introuvable");
-  return ok(band);
-});
+export const GET = route(
+  {
+    params: idParamSchema,
+    rateLimit: { limit: 60, window: 60 },
+  },
+  async ({ params }) => {
+    const [band] = await db
+      .select()
+      .from(bands)
+      .where(eq(bands.id, params.id))
+      .limit(1);
+    if (!band) return fail("NOT_FOUND", "Groupe introuvable");
+    return ok(band);
+  },
+);
 
 export const PATCH = route(
   {
     params: idParamSchema,
     body: updateBandBodySchema,
     permission: { resource: "band", action: "update" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ params, body }) => {
     const [band] = await db
@@ -37,7 +44,11 @@ export const PATCH = route(
 );
 
 export const DELETE = route(
-  { params: idParamSchema, permission: { resource: "band", action: "delete" } },
+  {
+    params: idParamSchema,
+    permission: { resource: "band", action: "delete" },
+    rateLimit: { limit: 5, window: 60, failMode: "closed" },
+  },
   async ({ params }) => {
     const [band] = await db
       .delete(bands)

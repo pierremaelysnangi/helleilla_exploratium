@@ -31,3 +31,11 @@ vi.mock("@/lib/queue/jobs/index-album", () => ({
 vi.mock("@/lib/queue/jobs/index-track", () => ({
   enqueueTrackIndex: vi.fn(async () => undefined),
 }));
+
+vi.mock("@/lib/api/rate-limit", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/api/rate-limit")>();
+  return {
+    ...actual,
+    rateLimit: vi.fn().mockResolvedValue(null), // jamais limité par défaut
+  };
+});

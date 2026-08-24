@@ -13,35 +13,39 @@ const SORT_COLUMNS = {
   year: bands.formedYear,
 } as const;
 
-export const GET = route({ query: searchQuerySchema }, async ({ query }) => {
-  const { page, perPage, q, sort, order } = query;
-  const offset = (page - 1) * perPage;
-  const where: SQL | undefined = q ? ilike(bands.name, `%${q}%`) : undefined;
-  const dir = order === "asc" ? asc : desc;
-  const column =
-    SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? bands.createdAt;
+export const GET = route(
+  { query: searchQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  async ({ query }) => {
+    const { page, perPage, q, sort, order } = query;
+    const offset = (page - 1) * perPage;
+    const where: SQL | undefined = q ? ilike(bands.name, `%${q}%`) : undefined;
+    const dir = order === "asc" ? asc : desc;
+    const column =
+      SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? bands.createdAt;
 
-  const [items, counts] = await Promise.all([
-    db
-      .select()
-      .from(bands)
-      .where(where)
-      .orderBy(dir(column))
-      .limit(perPage)
-      .offset(offset),
-    db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(bands)
-      .where(where),
-  ]);
+    const [items, counts] = await Promise.all([
+      db
+        .select()
+        .from(bands)
+        .where(where)
+        .orderBy(dir(column))
+        .limit(perPage)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(bands)
+        .where(where),
+    ]);
 
-  return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
-});
+    return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
+  },
+);
 
 export const POST = route(
   {
     body: createBandSchema,
     permission: { resource: "band", action: "create" },
+    rateLimit: { limit: 10, window: 60, failMode: "closed" },
   },
   async ({ body }) => {
     const [band] = await db.insert(bands).values(body).returning();

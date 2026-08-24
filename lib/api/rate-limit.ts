@@ -161,3 +161,8 @@ export function clientIp(req: Request) {
     "unknown"
   );
 }
+
+// Exporté uniquement pour les tests
+export function __resetScriptCache() {
+  cachedSha = null;
+}
