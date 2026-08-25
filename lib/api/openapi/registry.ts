@@ -1,8 +1,25 @@
+/**
+ * Registre central des chemins OpenAPI.
+ * Les modules (paths.ts) y enregistrent leurs opérations via
+ * `registerPath` ; `buildDocument` assemble ensuite le document 3.1
+ * complet (info, tags, sécurité, composants) via zod-openapi.
+ */
+
+// Génération du document OpenAPI depuis les schémas zod annotés
 import { createDocument } from "zod-openapi";
 import type { ZodOpenApiObject, ZodOpenApiPathsObject } from "zod-openapi";
 
+// Accumulateur des opérations enregistrées à l'import des modules paths
 const paths: ZodOpenApiPathsObject = {};
 
+/**
+ * Construit un operationId lisible et unique depuis la méthode et le chemin,
+ * ex : GET /api/bands/{id} -> "getBandsById".
+ *
+ * @param method - Méthode HTTP de l'opération.
+ * @param path - Chemin de l'API ("/api/bands/{id}").
+ * @returns L'operationId en camelCase.
+ */
 function toOperationId(method: string, path: string): string {
   const parts = path
     .replace(/^\/api\//, "")
@@ -19,6 +36,14 @@ function toOperationId(method: string, path: string): string {
   return `${method}${base.replace(/^\w/, (c) => c.toUpperCase())}`;
 }
 
+/**
+ * Enregistre une opération pour un chemin/méthode donné et lui assigne
+ * automatiquement un operationId.
+ *
+ * @param path - Chemin de l'API (ex : "/api/bands/{id}").
+ * @param method - Méthode HTTP de l'opération.
+ * @param operation - Définition OpenAPI (tags, summary, responses...).
+ */
 export function registerPath(
   path: string,
   method: "get" | "post" | "patch" | "delete" | "put",
@@ -30,10 +55,18 @@ export function registerPath(
   });
 }
 
+/** Retourne les chemins enregistrés à ce jour (lecture seule côté appelant). */
 export function getPaths(): ZodOpenApiPathsObject {
   return paths;
 }
 
+/**
+ * Assemble et retourne le document OpenAPI 3.1 complet :
+ * métadonnées, tags documentaires, schéma de sécurité par cookie de
+ * session et l'ensemble des chemins du registre.
+ *
+ * @returns Le document OpenAPI généré par zod-openapi.
+ */
 export function buildDocument(): ReturnType<typeof createDocument> {
   const doc: ZodOpenApiObject = {
     openapi: "3.1.0",
@@ -63,6 +96,12 @@ export function buildDocument(): ReturnType<typeof createDocument> {
           type: "apiKey",
           in: "cookie",
           name: "authjs.session-token",
+        },
+        // Secret machine-to-machine du endpoint /api/revalidate
+        revalidateSecret: {
+          type: "apiKey",
+          in: "header",
+          name: "x-revalidate-secret",
         },
       },
     },

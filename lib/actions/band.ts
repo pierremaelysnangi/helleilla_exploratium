@@ -1,18 +1,45 @@
 "use server";
 
+/**
+ * Server Actions CRUD pour les groupes (bands).
+ * Même structure que album.ts : vérification RBAC, validation zod,
+ * gestion du logo, persistance Drizzle, indexation Meilisearch asynchrone
+ * et invalidation du cache Next.js.
+ */
+
+// Invalidation du cache des routes Next.js après mutation
 import { revalidatePath } from "next/cache";
+// Schémas de validation zod pour création / modification de groupe
 import { createBandSchema, updateBandSchema } from "@/lib/validations/band";
+// Stockage des images : upload et suppression du logo
 import { uploadImage, deleteImage } from "@/lib/storage/images";
+// Mutations base de données (Drizzle) pour les groupes
 import { createBand, updateBand, deleteBand } from "@/db/mutations/bands";
+// Requête de lecture : existence d'un groupe par id
 import { getBandById } from "@/db/queries/bands";
+// File BullMQ : indexation / suppression dans Meilisearch
 import { enqueueBandIndex } from "@/lib/queue/jobs/index-band";
+// Garde RBAC : lève une ActionError si la permission manque
 import { requirePermission } from "@/lib/rbac/guards";
+// Gestion d'erreur commune + type de retour standard des actions
 import { handleActionError, type ActionResult } from "./utils";
+// Requêtes utilisées pour collecter la descendance avant suppression cascade
 import { listAlbumIdsByBandId } from "@/db/queries/albums";
 import { listTrackIdsByAlbumIds } from "@/db/queries/tracks";
+// Files BullMQ des entités enfants (désindexation en cascade)
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
+/**
+ * Crée un groupe à partir d'un FormData.
+ *
+ * Vérifie la permission `band:create`, valide les champs via
+ * `createBandSchema`, upload éventuellement le logo puis persiste
+ * et planifie l'indexation.
+ *
+ * @param formData - Données du formulaire (champs groupe + fichier `image`).
+ * @returns ActionResult contenant le groupe créé ou une erreur structurée.
+ */
 export async function createBandAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createBand>>>> {
@@ -43,6 +70,16 @@ export async function createBandAction(
   }
 }
 
+/**
+ * Met à jour un groupe existant à partir d'un FormData.
+ *
+ * Vérifie la permission `band:update`, valide les champs, remplace le
+ * logo si un nouveau fichier est fourni (l'ancien est supprimé), puis
+ * persiste et planifie la réindexation.
+ *
+ * @param formData - Données du formulaire (dont `id` du groupe + `image`).
+ * @returns ActionResult contenant le groupe mis à jour ou une erreur structurée.
+ */
 export async function updateBandAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateBand>>>> {
@@ -81,6 +118,16 @@ export async function updateBandAction(
   }
 }
 
+/**
+ * Supprime un groupe, son logo et toute sa descendance (albums + pistes).
+ *
+ * Vérifie la permission `band:delete`, collecte les ids d'albums et de
+ * pistes AVANT la suppression en cascade afin de les désindexer aussi
+ * de Meilisearch, puis invalide le cache.
+ *
+ * @param id - UUID du groupe à supprimer.
+ * @returns ActionResult contenant `{ id }` ou une erreur structurée.
+ */
 export async function deleteBandAction(
   id: string,
 ): Promise<ActionResult<{ id: string }>> {

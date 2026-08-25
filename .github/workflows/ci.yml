@@ -5,13 +5,16 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Déclenchement manuel pour rejouer la suite E2E à la demande
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  # Valeurs factices : lib/env.ts (Zod) exige ces vars au build/import
+  # Valeurs factices : lib/env.ts (Zod) exige ces vars au build/import.
+  # Les tests E2E utilisent leurs propres valeurs (tests/e2e/config.ts).
   DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
   DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
   MEILI_HOST: http://localhost:7700
@@ -26,7 +29,7 @@ env:
 
 jobs:
   quality:
-    name: Lint · Types · Tests
+    name: Lint · Types · Tests · OpenAPI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,8 +54,11 @@ jobs:
       - name: TypeScript
         run: pnpm typecheck
 
-      - name: Tests + coverage
+      - name: Tests unitaires + coverage
         run: pnpm test:cov
+
+      - name: Export et lint OpenAPI (Redocly)
+        run: pnpm openapi:lint
 
       - name: Upload coverage
         if: always()
@@ -61,6 +67,64 @@ jobs:
           name: coverage
           path: coverage/
           retention-days: 7
+
+  integration:
+    name: E2E API (Postgres · Redis · Meili · MinIO)
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Services identiques à docker-compose.test.yml (ports hôtes inclus).
+      # Toute la configuration applicative est fournie par
+      # tests/e2e/config.ts : le setup Vitest applique les migrations,
+      # seede les comptes, lance init-meili, le serveur Next et les workers.
+      - name: Démarrage des services d'intégration
+        run: |
+          docker run -d --name postgres \
+            -p 5433:5432 \
+            -e POSTGRES_USER=e2e -e POSTGRES_PASSWORD=e2e -e POSTGRES_DB=e2e \
+            --health-cmd "pg_isready -U e2e -d e2e" \
+            pgvector/pgvector:pg17
+          docker run -d --name redis \
+            -p 6380:6379 \
+            valkey/valkey:8.1-alpine
+          docker run -d --name meilisearch \
+            -p 7701:7700 \
+            -e MEILI_MASTER_KEY=e2e_master_key_1234567890 \
+            -e MEILI_NO_ANALYTICS=true \
+            getmeili/meilisearch:v1.13
+          docker run -d --name minio \
+            -p 9002:9000 \
+            -e MINIO_ROOT_USER=e2euser -e MINIO_ROOT_PASSWORD=e2epassword \
+            minio/minio:RELEASE.2024-10-13T13-34-11Z server /data
+          # Attente de disponibilité (healthchecks manuels)
+          for i in $(seq 1 60); do
+            pg_isready -h localhost -p 5433 -U e2e && break
+            sleep 2
+          done
+          curl --retry 60 --retry-delay 2 --retry-connrefused \
+            -sf http://localhost:7701/health > /dev/null
+
+      - name: Tests E2E (serveur Next réel)
+        run: pnpm test:e2e
+
+      - name: Logs des conteneurs en cas d'échec
+        if: failure()
+        run: |
+          docker logs postgres || true
+          docker logs meilisearch || true
 
   build:
     name: Build Next.js

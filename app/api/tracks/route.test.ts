@@ -1,4 +1,11 @@
+/**
+ * Tests unitaires de la route /api/tracks (GET liste paginée, POST création).
+ * Toutes les dépendances externes (Redis, auth, DB, file BullMQ) sont mockées
+ * pour tester les codes HTTP, la validation et l'indexation.
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Helpers partagés : session simulée, fabrication de requêtes,
+// contexte de route et chaînage des mocks Drizzle.
 import {
   mockSession,
   setUser,
@@ -7,39 +14,51 @@ import {
   chain,
 } from "@/lib/api/__tests__/route-helpers";
 
+// Mock de Redis : le rate limiter ne bloque jamais (compteur toujours à 1).
 vi.mock("@/lib/redis", () => ({
   redis: { incr: vi.fn(async () => 1), expire: vi.fn(async () => 1) },
 }));
 
+// Mock de better-auth : session pilotée par `setUser(...)` dans chaque test.
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => mockSession.current) } },
 }));
 
+// Mock du client Drizzle (déclaré via `vi.hoisted` pour précéder le hoisting).
 const dbMock = vi.hoisted(() => ({
   select: vi.fn(),
   insert: vi.fn(),
 }));
 vi.mock("@/db", () => ({ db: dbMock }));
 
+// Mock espion de la file d'indexation des pistes.
 const queueMock = vi.hoisted(() => ({ add: vi.fn() }));
 vi.mock("@/lib/queue/client", () => ({ trackIndexQueue: queueMock }));
 
+// Import dynamique après les mocks afin que la route les utilise.
 const { GET, POST } = await import("./route");
 
+// Identifiants UUID valides pour les fixtures de test.
 const ALBUM_ID = "00000000-0000-4000-8000-0000000000a1";
 const TRACK_ID = "00000000-0000-4000-8000-000000000091";
 
+// Corps de requête POST valide servant de base aux tests de validation.
 const validTrack = {
   albumId: ALBUM_ID,
   title: "Slottet i det fjerne",
   trackNumber: 1,
 };
 
+// Réinitialisation des mocks et de la session avant chaque test.
 beforeEach(() => {
   vi.clearAllMocks();
   setUser(null);
 });
 
+/**
+ * Suite GET : vérifie la réponse 200 avec pagination (items + meta.total),
+ * et le 422 si `page` est invalide (0 ou négatif), sans requête DB.
+ */
 describe("GET /api/tracks", () => {
   it("200 + pagination", async () => {
     dbMock.select
@@ -61,6 +80,11 @@ describe("GET /api/tracks", () => {
   });
 });
 
+/**
+ * Suite POST : vérifie 401 sans session, 403 pour un simple user,
+ * 201 + job d'indexation pour un contributor, et les 422 de validation
+ * (trackNumber négatif, audioUrl mal formée) sans insertion en DB.
+ */
 describe("POST /api/tracks", () => {
   it("401 si non authentifié", async () => {
     const res = await POST(

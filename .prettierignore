@@ -5,4 +5,5 @@ coverage
 node_modules
 pnpm-lock.yaml
 db/migrations
-.env*
+.env*db/migrations
+**/meta/*.json

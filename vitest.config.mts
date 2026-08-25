@@ -5,6 +5,8 @@ export default defineConfig({
     environment: "node",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
+    // Les tests E2E (serveur réel + services Docker) ont leur config dédiée
+    exclude: ["**/node_modules/**", "tests/e2e/**"],
     coverage: {
       provider: "v8",
       include: [

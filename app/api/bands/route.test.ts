@@ -1,4 +1,11 @@
+/**
+ * Tests unitaires de la route /api/bands (GET liste paginée, POST création).
+ * Toutes les dépendances externes (Redis, auth, DB, file BullMQ) sont mockées
+ * pour tester les codes HTTP, la validation et l'indexation.
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Helpers partagés : session simulée, fabrication de requêtes,
+// contexte de route et chaînage des mocks Drizzle.
 import {
   mockSession,
   setUser,
@@ -7,30 +14,44 @@ import {
   chain,
 } from "@/lib/api/__tests__/route-helpers";
 
+// Mock de Redis : le rate limiter ne bloque jamais (compteur toujours à 1).
 vi.mock("@/lib/redis", () => ({
   redis: { incr: vi.fn(async () => 1), expire: vi.fn(async () => 1) },
 }));
 
+// Mock de better-auth : session pilotée par `setUser(...)` dans chaque test.
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => mockSession.current) } },
 }));
 
+// Mock du client Drizzle (déclaré via `vi.hoisted` pour précéder le hoisting).
 const dbMock = vi.hoisted(() => ({
   select: vi.fn(),
   insert: vi.fn(),
 }));
 vi.mock("@/db", () => ({ db: dbMock }));
 
+// Mock espion de la file d'indexation des groupes.
 const queueMock = vi.hoisted(() => ({ add: vi.fn() }));
-vi.mock("@/lib/queue/client", () => ({ bandIndexQueue: queueMock }));
+vi.mock("@/lib/queue/client", () => ({
+  bandIndexQueue: queueMock,
+  embeddingsQueue: { add: vi.fn(async () => undefined) },
+}));
 
+// Import dynamique après les mocks afin que la route les utilise.
 const { GET, POST } = await import("./route");
 
+// Réinitialisation des mocks et de la session avant chaque test.
 beforeEach(() => {
   vi.clearAllMocks();
   setUser(null);
 });
 
+/**
+ * Suite GET : vérifie la réponse 200 paginée (items + meta complètes),
+ * et les 422 de validation des query params (`perPage` hors bornes,
+ * `sort` inconnu).
+ */
 describe("GET /api/bands", () => {
   it("renvoie une liste paginée", async () => {
     const rows = [{ id: "b1", name: "Emperor" }];
@@ -70,6 +91,11 @@ describe("GET /api/bands", () => {
   });
 });
 
+/**
+ * Suite POST : vérifie 401 sans session, 403 pour un simple user,
+ * 201 + job d'indexation pour un contributor, et le 422 si le corps
+ * est invalide (sans insertion en DB).
+ */
 describe("POST /api/bands", () => {
   const valid = { name: "Mayhem", slug: "mayhem" };
 

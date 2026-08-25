@@ -1,8 +1,15 @@
+/**
+ * Input — champ de saisie texte stylisé (focus, erreur, états désactivés).
+ * Composant shadcn/ui basé sur le primitive Input de Base UI.
+ */
 import * as React from "react";
+// Primitive Input de Base UI
 import { Input as InputPrimitive } from "@base-ui/react/input";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
 
+/** Champ de formulaire (<input>) avec styles cohérents. */
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <InputPrimitive

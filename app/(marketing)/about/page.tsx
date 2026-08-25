@@ -1,3 +1,8 @@
+/**
+ * Page "À propos" dans le groupe de routes (marketing).
+ * Le groupe (marketing) n'affecte pas l'URL : la route finale est /about.
+ * Page placeholder : le contenu définitif sera implémenté plus tard.
+ */
 export default function MarketingAboutPage() {
   return (
     <main className="container mx-auto px-4 py-8">

@@ -1,28 +1,41 @@
 "use client";
 
+/**
+ * Dialog — fenêtre modale (overlay, popup, en-tête, pied de page, bouton fermer).
+ * Composant shadcn/ui basé sur le primitive Dialog de Base UI.
+ */
 import * as React from "react";
+// Primitive Dialog de Base UI (Root, Trigger, Portal, Backdrop, Popup...)
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
+// Bouton stylisé utilisé pour la croix de fermeture
 import { Button } from "@/components/ui/button";
+// Icône de fermeture (X)
 import { XIcon } from "lucide-react";
 
+/** Racine du dialogue : gère l'état ouvert/fermé. */
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
+/** Élément déclencheur qui ouvre le dialogue. */
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
+/** Portail : rend le contenu du dialogue hors de l'arbre DOM parent. */
 function DialogPortal({ ...props }: DialogPrimitive.Portal.Props) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
+/** Bouton qui referme le dialogue. */
 function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
+/** Arrière-plan assombri/flouté derrière la popup. */
 function DialogOverlay({
   className,
   ...props
@@ -39,6 +52,10 @@ function DialogOverlay({
   );
 }
 
+/**
+ * Contenu du dialogue (popup centrée) avec overlay et bouton de fermeture.
+ * @param showCloseButton - Affiche ou non la croix de fermeture (défaut : true).
+ */
 function DialogContent({
   className,
   children,
@@ -79,6 +96,7 @@ function DialogContent({
   );
 }
 
+/** En-tête du dialogue (titre + description). */
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -89,6 +107,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/**
+ * Pied de page du dialogue (actions alignées à droite).
+ * @param showCloseButton - Ajoute un bouton "Close" (défaut : false).
+ */
 function DialogFooter({
   className,
   showCloseButton = false,
@@ -116,6 +138,7 @@ function DialogFooter({
   );
 }
 
+/** Titre du dialogue (accessible aux lecteurs d'écran). */
 function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
@@ -129,6 +152,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   );
 }
 
+/** Description du dialogue (texte secondaire sous le titre). */
 function DialogDescription({
   className,
   ...props

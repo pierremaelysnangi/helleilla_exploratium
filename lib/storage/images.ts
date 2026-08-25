@@ -1,14 +1,31 @@
-import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { s3, BUCKET } from "@/lib/s3";
-import { randomUUID } from "crypto";
+/**
+ * Gestion des images (logos, pochettes) stockées dans MinIO.
+ * Fournit l'upload d'images validées (type MIME, taille) et la suppression
+ * à partir de l'URL publique. Les clés sont générées en UUID pour éviter
+ * les collisions.
+ */
 
+// Commandes S3 d'écriture et de suppression d'objets
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { s3, BUCKET } from "@/lib/s3"; // Client S3 (MinIO) et bucket cible
+import { randomUUID } from "crypto"; // Génération de noms de fichiers uniques
+
+// Dossiers autorisés dans le bucket, déterminant le type d'image
 type ImageFolder = "logos" | "covers";
 
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mo
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mo — taille max acceptée
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const; // Formats acceptés
 
+/**
+ * Erreur métier levée lorsqu'un fichier image ne passe pas la validation.
+ */
 export class ImageValidationError extends Error {}
 
+/**
+ * Valide un fichier image : type MIME autorisé et taille maximale respectée.
+ * @param file Le fichier à valider.
+ * @throws ImageValidationError si le type ou la taille est invalide.
+ */
 function assertValidImage(file: File) {
   if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
     throw new ImageValidationError(
@@ -22,6 +39,11 @@ function assertValidImage(file: File) {
   }
 }
 
+/**
+ * Dérive l'extension de fichier à partir du type MIME.
+ * @param mime Le type MIME de l'image (image/jpeg, image/png ou image/webp).
+ * @returns L'extension correspondante ("jpg", "png" ou "webp").
+ */
 function extFromMime(mime: string) {
   return mime === "image/jpeg" ? "jpg" : mime === "image/png" ? "png" : "webp";
 }

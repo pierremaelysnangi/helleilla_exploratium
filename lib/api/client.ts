@@ -1,6 +1,15 @@
+/**
+ * Client HTTP typé pour consommer l'API interne côté serveur (RSC).
+ * Enrobe `fetch` avec construction d'URL, sérialisation JSON, options de
+ * cache Next.js (revalidate/tags) et validation zod de la réponse.
+ */
+
+// Validation du corps de réponse via un schéma zod
 import { z } from "zod";
+// Erreur applicative standardisée levée sur réponse non-2xx
 import { ApiError } from "./response";
 
+/** Options du client : méthode, corps, query string, cache et abort. */
 type FetchOpts = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
@@ -10,8 +19,19 @@ type FetchOpts = {
   signal?: AbortSignal;
 };
 
+// Base des URLs d'API (configurable via variable d'environnement)
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+/**
+ * Effectue une requête vers l'API et retourne la réponse validée.
+ *
+ * @param path - Chemin de l'API (absolu ou relatif à BASE).
+ * @param schema - Schéma zod validant le corps JSON de la réponse ;
+ *                 son type paramètre la valeur de retour.
+ * @param opts - Options optionnelles : méthode, body, query, cache, signal.
+ * @returns Les données désérialisées et validées (`z.infer<S>`).
+ * @throws ApiError si le statut HTTP n'est pas 2xx ou si le JSON est invalide.
+ */
 export async function apiFetch<S extends z.ZodTypeAny>(
   path: string,
   schema: S,
@@ -49,4 +69,5 @@ export async function apiFetch<S extends z.ZodTypeAny>(
   return schema.parse(json);
 }
 
+// Ré-export pour que les consommateurs du client aient ApiError sous la main
 export { ApiError };

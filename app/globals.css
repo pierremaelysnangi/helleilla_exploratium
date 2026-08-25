@@ -1,9 +1,18 @@
+/* Import du framework CSS utilitaire Tailwind CSS v4 */
 @import "tailwindcss";
+/* Animations prêtes à l'emploi pour Tailwind (utilisées notamment par shadcn/ui) */
 @import "tw-animate-css";
+/* Thème et styles de base des composants shadcn/ui */
 @import "shadcn/tailwind.css";
 
+/* Variante personnalisée : active la classe `dark:` dès que l'ancêtre `.dark` est présent */
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Mappage des variables CSS (couleurs, polices, rayons) vers le thème
+ * Tailwind : permet d'utiliser des classes comme bg-background, text-muted-foreground,
+ * rounded-lg, etc., alimentées par les variables définies plus bas.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -48,6 +57,11 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Palette de couleurs en mode clair (thème par défaut).
+ * Format oklch ; variables de base (background, foreground, primary…),
+ * couleurs de composants shadcn/ui (card, popover, sidebar…) et graphiques (chart-*).
+ */
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -83,6 +97,11 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/*
+ * Palette de couleurs en mode sombre (activée par la classe .dark sur <html>).
+ * Mêmes variables que :root mais avec des valeurs adaptées au thème sombre
+ * (fonds sombres, textes clairs, bordures translucides).
+ */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -117,6 +136,12 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/*
+ * Styles de base appliqués à toute la page :
+ * - tous les éléments héritent de la couleur de bordure et du contour (ring) du thème ;
+ * - le body utilise les couleurs fond/texte du thème ;
+ * - l'élément html utilise la police sans-serif définie dans le thème.
+ */
 @layer base {
   * {
     @apply border-border outline-ring/50;

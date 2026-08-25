@@ -1,0 +1,159 @@
+# Lexique du projet — Helleilla Exploratium
+
+> Documentation de référence pour toute personne reprenant le projet.
+> Chaque terme est défini dans le contexte **de ce dépôt** : quand un mot a
+> une signification générique ailleurs, c'est son usage local qui prime.
+> Les chemins entre parenthèses renvoient aux fichiers où le concept vit.
+
+---
+
+## 1. Domaine métier
+
+Le projet est une **encyclopédie musicale metal** : catalogage de groupes,
+discographies et taxonomie des genres, avec recherche plein-texte.
+
+| Terme             | Définition                                                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Band** (groupe) | Entité centrale : groupe ou projet musical. Champs notables : `slug`, `bio`, `countryCode` (ISO 3166-1 alpha-2), `formedYear`, `dissolvedYear`, `imageUrl`. Table `bands` (`db/schema/bands.ts`). |
+| **Album**         | Sortie rattachée à un band (`bandId`). `type` suit l'enum PostgreSQL `album_type` : `album`, `ep`, `single`, `compilation`, `live`, `demo`. Table `albums`.                                       |
+| **Track** (piste) | Morceau rattaché à un album (`albumId`), positionné par `(discNumber, trackNumber)` — contrainte d'unicité en base. `durationMs` en millisecondes. Table `tracks`.                                |
+| **Genre**         | Étiquette stylistique (`Black Metal`…). Hiérarchique via `parentId` auto-référencé (`ON DELETE SET NULL`). Association many-to-many avec les bands via la table de jonction **`bandGenres`**.     |
+| **Slug**          | Identifiant textuel URL-friendly kebab-case (`necrofrost`). Unique par entité ; les pages publiques `/bands/[slug]` l'utilisent plutôt que l'UUID. Validé par regex côté `lib/validations/*`.     |
+| **Discographie**  | Ensemble des albums d'un groupe ; page dédiée `app/bands/[slug]/discography`.                                                                                                                     |
+| **DTO**           | Data Transfer Object : forme publique sérialisée d'une entité renvoyée par l'API (les dates deviennent des chaînes ISO). Schémas zod dans `lib/api/schemas.ts` et `hooks/api/schemas.ts`.         |
+
+## 2. Données & modèle
+
+| Terme                   | Définition                                                                                                                                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Drizzle ORM**         | ORM typé utilisé pour tout l'accès SQL. Le schéma source de vérité vit dans `db/schema/*.ts`.                                                                                                                                                      |
+| **Drizzle Kit**         | Outil CLI associé : `pnpm db:generate` produit les migrations, `db:migrate` les applique, `db:push` synchronise directement (déconseillé hors prototypage). Config dans `drizzle.config.ts`.                                                       |
+| **Migration**           | Fichier SQL versionné dans `db/migrations/` (journal dans `meta/`). Appliquées par le programme (`drizzle-orm/postgres-js/migrator`) au setup E2E. ⚠️ Toute modification de `db/schema/` doit passer par `db:generate`, jamais par un push manuel. |
+| **Queries / Mutations** | Convention du dépôt : lectures dans `db/queries/<entité>.ts`, écritures dans `db/mutations/<entité>.ts`. Les routes API appellent ces modules, jamais Drizzle brut pour la logique réutilisable.                                                   |
+| **pgvector**            | Extension PostgreSQL des embeddings vectoriels. Colonne `bands.embedding` (1536 dimensions, index HNSW cosine) destinée à la recherche sémantique.                                                                                                 |
+| **pg_trgm / unaccent**  | Extensions pour la recherche fuzzy SQL : index trigrammes GIN sur `bands.name` et titres d'albums, insensibilité aux accents. Requises avant les migrations (créées par le setup E2E).                                                             |
+| **Supabase**            | Hébergeur PostgreSQL utilisé en dev/prod. Connexion poolée (`?pgbouncer=true`, port 6543) au runtime via `DATABASE_URL`, connexion directe (5432) pour les migrations via `DIRECT_URL`.                                                            |
+
+## 3. Authentification & autorisations
+
+| Terme                 | Définition                                                                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Better Auth**       | Bibliothèque d'authentification email+mot de passe (Argon2id). Instance serveur dans `lib/auth.ts`, client dans `lib/auth-client.ts`, endpoint catch-all `app/api/auth/[...all]`.                |
+| **Session**           | État connecté d'un utilisateur, stocké dans Redis (**secondary storage**) et transmis par cookie. Lue via `auth.api.getSession({ headers })`.                                                    |
+| **Secondary storage** | Stockage externe Better Auth : ici Redis (`lib/auth.ts`) — sessions, compteurs de rate limit Better Auth, données TTL.                                                                           |
+| **RBAC**              | Role-Based Access Control « maison » (`lib/rbac/`) : rôles → matrice de permissions → gardes. Ne pas confondre avec le rate limiting (voir §4).                                                  |
+| **Rôle**              | Enum PostgreSQL `user_role` : `user` < `contributor` < `moderator` < `admin` (`lib/rbac/roles.ts`). Champ `user.role` interdit en entrée API (`input:false`) : forcé en SQL direct lors du seed. |
+| **Permission**        | Couple `(resource, action)` : ressource `band                                                                                                                                                    | album | track | genre | user`, action `create | read | update | delete | moderate`. Matrice complète dans `lib/rbac/permissions.ts`(fonction`can`). |
+| **Garde**             | Fonction de contrôle qui lève `ActionError` : `requireAuth()`, `requireRole(minRole)`, `requirePermission(resource, action)` (`lib/rbac/guards.ts`). Utilisée dans les Server Actions.           |
+| **Seed admin**        | Script `scripts/seed-admin.ts` (`pnpm seed:admin`) : crée le compte administrateur initial depuis `ADMIN_EMAIL`/`ADMIN_PASSWORD`.                                                                |
+
+## 4. API HTTP
+
+| Terme                       | Définition                                                                                                                                                                                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Route Handler**           | Endpoint Next.js App Router : fichier `route.ts` exportant GET/POST/PATCH/DELETE sous `app/api/**`.                                                                                                                                                |
+| **`route()`**               | Fabrique centralisée (`lib/api/handler.ts`) qui enrobe chaque handler : rate limit → auth → permission RBAC → validation zod (params/query/body) → handler métier. Toujours l'utiliser plutôt qu'un handler nu.                                    |
+| **Server Action**           | Fonction serveur appelée depuis les composants React (`"use server"`, dossier `lib/actions/`). Alternative aux routes API pour les formulaires ; protégée par les gardes RBAC.                                                                     |
+| **Enveloppe de réponse**    | Format standardisé : succès `{ data }` ou `{ data, meta }` (listes paginées, `okPaginated`) ; erreur `{ error: { code, message, details } }` (`lib/api/response.ts`).                                                                              |
+| **ErrorCode**               | Codes métier mappés sur HTTP : `UNAUTHORIZED` 401, `FORBIDDEN` 403, `NOT_FOUND` 404, `VALIDATION` 422, `RATE_LIMIT` 429, `INTERNAL` 500, `UNAVAILABLE` 503.                                                                                        |
+| **ApiError**                | Exception lancée par le code métier, convertie automatiquement en réponse JSON standard par `route()`.                                                                                                                                             |
+| **Rate limiting**           | Sliding window log en script Lua atomique sur Redis (`lib/api/rate-limit.ts`). `failMode` : `open` (laisse passer si Redis tombe, défaut) vs `closed` (bloque — réservé aux routes sensibles). Indépendant du rate limiter interne de Better Auth. |
+| **Schéma zod**              | Contrat de validation partagé. Sources : `lib/validations/*` (corps de mutations, réutilisés serveur ET hooks clients), `lib/api/schemas.ts` (params/query/réponses). Source unique = pas de duplication client/serveur.                           |
+| **OpenAPI**                 | Spécification de l'API générée **depuis les schémas zod annotés** (`lib/api/openapi/`), exportée vers `openapi/openapi.json` (`pnpm openapi:export`).                                                                                              |
+| **Swagger UI**              | Documentation interactive servie sur `/api/docs` (`app/api/docs/`), alimentée par le document OpenAPI.                                                                                                                                             |
+| **Redocly**                 | Linter de la spec : `pnpm openapi:lint` (inclus dans `pnpm verify`). Bloquant en CI.                                                                                                                                                               |
+| **Pagination**              | Convention listes : query `page`/`perPage` (max 100), réponse `meta: { total, page, perPage, totalPages }`. La spec OpenAPI documente aussi `limit`/`offset` (PaginationQuerySchema).                                                              |
+| **Recherche globale**       | `GET /api/search?q=...&limit=...` : multi-index Meilisearch groupé `{ bands, albums, tracks }` (`app/api/search/route.ts`). Publique, rate limitée, 503 si moteur indisponible.                                                                    |
+| **Violation FK / SQLSTATE** | Les erreurs de contraintes PostgreSQL sont converties en erreurs HTTP propres par `lib/api/db-errors.ts` : unicité → 409 CONFLICT, référence inexistante → 422. Jamais un 500 générique.                                                           |
+| **`/api/health`**           | Sonde de disponibilité (Postgres, Redis, Meilisearch) : 200 healthy / 503 degraded. Utilisable pour la CI et le monitoring.                                                                                                                        |
+
+## 5. Recherche & indexation
+
+| Terme                    | Définition                                                                                                                                                                                                                                                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Meilisearch**          | Moteur de recherche plein-texte. Client et handles des 3 index dans `lib/search/meilisearch.ts`. Initialisation : `pnpm meili:init` (`scripts/init-meili.ts`).                                                                                                                                                                   |
+| **Index**                | Collection Meili : `bands`, `albums`, `tracks`. Clé primaire `id`. Créés par init-meili **et** automatiquement au premier document indexé.                                                                                                                                                                                       |
+| **Hit**                  | Document résultat d'une recherche Meili. Sa forme est contractualisée par les schémas `*HitSchema` — alignés sur les champs réellement indexés par les jobs (toute évolution doit être symétrique).                                                                                                                              |
+| **multiSearch**          | Requête unique interrogeant plusieurs index (utilisée par `/api/search`). Échoue si un index n'existe pas encore.                                                                                                                                                                                                                |
+| **Embedding**            | Vecteur sémantique (1536 dims, pgvector) prévu pour la recherche par similarité. Généré par le job `generate-embeddings` : appel au service Ollama local (`EMBEDDINGS_BASE_URL`, modèle `EMBEDDINGS_MODEL`) après chaque création/modification de groupe. Échec non bloquant (retry BullMQ).                                     |
+| **Providers externes**   | Couche `lib/providers/` interrogeant les plateformes de données musicales : MusicBrainz (infos structurées, 1 req/s), Wikidata (résumés/images), Discogs (photos/bio, token), Deezer (extraits MP3 30 s). Client commun `http.ts` : timeout + retry + cache Redis + throttling. Jamais appelés depuis le navigateur.             |
+| **`external_refs`**      | Table polymorphe stockant les identifiants externes `(entityType, provider, externalId)` — la DB ne garde que des références, jamais les médias. Sync idempotente via `PUT /api/bands/:id/refs`.                                                                                                                                 |
+| **Resolver média**       | `lib/media/resolver.ts` : agrège les providers en parallèle (`allSettled`) en un DTO validé zod `{ info, images[], links[], previews[] }`, cache Redis 24 h, flag `degraded` si panne partielle. Exposé par `GET /api/bands/:id/media`.                                                                                          |
+| **Virtualisation**       | Rendu des seules lignes visibles (`@tanstack/react-virtual`, hook `use-virtual-list`) avec mesure dynamique — indispensable quand la hauteur des items dépend de données API variables. Combinée à `useInfiniteQuery`.                                                                                                           |
+| **Embeds officiels**     | Lecteurs intégrables par iframe (`components/embeds/platformEmbed.tsx`, registre `lib/media/embeds.ts`) : façade YouTube cliquable (nocookie), widgets Spotify/Bandcamp/Qobuz lazy. Aucun média copié, aucun SDK tiers.                                                                                                          |
+| **Contribution**         | Dossier modéré (`contributions`) : soumission contributeur → demande de preuves (boucle) → approbation avec promotion MinIO staging → public. Expiration auto après 2 relances/30 j ; rejet terminal réservé aux admins. Barrière anti-contenu-IA = preuves officielles obligatoires (référence MusicBrainz/Discogs vérifiable). |
+| **Base identité dédiée** | Cloisonnement RGPD : user/session/account/verification vivent dans une base séparée (`AUTH_DATABASE_URL`, config `drizzle.auth.config.ts`). La DB contenu ne conserve qu'une projection publique minimale (`profiles`) répliquée par les hooks Better Auth. Migration : `pnpm migrate:auth-db`.                                  |
+| **Réindexation**         | Cycle create/update/delete → enqueue d'un job → worker lit la ligne en base → addDocuments/deleteDocument dans Meili. Asynchrone : un délai existe toujours entre écriture SQL et visibilité en recherche.                                                                                                                       |
+
+## 6. Files de tâches (asynchrone)
+
+| Terme                   | Définition                                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **BullMQ**              | Bibliothèque de files persistantes sur Redis. Client (enqueue) dans `lib/queue/client.ts`, workers dans `lib/queue/workers.ts`.                                                   |
+| **File (queue)**        | Une par entité + embeddings : `band-index`, `album-index`, `track-index`, `embeddings`. Connexion Redis partagée issue de `lib/redis.ts` (`REDIS_URL`, jamais host/port séparés). |
+| **Job**                 | Unité de travail : payload `{ id, action: "index" \| "delete" }`. Options standard : 3 tentatives, backoff exponentiel 2 s, échecs conservés (`removeOnFail: false`).             |
+| **Worker**              | Processus consommateur, démarré hors Next.js : `pnpm workers` (`scripts/start-workers.ts`). Obligatoire pour que la recherche soit alimentée.                                     |
+| **Backoff exponentiel** | Stratégie de nouvelle tentative : délai doublé à chaque échec (2 s, 4 s, 8 s…).                                                                                                   |
+| **Redis / Valkey**      | Valkey est le fork open-source compatible protocole Redis utilisé ici. Rôles : files BullMQ, rate limiting, secondary storage Better Auth. Client ioredis (`lib/redis.ts`).       |
+
+## 7. Frontend & React
+
+| Terme              | Définition                                                                                                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **App Router**     | Routage Next.js par arborescence de fichiers (`app/`). Segments dynamiques `[slug]`, `[id]` ; états spéciaux `loading.tsx`, `error.tsx`, `not-found.tsx`.                                                                 |
+| **RSC**            | React Server Component : composant rendu serveur sans JS client. Fetcher serveur dédié : `apiFetch` (`lib/api/client.ts`, cache Next.js). À ne pas confondre avec le client navigateur `apiJson` (`hooks/api/client.ts`). |
+| **TanStack Query** | Cache/gestion d'état asynchrone côté client (`@tanstack/react-query`). Provider dans `providers.tsx` (staleTime 60 s, refetchOnWindowFocus off).                                                                          |
+| **queryOptions**   | Fabrique TanStack regroupant clé + fonction de requête, réutilisable en `useQuery` comme en prefetch RSC. Générées par entité dans `hooks/use-*.ts`.                                                                      |
+| **queryKey**       | Clé de cache hiérarchique normalisée (`["bands", "list", filters]`), centralisée dans `hooks/api/queryKeys.ts`. Les invalidations passent exclusivement par ces fabriques.                                                |
+| **Invalidation**   | Après mutation, marquer les clés concernées obsolètes pour refetch : lists après create/delete, détail + lists après update, racine après delete. Câblé dans `hooks/api/entity.ts`.                                       |
+| **Mutation**       | Hook d'écriture (`useCreateBand`, …) : validation zod du corps **avant** envoi, puis invalidations. Erreurs exposées en `ApiClientError` (statut + code + détails).                                                       |
+| **Debounce**       | Retardement de propagation d'une valeur instable (`useDebounce`, 300 ms par défaut) — utilisé par `useGlobalSearch` pour ne requêter qu'à la fin de la frappe.                                                            |
+| **shadcn/ui**      | Composants UI copiés dans le dépôt (`components/ui/*`) bâtis sur Base UI + Tailwind + cva. Personnifiables directement, contrairement à une lib npm.                                                                      |
+| **Zustand**        | Store client léger (`stores/*.store.ts`) pour l'état global non-serveur (lecteur audio, préférences). Ne remplace pas TanStack Query (état serveur).                                                                      |
+| **nuqs**           | Gestion typée des query params d'URL côté client (filtres/tri des listes).                                                                                                                                                |
+
+## 8. Tests & qualité
+
+| Terme                   | Définition                                                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Test unitaire**       | Vitest (`*.test.ts` à côté du code). Dépendances externes mockées par module (`vi.mock("@/db")`, helpers `__tests__/`). Config : `vitest.config.mts` + mocks globaux `vitest.setup.ts`.                         |
+| **Test E2E**            | Test d'intégration bout-en-bout (`tests/e2e/`, config dédiée `vitest.config.e2e.mts`) : vrai serveur `next start`, vraies migrations, vraie auth HTTP. Lancé via `pnpm test:e2e:full` (services Docker inclus). |
+| **Mock de session**     | Helper de tests `setUser(role)` pilotant `auth.api.getSession` — simule n'importe quel rôle sans auth réelle.                                                                                                   |
+| **Coverage**            | Couverture v8 avec seuils bloquants (statements 70 %, branches 45 %…) sur `lib/actions`, `lib/rbac`, `lib/validations` : `pnpm test:cov`.                                                                       |
+| **`pnpm verify`**       | Chaîne qualité complète locale : lint + typecheck + tests unitaires + lint OpenAPI. À passer avant chaque push.                                                                                                 |
+| **Husky / lint-staged** | Git hooks : pre-commit formate/lint les fichiers stagés, pre-push relance typecheck + tests.                                                                                                                    |
+| **CI**                  | GitHub Actions `.github/workflows/ci.yml` : jobs `quality` (prettier, eslint, tsc, tests+cov, redocly) → `integration` (E2E contre services Docker) et `build` (next build) en parallèle.                       |
+
+## 9. Infrastructure & outils
+
+| Terme                         | Definitition                                                                                                                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **ai-stack**                  | Stack Docker de dev (`ai-stack/compose.yml`) : Meilisearch, Valkey, MinIO + Open WebUI (outil IA local). Postgres y figure volontairement **pas** (hébergé chez Supabase). Credentials dans `ai-stack/.env` (gitignore). |
+| **docker-compose.test.yml**   | Services d'intégration des tests E2E : ports **décalés** (Postgres-pgvector 5433, Valkey 6380, Meili 7701, MinIO 9002) pour coexister avec ai-stack. Images épinglées identiques à ai-stack.                             |
+| **MinIO**                     | Stockage objet compatible S3 pour les médias. Client `lib/storage/minio.ts`, helpers images `lib/storage/images.ts`. Init : `pnpm minio:init`. Bucket par défaut `helleilla-media`.                                      |
+| **Presigned URL**             | URL S3 signée à durée limitée (`@aws-sdk/s3-request-presigner`) pour upload/download direct sans exposer les credentials.                                                                                                |
+| **pnpm**                      | Gestionnaire de paquets (workspace strict, lockfile figé en CI : `--frozen-lockfile`).                                                                                                                                   |
+| **Turbopack**                 | Bundler Next.js 16 utilisé par `next dev`/`next build`.                                                                                                                                                                  |
+| **Variables d'environnement** | Validées au boot par zod (`lib/env.ts`) : process tué immédiatement si incomplètes. Modèles : `.env.example` (app) et `ai-stack/.env.example` (infra). Ne jamais committer de `.env*` réel.                              |
+| **Port décalé**               | Pratique du dépôt : dev utilise les ports standards (5432/6379/7700/9000), les tests E2E les ports +offset afin que les deux stacks puissent tourner simultanément.                                                      |
+
+---
+
+## Conventions transversales à retenir
+
+1. **Source unique** : un schéma zod décrit un contrat une seule fois (`lib/validations`, `lib/api/schemas`) et sert au serveur, aux hooks clients et à la doc OpenAPI.
+2. **Chose créée → chose utilisée** : pas de module orphelin ; si un helper existe (`route()`, `okPaginated`, `paginatedSchema`), on le réutilise au lieu de recoder.
+3. **Standardisation** : nomenclature `use-<entité>.ts`, `<domaine>/<composant>.tsx`, fabriques `entityKeys`/`createEntityHooks` ; toute nouvelle entité CRUD suit le moule existant.
+4. **Asynchrone assumé** : l'écriture SQL et l'indexation Meili sont découplées par BullMQ — ne jamais supposer qu'un objet créé est immédiatement recherchable.
+5. **Sécurité par défaut** : toute route de mutation déclare `permission` + rate limit `failMode: "closed"` ; toute Server Action passe par une garde RBAC.
+
+## 10. Authentification UI (formulaires)
+
+| Terme                    | Définition                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Argon2id**             | Fonction de hachage de mots de passe (OWASP) utilisée par Better Auth via `@node-rs/argon2` — sel intégré, résistant GPU. **Ne jamais remplacer par un hash hex (SHA-256)** : cassable par force brute. |
+| **CSPRNG**               | Générateur aléatoire cryptographique : `crypto.getRandomValues` côté navigateur (`hooks/use-password-generator.ts`). Math.random est prévisible et interdit pour les secrets.                           |
+| **zxcvbn**               | Estimation de force réelle d'un mot de passe (`@zxcvbn-ts/core`, hook `use-password-strength`) : dictionnaires de fuites, motifs clavier, l33t. Score 0–4 ; 3 requis pour soumettre le formulaire.      |
+| **Turnstile**            | CAPTCHA invisible Cloudflare vérifié **côté serveur** dans `signUpAction` (`lib/auth/turnstile.ts`, API siteverify). Fail-closed ; se désactive proprement sans `TURNSTILE_SECRET_KEY`.                 |
+| **Anti-énumération**     | Message d'erreur unique « Email ou mot de passe incorrect » : impossible de distinguer un compte inexistant d'un mauvais mot de passe, empêchant la découverte de comptes.                              |
+| **`(auth)` route group** | Segment Next.js `app/(auth)/` : pages /sign-in et /sign-up avec layout centré dédié, sans préfixe d'URL. Les Server Actions (`lib/actions/auth.ts`) portent toute la sécurité serveur.                  |

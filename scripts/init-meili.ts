@@ -1,5 +1,18 @@
-import { meili, INDEXES } from "../lib/meili";
+/**
+ * Script d'initialisation de Meilisearch.
+ * Crée (si besoin) et configure les trois index de recherche :
+ * - bands : recherche sur nom/alias, filtres pays/genres, tolérance aux typos
+ * - albums : recherche sur titre/groupe/label, filtres type/année
+ * - tracks : recherche sur titre/album/groupe, tri par numéro de piste
+ */
 
+import { meili, INDEXES } from "../lib/meili"; // Client Meilisearch et noms d'index
+
+/**
+ * Point d'entrée du script : crée chaque index avec `id` comme clé primaire
+ * puis applique les paramètres de recherche/filtrage/tri. Ignore l'erreur
+ * si l'index existe déjà (`catch(() => {})`).
+ */
 async function main() {
   // --- Index BANDS ---
   await meili.createIndex(INDEXES.bands, { primaryKey: "id" }).catch(() => {});
@@ -42,6 +55,7 @@ async function main() {
   console.log("✅ Index tracks configuré");
 }
 
+// Lancement du script avec sortie en erreur (code 1) en cas d'échec
 main().catch((e) => {
   console.error(e);
   process.exit(1);

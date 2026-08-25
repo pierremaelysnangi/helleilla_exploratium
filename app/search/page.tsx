@@ -1,3 +1,8 @@
+/**
+ * Page de recherche (/search).
+ * Page placeholder : permettra de rechercher groupes, albums, genres et membres
+ * une fois la logique (paramètres d'URL + requêtes Drizzle) implémentée.
+ */
 export default function SearchPage() {
   return (
     <main className="container mx-auto px-4 py-8">

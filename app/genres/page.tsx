@@ -1,3 +1,7 @@
+/**
+ * Page listant les genres musicaux (/genres).
+ * Page placeholder : le contenu définitif sera implémenté plus tard.
+ */
 export default function GenresPage() {
   return (
     <main className="container mx-auto px-4 py-8">

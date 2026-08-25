@@ -1,17 +1,42 @@
 "use server";
 
+/**
+ * Server Actions CRUD pour les albums.
+ * Chaque action vérifie les permissions RBAC, valide les données via zod,
+ * persiste en base, gère la pochette (upload/suppression), déclenche
+ * l'indexation asynchrone dans Meilisearch et invalide le cache Next.js.
+ */
+
+// Invalidation du cache des routes Next.js après mutation
 import { revalidatePath } from "next/cache";
+// Garde RBAC : lève une ActionError si la permission manque
 import { requirePermission } from "@/lib/rbac/guards";
+// Schémas de validation zod pour création / modification d'album
 import { createAlbumSchema, updateAlbumSchema } from "@/lib/validations/album";
+// Stockage des images : upload et suppression de la pochette
 import { uploadImage, deleteImage } from "@/lib/storage/images";
+// Mutations base de données (Drizzle) pour les albums
 import { createAlbum, updateAlbum, deleteAlbum } from "@/db/mutations/albums";
+// Requêtes de lecture pour vérifier l'existence des entités
 import { getAlbumById } from "@/db/queries/albums";
 import { getBandById } from "@/db/queries/bands";
+// Gestion d'erreur commune + type de retour standard des actions
 import { handleActionError, type ActionResult } from "./utils";
+// Files BullMQ : indexation / suppression dans Meilisearch
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { listTrackIdsByAlbumId } from "@/db/queries/tracks";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
+/**
+ * Crée un album à partir d'un FormData.
+ *
+ * Vérifie la permission `album:create`, valide les champs via
+ * `createAlbumSchema`, contrôle l'existence du groupe parent, upload
+ * éventuellement la pochette puis persiste et planifie l'indexation.
+ *
+ * @param formData - Données du formulaire (champs album + fichier `cover`).
+ * @returns ActionResult contenant l'album créé ou une erreur structurée.
+ */
 export async function createAlbumAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createAlbum>>>> {
@@ -48,6 +73,16 @@ export async function createAlbumAction(
   }
 }
 
+/**
+ * Met à jour un album existant à partir d'un FormData.
+ *
+ * Vérifie la permission `album:update`, valide les champs, remplace
+ * la pochette si un nouveau fichier est fourni (l'ancienne est supprimée),
+ * puis persiste et planifie la réindexation.
+ *
+ * @param formData - Données du formulaire (dont `id` de l'album + `cover`).
+ * @returns ActionResult contenant l'album mis à jour ou une erreur structurée.
+ */
 export async function updateAlbumAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateAlbum>>>> {
@@ -86,6 +121,16 @@ export async function updateAlbumAction(
   }
 }
 
+/**
+ * Supprime un album (et sa pochette) par identifiant.
+ *
+ * Vérifie la permission `album:delete`, collecte les pistes AVANT la
+ * suppression en cascade afin de les retirer aussi de l'index de
+ * recherche, puis invalide le cache.
+ *
+ * @param id - UUID de l'album à supprimer.
+ * @returns ActionResult contenant `{ id }` ou une erreur structurée.
+ */
 export async function deleteAlbumAction(
   id: string,
 ): Promise<ActionResult<{ id: string }>> {

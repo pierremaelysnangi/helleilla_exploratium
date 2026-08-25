@@ -1,14 +1,38 @@
 "use server";
 
+/**
+ * Server Actions CRUD pour les pistes (tracks).
+ * Vérification RBAC, validation zod, contrôle du parent album,
+ * persistance Drizzle, indexation Meilisearch asynchrone et
+ * invalidation du cache Next.js.
+ */
+
+// Invalidation du cache des routes Next.js après mutation
 import { revalidatePath } from "next/cache";
+// Garde RBAC : lève une ActionError si la permission manque
 import { requirePermission } from "@/lib/rbac/guards";
+// Schémas de validation zod pour création / modification de piste
 import { createTrackSchema, updateTrackSchema } from "@/lib/validations/track";
+// Mutations base de données (Drizzle) pour les pistes
 import { createTrack, updateTrack, deleteTrack } from "@/db/mutations/tracks";
+// Requêtes de lecture : existence album / piste (avec album joint)
 import { getTrackWithAlbum } from "@/db/queries/tracks";
 import { getAlbumById } from "@/db/queries/albums";
+// Gestion d'erreur commune + type de retour standard des actions
 import { handleActionError, type ActionResult } from "./utils";
+// File BullMQ : indexation / suppression dans Meilisearch
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
+/**
+ * Crée une piste à partir d'un FormData.
+ *
+ * Vérifie la permission `track:create`, valide les champs via
+ * `createTrackSchema`, contrôle l'existence de l'album parent puis
+ * persiste et planifie l'indexation.
+ *
+ * @param formData - Données du formulaire (`albumId`, `title`, `trackNumber`...).
+ * @returns ActionResult contenant la piste créée ou une erreur structurée.
+ */
 export async function createTrackAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof createTrack>>>> {
@@ -40,6 +64,16 @@ export async function createTrackAction(
   }
 }
 
+/**
+ * Met à jour une piste existante à partir d'un FormData.
+ *
+ * Vérifie la permission `track:update`, valide les champs, contrôle
+ * l'existence de la piste (avec son album pour l'invalidation du cache),
+ * puis persiste et planifie la réindexation.
+ *
+ * @param formData - Données du formulaire (dont `id` de la piste).
+ * @returns ActionResult contenant la piste mise à jour ou une erreur structurée.
+ */
 export async function updateTrackAction(
   formData: FormData,
 ): Promise<ActionResult<Awaited<ReturnType<typeof updateTrack>>>> {
@@ -71,6 +105,16 @@ export async function updateTrackAction(
   }
 }
 
+/**
+ * Supprime une piste par identifiant.
+ *
+ * Vérifie la permission `track:delete`, contrôle l'existence de la piste
+ * (avec son album pour l'invalidation du cache), supprime puis planifie
+ * la désindexation.
+ *
+ * @param id - UUID de la piste à supprimer.
+ * @returns ActionResult contenant `{ id }` ou une erreur structurée.
+ */
 export async function deleteTrackAction(
   id: string,
 ): Promise<ActionResult<{ id: string }>> {

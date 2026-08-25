@@ -1,3 +1,8 @@
+/**
+ * Page de détail d'un genre musical (/genres/[slug]).
+ * Page placeholder : le paramètre dynamique [slug] permettra de charger
+ * le genre correspondant une fois la logique de données implémentée.
+ */
 export default function GenresSlugPage() {
   return (
     <main className="container mx-auto px-4 py-8">

@@ -9,10 +9,6 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
 }));
 
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => state.session) } },
 }));
@@ -31,6 +27,17 @@ vi.mock("@/lib/queue/jobs/index-album", () => ({
 vi.mock("@/lib/queue/jobs/index-track", () => ({
   enqueueTrackIndex: vi.fn(async () => undefined),
 }));
+// Embeddings : no-op en tests unitaires (le vrai job est testé à part)
+vi.mock("@/lib/queue/jobs/generate-embeddings", () => ({
+  enqueueEmbeddings: vi.fn(async () => undefined),
+  buildBandEmbeddingText: (band: { name: string }) => band.name,
+}));
+
+// next/cache : revalidateTag manquait pour /api/revalidate
+vi.mock("next/cache", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/cache")>();
+  return { ...actual, revalidateTag: vi.fn() };
+});
 
 vi.mock("@/lib/api/rate-limit", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/api/rate-limit")>();

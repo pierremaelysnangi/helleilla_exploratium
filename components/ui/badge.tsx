@@ -1,9 +1,17 @@
+/**
+ * Badge — petit élément d'étiquette (statut, compteur, catégorie).
+ * Composant shadcn/ui basé sur Base UI, rendu par défaut comme un <span>.
+ */
+// Utilitaires Base UI : fusion des props et rendu polymorphe (span par défaut)
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
+// cva : définition des variantes de style du badge
 import { cva, type VariantProps } from "class-variance-authority";
 
+// Fusion de classes conditionnelle (tailwind-merge + clsx)
 import { cn } from "@/lib/utils";
 
+// Variantes visuelles du badge (default, secondary, destructive, outline, ghost, link)
 const badgeVariants = cva(
   "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
   {
@@ -27,6 +35,10 @@ const badgeVariants = cva(
   },
 );
 
+/**
+ * Badge — composant principal.
+ * @param props - Props du <span> natif + variante visuelle.
+ */
 function Badge({
   className,
   variant = "default",

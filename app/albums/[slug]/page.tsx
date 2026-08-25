@@ -1,3 +1,8 @@
+/**
+ * Page de détail d'un album (/albums/[slug]).
+ * Page placeholder : le paramètre dynamique [slug] permettra de charger
+ * l'album correspondant une fois la logique de données implémentée.
+ */
 export default function AlbumsSlugPage() {
   return (
     <main className="container mx-auto px-4 py-8">

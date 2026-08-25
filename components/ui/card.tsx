@@ -1,7 +1,17 @@
+/**
+ * Card — conteneur de type "carte" composé de sous-parties
+ * (en-tête, titre, description, action, contenu, pied de page).
+ * Composant shadcn/ui standard.
+ */
 import * as React from "react";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
 
+/**
+ * Card — conteneur principal de la carte.
+ * @param size - Densité du padding ("default" | "sm").
+ */
 function Card({
   className,
   size = "default",
@@ -20,6 +30,7 @@ function Card({
   );
 }
 
+/** En-tête de la carte (titre, description, action). */
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -33,6 +44,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Titre de la carte. */
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -46,6 +58,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Description secondaire de la carte (texte atténué). */
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -56,6 +69,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Zone d'action alignée à droite dans l'en-tête (bouton, menu...). */
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -69,6 +83,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Contenu principal de la carte. */
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -79,6 +94,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Pied de page de la carte (séparé par une bordure supérieure). */
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

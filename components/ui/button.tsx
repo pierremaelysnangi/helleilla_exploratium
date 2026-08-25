@@ -1,8 +1,16 @@
+/**
+ * Button — bouton stylisé avec plusieurs variantes et tailles.
+ * Composant shadcn/ui basé sur le primitive Button de Base UI.
+ */
+// Primitive Button de Base UI (gestion du rendu, focus, etc.)
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
+// cva : définition des variantes (variant / size) via classes Tailwind
 import { cva, type VariantProps } from "class-variance-authority";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
 
+// Variantes visuelles et tailles du bouton
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
@@ -40,6 +48,11 @@ const buttonVariants = cva(
   },
 );
 
+/**
+ * Button — composant principal.
+ * @param variant - Style visuel (default, outline, secondary, ghost, destructive, link).
+ * @param size - Taille du bouton (default, xs, sm, lg, icon...).
+ */
 function Button({
   className,
   variant = "default",

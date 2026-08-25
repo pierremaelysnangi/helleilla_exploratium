@@ -1,23 +1,39 @@
 "use client";
 
+/**
+ * DropdownMenu — menu déroulant (items, sous-menus, cases à cocher,
+ * boutons radio, séparateurs, raccourcis clavier).
+ * Composant shadcn/ui basé sur le primitive Menu de Base UI.
+ */
 import * as React from "react";
+// Primitive Menu de Base UI (Root, Trigger, Popup, Item...)
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
+// Icônes : chevron des sous-menus et coche des items cochables
 import { ChevronRightIcon, CheckIcon } from "lucide-react";
 
+/** Racine du menu : gère l'état ouvert/fermé. */
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
+/** Portail : rend le contenu du menu hors de l'arbre DOM parent. */
 function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
   return <MenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
 }
 
+/** Élément déclencheur qui ouvre le menu. */
 function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
+/**
+ * Contenu du menu : popup positionnée via un Positioner.
+ * @param align - Alignement par rapport à l'ancre (défaut : "start").
+ * @param side - Côté d'ouverture (défaut : "bottom").
+ */
 function DropdownMenuContent({
   align = "start",
   alignOffset = 0,
@@ -52,10 +68,12 @@ function DropdownMenuContent({
   );
 }
 
+/** Groupe d'items du menu. */
 function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
 }
 
+/** Libellé de section dans le menu. */
 function DropdownMenuLabel({
   className,
   inset,
@@ -76,6 +94,11 @@ function DropdownMenuLabel({
   );
 }
 
+/**
+ * Item cliquable du menu.
+ * @param inset - Décale le contenu (alignement avec les items ayant une icône).
+ * @param variant - Style "default" ou "destructive" (action dangereuse).
+ */
 function DropdownMenuItem({
   className,
   inset,
@@ -99,10 +122,12 @@ function DropdownMenuItem({
   );
 }
 
+/** Racine d'un sous-menu imbriqué. */
 function DropdownMenuSub({ ...props }: MenuPrimitive.SubmenuRoot.Props) {
   return <MenuPrimitive.SubmenuRoot data-slot="dropdown-menu-sub" {...props} />;
 }
 
+/** Déclencheur d'un sous-menu (avec chevron à droite). */
 function DropdownMenuSubTrigger({
   className,
   inset,
@@ -127,6 +152,7 @@ function DropdownMenuSubTrigger({
   );
 }
 
+/** Contenu d'un sous-menu (popup latérale, à droite par défaut). */
 function DropdownMenuSubContent({
   align = "start",
   alignOffset = -3,
@@ -151,6 +177,10 @@ function DropdownMenuSubContent({
   );
 }
 
+/**
+ * Item à case à cocher avec indicateur (coche) à droite.
+ * @param checked - État coché ou non.
+ */
 function DropdownMenuCheckboxItem({
   className,
   children,
@@ -184,6 +214,7 @@ function DropdownMenuCheckboxItem({
   );
 }
 
+/** Groupe d'items radio (sélection unique). */
 function DropdownMenuRadioGroup({ ...props }: MenuPrimitive.RadioGroup.Props) {
   return (
     <MenuPrimitive.RadioGroup
@@ -193,6 +224,7 @@ function DropdownMenuRadioGroup({ ...props }: MenuPrimitive.RadioGroup.Props) {
   );
 }
 
+/** Item radio avec indicateur (point) à droite. */
 function DropdownMenuRadioItem({
   className,
   children,
@@ -224,6 +256,7 @@ function DropdownMenuRadioItem({
   );
 }
 
+/** Ligne de séparation entre les items. */
 function DropdownMenuSeparator({
   className,
   ...props
@@ -237,6 +270,7 @@ function DropdownMenuSeparator({
   );
 }
 
+/** Raccourci clavier affiché à droite d'un item (ex : ⌘K). */
 function DropdownMenuShortcut({
   className,
   ...props

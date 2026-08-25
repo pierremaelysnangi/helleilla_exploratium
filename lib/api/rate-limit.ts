@@ -1,6 +1,15 @@
+/**
+ * Rate limiting en sliding window log, adossé à Redis.
+ * Fournit `rateLimit()` (retourne une Response 429 ou null) et
+ * `clientIp()` (extraction de l'IP derrière un reverse proxy).
+ */
+
+// Client Redis partagé de l'application
 import { redis } from "@/lib/redis";
+// Réponse d'erreur 429 standardisée
 import { fail } from "./response";
 
+/** Options de limitation : clé, plafond, fenêtre et comportement en cas d'échec. */
 type Opts = {
   key: string;
   limit: number;
@@ -54,12 +63,23 @@ end
 
 let cachedSha: string | null = null;
 
+/** Charge le script Lua une seule fois et met le SHA en cache mémoire. */
 async function getScriptSha(): Promise<string> {
   if (cachedSha) return cachedSha;
   cachedSha = (await redis.script("LOAD", SLIDING_WINDOW_SCRIPT)) as string;
   return cachedSha;
 }
 
+/**
+ * Évalue le script sliding window via EVALSHA, avec repli sur un
+ * rechargement du script si Redis renvoie NOSCRIPT.
+ *
+ * @param key - Clé Redis du ZSET (fenêtre glissante).
+ * @param now - Horodatage courant en ms.
+ * @param windowMs - Taille de la fenêtre en millisecondes.
+ * @param limit - Nombre maximal de requêtes autorisées dans la fenêtre.
+ * @returns Un tuple `[allowed (0|1), remaining, resetAtMs]`.
+ */
 async function evalSlidingWindow(
   key: string,
   now: number,
@@ -93,6 +113,7 @@ async function evalSlidingWindow(
   }
 }
 
+/** Informations de limitation exposées dans les en-têtes de réponse. */
 export type RateLimitInfo = {
   limit: number;
   remaining: number;
@@ -154,6 +175,14 @@ export async function rateLimit({
   }
 }
 
+/**
+ * Extrait l'adresse IP du client depuis les en-têtes de proxy usuels.
+ * Lit d'abord la première IP de `x-forwarded-for`, puis `x-real-ip`,
+ * et retourne "unknown" en dernier recours.
+ *
+ * @param req - Requête HTTP entrante.
+ * @returns L'IP client (string) ou "unknown".
+ */
 export function clientIp(req: Request) {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -162,6 +191,7 @@ export function clientIp(req: Request) {
   );
 }
 
+/** Réinitialise le cache du SHA du script (usage exclusif en tests). */
 // Exporté uniquement pour les tests
 export function __resetScriptCache() {
   cachedSha = null;

@@ -1,10 +1,19 @@
+/**
+ * Tests des Server Actions genre (lib/actions/genre.ts).
+ * Vérifie la matrice RBAC (création/modification réservées à moderator+,
+ * suppression à admin), le refus avant toute requête DB et la gestion
+ * des genres introuvables.
+ */
 // lib/actions/genre.test.ts
+// API Vitest : suites, tests, assertions, mocks et hooks
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Actions sous test
 import {
   createGenreAction,
   updateGenreAction,
   deleteGenreAction,
 } from "./genre";
+// Helpers partagés : session mockée et assertions
 import {
   mockSession,
   setUser,
@@ -12,16 +21,19 @@ import {
   expectDenied,
 } from "./__tests__/helpers";
 
+// Mocks des modules Next.js inutilisables hors rendu (headers, cache)
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
 }));
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
+// Mock de l'authentification : renvoie la session configurée par setUser()
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => mockSession.current) } },
 }));
 
+// Mocks des mutations DB genres : renvoient un objet fusionné minimal
 vi.mock("@/db/mutations/genres", () => ({
   createGenre: vi.fn(async (d: any) => ({
     id: "genre-new",
@@ -44,10 +56,12 @@ vi.mock("@/db/queries/genres", () => ({
   })),
 }));
 
+// Réinitialise les espions entre chaque test
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
+/** Fabrique un FormData de création de genre, avec champs surchargeables. */
 function genreForm(overrides: Record<string, string> = {}) {
   const fd = new FormData();
   fd.set("name", "Blackened Death Metal");
@@ -56,6 +70,7 @@ function genreForm(overrides: Record<string, string> = {}) {
   return fd;
 }
 
+/** Fabrique un FormData de modification de genre (avec id), surchargeable. */
 function genreUpdateForm(overrides: Record<string, string> = {}) {
   const fd = new FormData();
   fd.set("id", "550e8400-e29b-41d4-a716-446655440004");
@@ -65,6 +80,7 @@ function genreUpdateForm(overrides: Record<string, string> = {}) {
   return fd;
 }
 
+// Suite principale : matrice des permissions sur les actions genre
 describe("genre — RBAC", () => {
   it("non authentifié refusé", async () => {
     setUser(null);
@@ -105,6 +121,7 @@ describe("genre — RBAC", () => {
     );
   });
 
+  // Le garde RBAC doit bloquer avant la lecture en base
   it("refuse AVANT toute requête DB", async () => {
     const { getGenreById } = await import("@/db/queries/genres");
     setUser("user");

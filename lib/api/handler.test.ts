@@ -1,18 +1,38 @@
+/**
+ * Tests du fabrique de route handlers (lib/api/handler.ts).
+ * Vérifie les codes HTTP du pipeline : 401 sans session, 403 sans
+ * permission, 422 sur body invalide, coercion de la query zod et
+ * exécution du RBAC AVANT la validation du corps.
+ */
+
+// API Vitest : suites, tests, assertions, mocks et hooks
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Schémas zod pour tester la validation des entrées
 import { z } from "zod";
+// Fabrique sous test
 import { route } from "./handler";
+// Requête Next.js utilisée pour simuler les appels HTTP
 import { NextRequest } from "next/server";
 
+// Espion de getSession, branché dans le mock de @/lib/auth ci-dessous
 const mockGetSession = vi.fn();
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: () => mockGetSession() } },
 }));
+// Mocks des modules Next.js et du rate limiting (no-op)
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
 vi.mock("./rate-limit", () => ({
   rateLimit: async () => null,
   clientIp: () => "127.0.0.1",
 }));
 
+/**
+ * Fabrique une NextRequest de test.
+ *
+ * @param url - URL complète de la requête (query string incluse).
+ * @param method - Méthode HTTP.
+ * @param body - Corps JSON optionnel (sérialisé automatiquement).
+ */
 const mkReq = (
   url = "http://localhost/api/test",
   method = "GET",
@@ -23,8 +43,10 @@ const mkReq = (
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 
+// Segment de route sans paramètres dynamiques
 const noParams = { params: Promise.resolve({}) };
 
+// Suite principale : comportement du pipeline du handler
 describe("route handler", () => {
   beforeEach(() => vi.clearAllMocks());
 

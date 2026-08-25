@@ -1,3 +1,8 @@
+/**
+ * Page d'accueil du site (route /).
+ * Point d'entrée principal : affiche le titre et la baseline de
+ * l'encyclopédie du metal. Composant serveur statique.
+ */
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">

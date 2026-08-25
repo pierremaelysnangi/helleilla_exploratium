@@ -7,3 +7,6 @@ rules:
   info-license: off
   tag-description: warn
   operation-operationId: error
+  # /api/bands/by-slug/{slug} coexiste avec /api/bands/{id} : Next.js
+  # donne la précédence au segment statique, donc pas d'ambiguïté réelle.
+  no-ambiguous-paths: off

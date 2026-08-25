@@ -1,15 +1,26 @@
+/**
+ * Schémas de validation Zod pour les groupes (bands).
+ * Définit la forme de base réutilisable, une règle métier sur les années
+ * (dissolution >= formation), la validation d'un fichier image optionnel,
+ * et expose les schémas de création/mise à jour + types inférés.
+ */
+
+// Bibliothèque de validation de schéma
 import { z } from "zod";
 
-const CURRENT_YEAR = new Date().getFullYear();
+const CURRENT_YEAR = new Date().getFullYear(); // Année courante, borne supérieure
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // Taille max d'image : 5 Mo
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"]; // Formats acceptés
 
+// Slug kebab-case : lettres minuscules/chiffres séparés par des tirets
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+// Code pays ISO 3166-1 alpha-2 (ex: FR, US)
 const countryCodeRegex = /^[A-Z]{2}$/;
 
 // Objet "nu", sans refine — réutilisable pour .partial()
-const bandShape = {
+// Forme de base sans règle transversale, pour pouvoir appliquer .partial()
+export const bandShape = {
   name: z
     .string()
     .trim()
@@ -56,14 +67,22 @@ const bandShape = {
     .nullable(),
 };
 
+// Objet Zod construit à partir de la forme de base
 const bandObject = z.object(bandShape);
 
+// Contrainte des champs années (utilisée pour typer le refine)
 type YearFields = {
   formedYear?: number | null;
   dissolvedYear?: number | null;
 };
 
-function withYearRule<T extends z.ZodType<YearFields>>(schema: T) {
+/**
+ * Ajoute une règle métier à un schéma : l'année de dissolution, si fournie,
+ * doit être postérieure ou égale à l'année de formation.
+ * @param schema Un schéma Zod dont la sortie contient formedYear/dissolvedYear.
+ * @returns Le schéma enrichi du refine.
+ */
+export function withYearRule<T extends z.ZodType<YearFields>>(schema: T) {
   return schema.refine(
     (data) =>
       !data.dissolvedYear ||
@@ -89,6 +108,10 @@ function withYearRule<T extends z.ZodTypeAny>(schema: T) {
 }
 */
 
+/**
+ * Validation d'un fichier image optionnel (présence, taille max 5 Mo, format).
+ * Utilisé côté serveur dans les Server Actions.
+ */
 // Fichier image optionnel — validé côté serveur dans la Server Action
 export const imageFileSchema = z
   .instanceof(File)
@@ -100,15 +123,25 @@ export const imageFileSchema = z
   )
   .optional();
 
+/**
+ * Schéma de création d'un groupe : forme de base + règle sur les années.
+ */
 export const createBandSchema = withYearRule(bandObject);
 
+/**
+ * Schéma du body de mise à jour sans `id` : champs partiels + règle années.
+ */
 export const updateBandBodySchema = withYearRule(bandObject.partial());
 
+/**
+ * Schéma de mise à jour complète : champs partiels + `id` obligatoire + règle années.
+ */
 export const updateBandSchema = withYearRule(
   bandObject.partial().extend({
     id: z.string().uuid("ID de bande invalide"),
   }),
 );
 
+// Types TypeScript inférés depuis les schémas, utilisés côté app
 export type CreateBandInput = z.infer<typeof createBandSchema>;
 export type UpdateBandInput = z.infer<typeof updateBandSchema>;

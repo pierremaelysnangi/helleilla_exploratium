@@ -1,10 +1,22 @@
+/**
+ * Script d'initialisation de MinIO.
+ * Crée le bucket s'il n'existe pas, puis applique une policy de lecture
+ * publique sur les dossiers `covers/` et `logos/` afin que les images
+ * soient servies directement au navigateur.
+ */
+
+// Commandes S3 : vérification/création de bucket et application de policy
 import {
   CreateBucketCommand,
   HeadBucketCommand,
   PutBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
-import { s3, BUCKET } from "../lib/s3";
+import { s3, BUCKET } from "../lib/s3"; // Client S3 (MinIO) et nom du bucket
 
+/**
+ * Point d'entrée du script : vérifie l'existence du bucket (le crée sinon),
+ * puis applique la politique de lecture publique sur covers/ et logos/.
+ */
 async function main() {
   try {
     await s3.send(new HeadBucketCommand({ Bucket: BUCKET }));
@@ -39,6 +51,7 @@ async function main() {
   console.log("✅ Policy de lecture publique appliquée");
 }
 
+// Lancement du script avec sortie en erreur (code 1) en cas d'échec
 main().catch((e) => {
   console.error(e);
   process.exit(1);

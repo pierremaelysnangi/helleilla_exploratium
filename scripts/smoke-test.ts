@@ -1,13 +1,28 @@
+/**
+ * Script de test de fumée (smoke test) : valide la chaîne complète
+ * DB → BullMQ → Meilisearch. Crée un groupe, un album et une piste,
+ * enfile leur indexation, vérifie la recherche Meilisearch, puis
+ * supprime le tout et confirme la disparition des documents indexés.
+ */
+
+// Mutations Drizzle : création/suppression des entités
 import { createBand, deleteBand } from "@/db/mutations/bands";
 import { createAlbum } from "@/db/mutations/albums";
 import { createTrack } from "@/db/mutations/tracks";
+// Enqueue des jobs d'indexation dans BullMQ
 import { enqueueBandIndex } from "@/lib/queue/jobs/index-band";
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
+// Client Meilisearch pour vérifier les résultats de recherche
 import { meilisearch } from "@/lib/search/meilisearch";
 
+// Petit utilitaire d'attente (ms), pour laisser les workers traiter les jobs
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Point d'entrée du smoke test : création → indexation → recherche → nettoyage,
+ * avec vérification que la suppression a bien été propagée à Meilisearch.
+ */
 async function main() {
   console.log("🧪 Smoke test — chaîne DB → Queue → Meilisearch\n");
 
@@ -64,6 +79,7 @@ async function main() {
   process.exit(0);
 }
 
+// Lancement du script : log l'erreur et sort avec code 1 en cas d'échec
 main().catch((err) => {
   console.error("❌ Smoke test échoué:", err);
   process.exit(1);

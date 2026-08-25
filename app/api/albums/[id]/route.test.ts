@@ -1,4 +1,13 @@
+/**
+ * Tests unitaires de la route /api/albums/[id] (GET, PATCH, DELETE).
+ * Stratégie : toutes les dépendances externes (Redis, auth, DB, files BullMQ,
+ * requêtes utilitaires) sont mockées afin de tester uniquement la logique
+ * de la route (codes HTTP, permissions, effets sur les files d'indexation).
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Helpers de test partagés : session simulée (`mockSession`, `setUser`),
+// fabrication de requêtes (`mkReq`), contexte de route (`ctx`) et
+// chaînage des mocks Drizzle (`chain`, simulant .from().where().limit()).
 import {
   mockSession,
   setUser,
@@ -7,14 +16,20 @@ import {
   chain,
 } from "@/lib/api/__tests__/route-helpers";
 
+// Mock de Redis : le rate limiter incrémentera toujours un compteur à 1
+// (aucune limite atteinte pendant les tests).
 vi.mock("@/lib/redis", () => ({
   redis: { incr: vi.fn(async () => 1), expire: vi.fn(async () => 1) },
 }));
 
+// Mock de better-auth : `getSession` renvoie la session courante,
+// contrôlée par `setUser(...)` dans chaque test.
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => mockSession.current) } },
 }));
 
+// Mock du client Drizzle : `vi.hoisted` permet de déclarer les mocks
+// avant leur utilisation par `vi.mock` (hoisting des imports).
 const dbMock = vi.hoisted(() => ({
   select: vi.fn(),
   update: vi.fn(),
@@ -22,6 +37,8 @@ const dbMock = vi.hoisted(() => ({
 }));
 vi.mock("@/db", () => ({ db: dbMock }));
 
+// Mocks des files BullMQ d'indexation (album + pistes), espionnées
+// via `add` pour vérifier l'enchaînement des jobs.
 const albumQueue = vi.hoisted(() => ({ add: vi.fn() }));
 const trackQueue = vi.hoisted(() => ({ add: vi.fn() }));
 vi.mock("@/lib/queue/client", () => ({
@@ -29,23 +46,33 @@ vi.mock("@/lib/queue/client", () => ({
   trackIndexQueue: trackQueue,
 }));
 
+// Mock de la requête utilitaire listant les ids de pistes d'un album
+// (utilisée par DELETE pour désindexer la descendance).
 const queriesMock = vi.hoisted(() => ({
   listTrackIdsByAlbumId: vi.fn(async () => [] as string[]),
 }));
 vi.mock("@/db/queries/tracks", () => queriesMock);
 
+// Import dynamique APRÈS la déclaration des mocks, pour que le module
+// testé reçoive bien les versions mockées.
 const { GET, PATCH, DELETE } = await import("./route");
 
+// Identifiants UUID valides utilisés dans les tests (album + 2 pistes).
 const ID = "00000000-0000-4000-8000-0000000000a1";
 const T1 = "00000000-0000-4000-8000-0000000000t1".replace(/t/g, "9");
 const T2 = "00000000-0000-4000-8000-0000000000t2".replace(/t/g, "9");
 
+// Réinitialisation des mocks et de la session avant chaque test.
 beforeEach(() => {
   vi.clearAllMocks();
   setUser(null);
   queriesMock.listTrackIdsByAlbumId.mockResolvedValue([]);
 });
 
+/**
+ * Suite GET : vérifie le code 200 avec les données, le 404 si absent,
+ * et le 422 si l'id n'est pas un UUID valide (sans toucher la DB).
+ */
 describe("GET /api/albums/[id]", () => {
   it("200 si trouvé", async () => {
     dbMock.select.mockReturnValue(
@@ -69,6 +96,11 @@ describe("GET /api/albums/[id]", () => {
   });
 });
 
+/**
+ * Suite PATCH : vérifie l'interdiction pour un simple user (403),
+ * la mise à jour + réindexation pour un contributor (200),
+ * et le 404 si aucune ligne n'a été modifiée (sans job ajouté).
+ */
 describe("PATCH /api/albums/[id]", () => {
   it("403 pour un user simple", async () => {
     setUser("user");
@@ -106,6 +138,11 @@ describe("PATCH /api/albums/[id]", () => {
   });
 });
 
+/**
+ * Suite DELETE : vérifie l'interdiction pour un contributor (403),
+ * la suppression + cascade des jobs de désindexation pour un moderator
+ * (1 job album + 2 jobs pistes), et le 404 si absent.
+ */
 describe("DELETE /api/albums/[id]", () => {
   it("403 pour un contributor", async () => {
     setUser("contributor");

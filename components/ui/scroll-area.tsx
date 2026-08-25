@@ -1,10 +1,17 @@
 "use client";
 
+/**
+ * ScrollArea — zone défilante avec barre de défilement personnalisée.
+ * Composant shadcn/ui basé sur le primitive ScrollArea de Base UI.
+ */
 import * as React from "react";
+// Primitive ScrollArea de Base UI (Root, Viewport, Scrollbar, Thumb, Corner)
 import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 
+// Fusion de classes conditionnelle
 import { cn } from "@/lib/utils";
 
+/** Zone défilante : intègre le viewport et la barre de défilement. */
 function ScrollArea({
   className,
   children,
@@ -28,6 +35,10 @@ function ScrollArea({
   );
 }
 
+/**
+ * Barre de défilement personnalisée avec pouce (thumb).
+ * @param orientation - "vertical" (défaut) ou "horizontal".
+ */
 function ScrollBar({
   className,
   orientation = "vertical",

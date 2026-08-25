@@ -1,7 +1,18 @@
+/**
+ * Tests du document OpenAPI généré (lib/api/openapi).
+ * Vérifie la validité de surface (3.1, info), la présence des opérations
+ * CRUD par ressource, la réutilisation des composants nommés, la sécurité
+ * des mutations, l'unicité des operationId et les métadonnées (license/tags).
+ */
+
+// API Vitest : suites, tests et assertions
 import { describe, expect, it } from "vitest";
+// Point d'entrée qui enregistre les paths puis expose buildDocument
 import { buildDocument } from "./index";
 
+// Suite principale : invariants du document généré
 describe("OpenAPI document", () => {
+  // Document construit une seule fois pour toute la suite
   const doc = buildDocument();
 
   it("est un document 3.1 valide en surface", () => {
@@ -20,11 +31,22 @@ describe("OpenAPI document", () => {
     }
     expect(doc.paths?.["/api/genres"]).toHaveProperty("get");
     expect(doc.paths?.["/api/genres"]).toHaveProperty("post");
+    expect(doc.paths?.["/api/search"]).toHaveProperty("get");
   });
 
   it("réutilise les schémas nommés dans components", () => {
+    // Les hits (BandHit...) sont inlinés dans GlobalSearchResponse par
+    // zod-openapi : seuls les schémas référencés directement deviennent
+    // des composants nommés.
     expect(Object.keys(doc.components?.schemas ?? {})).toEqual(
-      expect.arrayContaining(["Band", "Album", "Track", "Genre", "Error"]),
+      expect.arrayContaining([
+        "Band",
+        "Album",
+        "Track",
+        "Genre",
+        "Error",
+        "GlobalSearchResponse",
+      ]),
     );
   });
 

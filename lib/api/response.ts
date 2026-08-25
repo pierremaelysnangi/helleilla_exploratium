@@ -5,9 +5,13 @@ export const ErrorCode = {
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  /** Conflit d'unicité (slug, email… déjà pris). */
+  CONFLICT: 409,
   VALIDATION: 422,
   RATE_LIMIT: 429,
   INTERNAL: 500,
+  /** Service dépendant indisponible (ex : Meilisearch, Redis fail-closed). */
+  UNAVAILABLE: 503,
 } as const;
 
 export type ErrorCodeKey = keyof typeof ErrorCode;

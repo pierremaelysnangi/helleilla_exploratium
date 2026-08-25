@@ -1,4 +1,12 @@
+/**
+ * Tests unitaires de la route /api/tracks/[id] (GET, PATCH, DELETE).
+ * Toutes les dépendances externes (Redis, auth, DB, file BullMQ) sont mockées
+ * pour tester la logique de la route : codes HTTP, permissions, jobs d'indexation.
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// Helpers partagés : session simulée (`mockSession`, `setUser`),
+// fabrication de requêtes (`mkReq`), contexte de route (`ctx`) et
+// chaînage des mocks Drizzle (`chain`).
 import {
   mockSession,
   setUser,
@@ -7,14 +15,17 @@ import {
   chain,
 } from "@/lib/api/__tests__/route-helpers";
 
+// Mock de Redis : le rate limiter ne bloque jamais (compteur toujours à 1).
 vi.mock("@/lib/redis", () => ({
   redis: { incr: vi.fn(async () => 1), expire: vi.fn(async () => 1) },
 }));
 
+// Mock de better-auth : session pilotée par `setUser(...)` dans chaque test.
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn(async () => mockSession.current) } },
 }));
 
+// Mock du client Drizzle (déclaré via `vi.hoisted` pour précéder le hoisting).
 const dbMock = vi.hoisted(() => ({
   select: vi.fn(),
   update: vi.fn(),
@@ -22,18 +33,27 @@ const dbMock = vi.hoisted(() => ({
 }));
 vi.mock("@/db", () => ({ db: dbMock }));
 
+// Mock espion de la file d'indexation des pistes.
 const queueMock = vi.hoisted(() => ({ add: vi.fn() }));
 vi.mock("@/lib/queue/client", () => ({ trackIndexQueue: queueMock }));
 
+// Import dynamique après les mocks afin que la route les utilise.
 const { GET, PATCH, DELETE } = await import("./route");
 
+// UUID valide utilisé comme identifiant de piste dans les tests.
 const ID = "00000000-0000-4000-8000-000000000091";
 
+// Réinitialisation des mocks et de la session avant chaque test.
 beforeEach(() => {
   vi.clearAllMocks();
   setUser(null);
 });
 
+/**
+ * Suite GET : vérifie le 200 avec les données de la piste,
+ * le 404 si absente, et le 422 si l'id n'est pas un UUID
+ * (sans requête SQL exécutée).
+ */
 describe("GET /api/tracks/[id]", () => {
   it("200 si trouvé", async () => {
     dbMock.select.mockReturnValue(
@@ -57,6 +77,11 @@ describe("GET /api/tracks/[id]", () => {
   });
 });
 
+/**
+ * Suite PATCH : vérifie l'interdiction pour un simple user (403),
+ * la mise à jour + réindexation pour un contributor (200),
+ * et le 404 si aucune ligne n'a été modifiée (sans job ajouté).
+ */
 describe("PATCH /api/tracks/[id]", () => {
   it("403 pour un user simple", async () => {
     setUser("user");
@@ -94,6 +119,11 @@ describe("PATCH /api/tracks/[id]", () => {
   });
 });
 
+/**
+ * Suite DELETE : vérifie l'interdiction pour un contributor (403),
+ * la suppression + job de désindexation pour un moderator (200),
+ * et le 404 si la piste est absente.
+ */
 describe("DELETE /api/tracks/[id]", () => {
   it("403 pour un contributor", async () => {
     setUser("contributor");

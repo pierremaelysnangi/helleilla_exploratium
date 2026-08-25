@@ -1,6 +1,15 @@
+/**
+ * Tests de la matrice de permissions RBAC (lib/rbac/permissions.ts).
+ * Vérifie la progression des droits entre rôles : user en lecture seule,
+ * contributor sans suppression, moderator avec suppression, admin complet.
+ */
+
+// API Vitest : suites, tests et assertions
 import { describe, it, expect } from "vitest";
+// Fonction de contrôle sous test
 import { can } from "./permissions";
 
+// Suite principale : invariants de la matrice par rôle
 describe("RBAC permissions matrix", () => {
   it("user ne peut pas supprimer une band", () => {
     expect(can("user", "band", "delete")).toBe(false);
