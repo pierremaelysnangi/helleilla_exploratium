@@ -77,3 +77,17 @@ export async function getBandWithAlbumsAndGenres(id: string) {
     },
   });
 }
+
+/**
+ * Liste plate des slugs + dates de mise à jour (sitemap SEO).
+ * Léger : deux colonnes seulement, tout le catalogue.
+ */
+export async function listBandSlugs(): Promise<
+  { slug: string; updatedAt: Date }[]
+> {
+  return db
+    .select({ slug: bands.slug, updatedAt: bands.updatedAt })
+    .from(bands)
+    .orderBy(desc(bands.updatedAt))
+    .limit(10_000);
+}

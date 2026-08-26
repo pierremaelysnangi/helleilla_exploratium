@@ -31,3 +31,6 @@ export const db = drizzle(client, { schema });
 
 /** Type de l'instance Drizzle, réutilisable pour l'injection de dépendances. */
 export type DB = typeof db;
+
+/** Ferme le pool de connexions applicatif (usage : teardown de tests). */
+export const closeDb = () => client.end({ timeout: 5 });

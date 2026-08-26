@@ -157,5 +157,10 @@ export default async function globalSetup() {
       }
     }
     await sql.end({ timeout: 5 });
+    // Ferme les connexions (Redis + pools Postgres) ouvertes dans ce
+    // processus par l'import de @/lib/auth lors du seed : sans cela
+    // l'event loop du runner Vitest ne se vide pas → « close timed out ».
+    const { closeAuthConnections } = await import("@/lib/auth");
+    await closeAuthConnections().catch(() => undefined);
   };
 }

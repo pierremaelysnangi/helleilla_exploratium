@@ -1,15 +1,24 @@
 /**
- * Page listant les albums (/albums).
- * Page placeholder : le contenu définitif sera implémenté plus tard.
- * Composant serveur par défaut (pas de "use client"), sans accès aux données pour l'instant.
+ * Page listant les albums (/albums) — catalogue virtualisé trié par
+ * année avec recherche par titre.
  */
+
+import type { Metadata } from "next";
+import { AlbumsList } from "@/components/albums/albumsList";
+
+export const metadata: Metadata = {
+  title: "Albums",
+  description: "Catalogue des albums, EP, singles et démos du monde metal.",
+};
+
 export default function AlbumsPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold">Albums</h1>
-      <p className="text-muted-foreground mt-2">
-        Page en construction — /albums
-      </p>
-    </main>
+    <div className="flex flex-col gap-4">
+      <header>
+        <h1 className="metal-title text-2xl">Albums</h1>
+        <div className="metal-rule mt-2 w-40" />
+      </header>
+      <AlbumsList />
+    </div>
   );
 }

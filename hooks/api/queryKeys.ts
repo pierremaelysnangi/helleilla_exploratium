@@ -44,3 +44,10 @@ export const searchKeys = {
   all: ["search"] as const,
   query: (q: string, limit: number) => ["search", q, limit] as const,
 };
+
+/** Clés des DTO média agrégé (resolver providers externes). */
+export const mediaKeys = {
+  all: ["media"] as const,
+  /** Média-complet d'un groupe par identifiant. */
+  band: (id: string) => ["media", "band", id] as const,
+};

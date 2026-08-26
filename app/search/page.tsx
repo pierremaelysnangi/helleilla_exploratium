@@ -1,15 +1,28 @@
 /**
- * Page de recherche (/search).
- * Page placeholder : permettra de rechercher groupes, albums, genres et membres
- * une fois la logique (paramètres d'URL + requêtes Drizzle) implémentée.
+ * Page de recherche (/search) — champ + résultats groupés par type
+ * (groupes, albums, pistes). La palette Ctrl+K est montée séparément
+ * dans le layout racine.
  */
+
+import type { Metadata } from "next";
+import { SearchView } from "@/components/search/searchView";
+
+export const metadata: Metadata = {
+  // La recherche est une interface, pas du contenu indexable
+  robots: { index: false },
+  title: "Recherche",
+  description:
+    "Recherchez parmi les groupes, albums et pistes du catalogue metal.",
+};
+
 export default function SearchPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold">Search</h1>
-      <p className="text-muted-foreground mt-2">
-        Page en construction — /search
-      </p>
-    </main>
+    <div className="flex flex-col gap-6">
+      <header>
+        <h1 className="metal-title text-2xl">Recherche</h1>
+        <div className="metal-rule mt-2 w-40" />
+      </header>
+      <SearchView />
+    </div>
   );
 }

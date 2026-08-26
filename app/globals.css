@@ -4,6 +4,8 @@
 @import "tw-animate-css";
 /* Thème et styles de base des composants shadcn/ui */
 @import "shadcn/tailwind.css";
+/* Identité visuelle dark-metal (utilitaires .metal-*) */
+@import "../styles/theme.css";
 
 /* Variante personnalisée : active la classe `dark:` dès que l'ancêtre `.dark` est présent */
 @custom-variant dark (&:is(.dark *));

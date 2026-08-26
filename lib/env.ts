@@ -47,15 +47,25 @@ const envSchema = z.object({
   // dégrade proprement (résultats vides) si absent. https://www.discogs.com/settings/developers
   DISCOGS_TOKEN: z.string().min(8).optional(),
 
-  // Base de données dédiée à l'identité (RGPD) : user/session/account.
-  // Optionnelle tant que la migration vers le projet dédié n'est pas
-  // effective ; Better Auth bascule dessus dès qu'elle est définie.
+  // Base identité DÉDIÉE (RGPD) : user/session/account/verification dans
+  // un projet Supabase séparé du contenu. Prend la priorité sur
+  // AUTH_DATABASE_URL (repli mono-base) puis DATABASE_URL.
+  IDENTITY_AUTH_DATABASE_URL: z.string().url().optional(),
   AUTH_DATABASE_URL: z.string().url().optional(),
 
   // Cloudflare Turnstile (CAPTCHA invisible sur l'inscription).
   // Optionnels : sans secret, la vérification est désactivée et
   // l'inscription repose uniquement sur le rate limiting Better Auth.
   TURNSTILE_SECRET_KEY: z.string().min(10).optional(),
+
+  // SMTP transactionnel (emails de réinitialisation de mot de passe).
+  // Optionnels : sans configuration, le lien de reset est journalisé en
+  // console (mode dev) au lieu d'être envoyé.
+  SMTP_HOST: z.string().min(3).optional(),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  MAIL_FROM: z.string().email().optional(),
 });
 
 /**

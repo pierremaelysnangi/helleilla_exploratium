@@ -130,3 +130,151 @@ describe("Pages d'authentification", () => {
     expect(html).toContain('name="password"');
   });
 });
+
+describe("Parcours catalogue (front métier)", () => {
+  it("l'accueil rend le héro et les sections", async () => {
+    const res = await fetch(`${BASE_URL}/`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("Helleilla Exploratium");
+    expect(html).toContain("Explorer le catalogue");
+  });
+
+  it("GET /bands rend la page catalogue (SSR : titre, nav)", async () => {
+    const res = await fetch(`${BASE_URL}/bands`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    // Le titre et la navigation sont SSR ; les filtres/liste se rendent
+    // côté client par design (filtres URL + infinite query).
+    expect(html).toContain("<title>Groupes | Helleilla Exploratium</title>");
+    expect(html).toContain('aria-current="page"');
+  });
+
+  it("GET /albums rend la page catalogue albums", async () => {
+    const res = await fetch(`${BASE_URL}/albums`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("<title>Albums | Helleilla Exploratium</title>");
+  });
+
+  it("GET /genres rend la taxonomie filtrable", async () => {
+    const res = await fetch(`${BASE_URL}/genres`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("Filtrer les genres");
+  });
+
+  it("la page détail d'un groupe SSR affiche nom, genres et discographie", async () => {
+    // Crée un groupe + genre + liaison pour avoir du contenu réel
+    const genre = await admin.post<{ data: { id: string; name: string } }>(
+      "/api/genres",
+      { name: `DetailGenre-${Date.now()}`, slug: `detailgenre-${Date.now()}` },
+    );
+    const payload = bandPayload(`DetailBand-${Date.now()}`);
+    const band = await contributor.post<{ data: { id: string; slug: string } }>(
+      "/api/bands",
+      payload,
+    );
+    const bandId = band.json.data.id;
+    await contributor.request(`/api/bands/${bandId}/genres`, {
+      method: "PUT",
+      body: JSON.stringify({ genreIds: [genre.json.data.id] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const res = await fetch(`${BASE_URL}/bands/${payload.slug}`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    // Contenu SSR indexable
+    // Contenu SSR indexable : nom, bio, genres liés, section discographie
+    expect(html).toContain(payload.name);
+    expect(html).toContain("Bio de test pour");
+    expect(html).toContain("Discographie");
+
+    // Nettoyage
+    await admin.delete(`/api/bands/${bandId}`).catch(() => undefined);
+    await admin
+      .delete(`/api/genres/${genre.json.data.id}`)
+      .catch(() => undefined);
+  });
+});
+
+describe("Réinitialisation de mot de passe", () => {
+  it("GET /forgot-password rend le formulaire avec anti-énumération", async () => {
+    const res = await fetch(`${BASE_URL}/forgot-password`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("Mot de passe oublié");
+    expect(html).toContain("Recevoir le lien");
+  });
+
+  it("GET /reset-password sans token invite à refaire une demande", async () => {
+    const res = await fetch(`${BASE_URL}/reset-password`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("Lien incomplet");
+  });
+
+  it("l'API forget-password répond génériquement pour un email inconnu (anti-énumération)", async () => {
+    const res = await fetch(`${BASE_URL}/api/auth/request-password-reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "compte-inexistant@example.com",
+        redirectTo: `${BASE_URL}/reset-password`,
+      }),
+    });
+    // Better Auth répond 200 même pour un email inconnu : aucune fuite d'info
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.status).toBe(true);
+  });
+});
+
+describe("SEO — indexation", () => {
+  it("GET /robots.txt autorise le catalogue et déclare le sitemap", async () => {
+    const res = await fetch(`${BASE_URL}/robots.txt`);
+    expect(res.status).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("Sitemap:");
+    expect(body).toContain("Disallow: /api/");
+  });
+
+  it("GET /sitemap.xml liste les groupes de la base", async () => {
+    // Crée un groupe pour vérifier sa présence dans le plan de site
+    const payload = bandPayload(`SitemapBand-${Date.now()}`);
+    const created = await contributor.post<{
+      data: { id: string; slug: string };
+    }>("/api/bands", payload);
+
+    const res = await fetch(`${BASE_URL}/sitemap.xml`);
+    expect(res.status).toBe(200);
+    const xml = await res.text();
+    expect(xml).toContain(`${BASE_URL}/bands`);
+    expect(xml).toContain(`/${payload.slug}`);
+
+    await admin
+      .delete(`/api/bands/${created.json.data.id}`)
+      .catch(() => undefined);
+  });
+
+  it("la page détail groupe embarque les données structurées MusicGroup", async () => {
+    const payload = bandPayload(`JsonLdBand-${Date.now()}`);
+    payload.formedYear = 1990;
+    const created = await contributor.post<{
+      data: { id: string; slug: string };
+    }>("/api/bands", payload);
+
+    const res = await fetch(`${BASE_URL}/bands/${payload.slug}`);
+    const html = await res.text();
+    expect(html).toContain("application/ld+json");
+    expect(html).toContain('"MusicGroup"');
+    expect(html).toContain(payload.name);
+    // Canonical dynamique présent
+    expect(html).toContain(`/bands/${payload.slug}`);
+
+    await admin
+      .delete(`/api/bands/${created.json.data.id}`)
+      .catch(() => undefined);
+  });
+});

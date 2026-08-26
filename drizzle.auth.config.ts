@@ -18,7 +18,9 @@ export default defineConfig({
   out: "./db/migrations-auth",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.AUTH_DATABASE_URL!,
+    // Priorité : projet identités dédié -> repli historique
+    url:
+      process.env.IDENTITY_AUTH_DATABASE_URL ?? process.env.AUTH_DATABASE_URL!,
     // Supabase exige TLS sur les connexions directes
     ssl: "require",
   },

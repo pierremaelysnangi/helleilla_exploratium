@@ -1,2 +1,45 @@
-/* Thème global de l'application (variables CSS, couleurs, typographie).
-   Fichier actuellement vide — à compléter. */
+/*
+ * Thème "dark-metal" de l'application.
+ * Complète les tokens shadcn (globals.css) avec des utilitaires dédiés à
+ * l'identité visuelle : typographie marquée, dégradés acier et accents
+ * rouges sang — sans jamais générer de médias (règle stricte AGENTS.md).
+ */
+
+/* Titre de site : capitales espacées, effet métal brossé par dégradé */
+.metal-title {
+  @apply font-heading font-black tracking-[0.18em] uppercase;
+  background: linear-gradient(
+    180deg,
+    var(--foreground) 0%,
+    color-mix(in oklab, var(--foreground) 55%, var(--muted-foreground)) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Lien de navigation : capitale discrète, accent rouge au survol/actif */
+.metal-nav-link {
+  @apply text-muted-foreground hover:text-foreground text-sm font-semibold tracking-widest uppercase transition-colors;
+}
+
+.metal-nav-link-active {
+  @apply text-foreground;
+  box-shadow: inset 0 -2px 0 0 var(--primary);
+}
+
+/* Carte catalogue : bordure acier, élévation subtile au survol */
+.metal-card {
+  @apply border-border bg-card rounded-lg border transition-all duration-200;
+}
+.metal-card:hover {
+  @apply border-primary/40 shadow-primary/5 shadow-lg;
+  transform: translateY(-1px);
+}
+
+/* Bande d'en-tête de section : filet dégradé façon lame */
+.metal-rule {
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--primary) 0%, transparent 80%);
+}

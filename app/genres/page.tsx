@@ -1,14 +1,24 @@
 /**
- * Page listant les genres musicaux (/genres).
- * Page placeholder : le contenu définitif sera implémenté plus tard.
+ * Page des genres (/genres) — taxonomie filtrable ; chaque genre renvoie
+ * vers le catalogue de groupes filtré.
  */
+
+import type { Metadata } from "next";
+import { GenresView } from "@/components/genres/genresView";
+
+export const metadata: Metadata = {
+  title: "Genres",
+  description: "Taxonomie des genres et sous-genres metal.",
+};
+
 export default function GenresPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold">Genres</h1>
-      <p className="text-muted-foreground mt-2">
-        Page en construction — /genres
-      </p>
-    </main>
+    <div className="flex flex-col gap-4">
+      <header>
+        <h1 className="metal-title text-2xl">Genres</h1>
+        <div className="metal-rule mt-2 w-40" />
+      </header>
+      <GenresView />
+    </div>
   );
 }

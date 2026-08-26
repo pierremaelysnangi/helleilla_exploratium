@@ -36,3 +36,40 @@ export const useCreateBand = bandsHooks.useCreate;
 export const useUpdateBand = bandsHooks.useUpdate;
 /** Suppression d'un groupe (moderator+). */
 export const useDeleteBand = bandsHooks.useDelete;
+
+// Lecture publique par slug (pages détail SSR)
+import { queryOptions } from "@tanstack/react-query";
+import { apiJson } from "./api/client";
+import { bandDetailSchema, type BandDetail } from "./api/schemas";
+
+/**
+ * Options de requête du détail par slug (GET /api/bands/by-slug/:slug).
+ * Exposées pour un fetch RSC direct côté page serveur.
+ */
+export function bandBySlugOptions(slug: string) {
+  return queryOptions({
+    queryKey: ["bands", "by-slug", slug],
+    queryFn: async ({ signal }): Promise<BandDetail> => {
+      const data = await apiJson<unknown>(
+        `/api/bands/by-slug/${encodeURIComponent(slug)}`,
+        { signal },
+      );
+      return bandDetailSchema.parse(data);
+    },
+  });
+}
+
+/** Fetch direct (RSC) du détail par slug ; null si 404. */
+export async function fetchBandBySlug(
+  slug: string,
+  init?: { signal?: AbortSignal },
+): Promise<BandDetail | null> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/bands/by-slug/${encodeURIComponent(slug)}`,
+    { next: { revalidate: 60 }, signal: init?.signal },
+  );
+  if (!res.ok) return null;
+  const payload: unknown = await res.json();
+  // Enveloppe { data }
+  return bandDetailSchema.parse((payload as { data: unknown }).data);
+}

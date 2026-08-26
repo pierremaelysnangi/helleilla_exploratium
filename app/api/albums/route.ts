@@ -16,7 +16,8 @@ import { listQuerySchema } from "@/lib/api/schemas";
 import { createAlbumSchema } from "@/lib/validations/album";
 import { db } from "@/db";
 import { albums } from "@/db/schema";
-import { desc, asc, ilike, sql, type SQL } from "drizzle-orm";
+import { desc, asc, ilike, sql, and, eq, type SQL } from "drizzle-orm";
+import { z } from "zod";
 import { albumIndexQueue } from "@/lib/queue/client";
 
 /**
@@ -30,22 +31,32 @@ const SORT_COLUMNS = {
 } as const;
 
 /**
- * GET /api/albums — liste paginée d'albums avec recherche et tri.
+ * Query de liste albums : pagination standard + filtre par groupe
+ * (`bandId`, UUID) pour la discographie d'une page détail.
+ */
+const albumListQuerySchema = listQuerySchema.extend({
+  bandId: z.string().uuid().optional(),
+});
+
+/**
+ * GET /api/albums — liste paginée d'albums avec recherche, tri et
+ * filtre facultatif par groupe.
  *
  * @param query - Query params validés : pagination, filtre texte `q`,
- *   colonne de tri `sort` et sens `order`.
+ *   colonne de tri `sort`, sens `order` et `bandId`.
  * @returns 200 avec la page d'albums et les métadonnées de pagination.
  * Exécute en parallèle la requête de données et celle de comptage total.
  * Limité à 60 requêtes par minute.
  */
 export const GET = route(
-  { query: listQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  { query: albumListQuerySchema, rateLimit: { limit: 60, window: 60 } },
   async ({ query }) => {
-    const { page, perPage, q, sort, order } = query;
+    const { page, perPage, q, sort, order, bandId } = query;
     const offset = (page - 1) * perPage;
-    const where: SQL | undefined = q
-      ? ilike(albums.title, `%${q}%`)
-      : undefined;
+    const where: SQL | undefined = and(
+      q ? ilike(albums.title, `%${q}%`) : undefined,
+      bandId ? eq(albums.bandId, bandId) : undefined,
+    );
     const dir = order === "asc" ? asc : desc;
     const column =
       SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? albums.createdAt;
