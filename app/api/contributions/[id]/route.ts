@@ -1,15 +1,16 @@
 /**
  * Route PATCH /api/contributions/:id — transitions du workflow de médiation
  * appliquées par le modérateur (evidence_requested | approved | rejected,
- * ce dernier réservé aux admins). L'approbation promeut les médias staging
- * vers l'espace public.
+ * ce dernier réservé aux admins). L'approbation matérialise le dossier :
+ * création ou enrichissement du groupe, références externes et promotion
+ * des médias (voir lib/contributions/approve.ts).
  *
  * L'ajout de preuves par le contributeur vit dans `./evidence/route.ts`.
  */
 
-// Wrapper standard + réponses + erreur typée
+// Wrapper standard + réponses
 import { route } from "@/lib/api/handler";
-import { ok, fail, ApiError } from "@/lib/api/response";
+import { ok, fail } from "@/lib/api/response";
 import { idParamSchema } from "@/lib/api/schemas";
 // Validation des entrées (source unique)
 import { requestEvidenceSchema } from "@/lib/validations/contribution";
@@ -17,8 +18,8 @@ import { z } from "zod";
 // Mutations workflow + lecture
 import { requestEvidence, updateStatus } from "@/db/mutations/contributions";
 import { getContributionById } from "@/db/queries/contributions";
-// Promotion des médias MinIO à l'approbation
-import { promoteContributionFiles } from "@/lib/storage/contributions";
+// Approbation : création/enrichissement du groupe, refs et médias
+import { approveContribution } from "@/lib/contributions/approve";
 
 /** Contexte de route partagé : paramètre { id }. */
 const paramsConfig = { params: idParamSchema };
@@ -33,8 +34,10 @@ const patchBodySchema = z.discriminatedUnion("status", [
 /**
  * PATCH /api/contributions/:id — transition modérateur :
  * - `evidence_requested` : demande de preuves (+ relance, échéance) ;
- * - `approved` : validation — promotion MinIO staging -> public ;
+ * - `approved` : groupe créé/enrichi, refs synchronisées, médias promus ;
  * - `rejected` : rejet TERMINAL réservé aux admins.
+ *
+ * @returns Le dossier mis à jour ; l'approbation joint `bandId`.
  */
 export const PATCH = route(
   {
@@ -69,30 +72,11 @@ export const PATCH = route(
       return ok(await updateStatus(params.id, "rejected", session!.user.id));
     }
 
-    // --- Approbation : promotion transactionnelle des médias ---
-    const contributionPayload = contribution.payload as {
-      targetBandId?: string | null;
-    };
-    if (
-      contribution.type !== "band_create" ||
-      !contributionPayload.targetBandId
-    ) {
-      // Sans bande cible connue (band_update), pas de promotion média
-      return ok(await updateStatus(params.id, "approved", session!.user.id));
-    }
-
-    try {
-      await promoteContributionFiles(
-        params.id,
-        String(contributionPayload.targetBandId),
-      );
-    } catch (err) {
-      console.error("[contributions] Promotion MinIO échouée:", err);
-      throw new ApiError(
-        "UNAVAILABLE",
-        "Stockage indisponible : approbation non finalisée, réessayez",
-      );
-    }
-    return ok(await updateStatus(params.id, "approved", session!.user.id));
+    // --- Approbation : matérialise le groupe, les références et les médias ---
+    const { contribution: approved, bandId } = await approveContribution(
+      contribution,
+      session!.user.id,
+    );
+    return ok({ ...approved, bandId });
   },
 );
