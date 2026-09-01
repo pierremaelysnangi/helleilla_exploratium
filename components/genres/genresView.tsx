@@ -2,7 +2,7 @@
 
 /**
  * <GenresView> — liste des genres avec filtre texte local.
- * Chaque carte renvoie vers le catalogue filtré sur ce genre.
+ * Chaque carte renvoie vers la page du genre.
  */
 
 // Requête TanStack + validation
@@ -12,6 +12,9 @@ import { apiJsonEnvelope } from "@/hooks/api/client";
 import { genreKeys } from "@/hooks/api/queryKeys";
 import { genreRowSchema } from "@/hooks/api/schemas";
 import { useState } from "react";
+// Présentation extraite : champ de filtre et carte de genre
+import { GenreFilter } from "./genreFilter";
+import { GenreCard } from "./genreCard";
 
 const genresPageSchema = z.object({
   data: z.array(genreRowSchema),
@@ -39,13 +42,10 @@ export function GenresView() {
 
   return (
     <div className="flex flex-col gap-4">
-      <input
-        type="search"
-        placeholder="Filtrer les genres…"
+      <GenreFilter
         value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        aria-label="Filtrer les genres"
-        className="border-border bg-card focus:border-primary/50 w-full max-w-xs rounded-md border px-3 py-2 text-sm outline-none"
+        onChange={setFilter}
+        resultCount={genres.isPending ? undefined : visible.length}
       />
 
       {genres.isPending && (
@@ -60,15 +60,7 @@ export function GenresView() {
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
         {visible.map((genre) => (
           <li key={genre.id}>
-            {/* Le catalogue bands accepte ?q= : réutilise la recherche SQL */}
-            <a
-              href={`/bands?q=${encodeURIComponent(genre.name)}`}
-              className="metal-card hover:bg-accent/30 block px-4 py-3 text-center"
-            >
-              <span className="text-sm font-semibold tracking-wide uppercase">
-                {genre.name}
-              </span>
-            </a>
+            <GenreCard genre={genre} />
           </li>
         ))}
       </ul>

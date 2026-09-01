@@ -8,8 +8,8 @@
 
 // Instance unique de la base de données Drizzle
 import { db } from "@/db";
-// Table `albums` définie dans le schéma
-import { albums } from "@/db/schema";
+// Tables `albums` et `bands` (jointure pour la résolution par slug)
+import { albums, bands } from "@/db/schema";
 // Opérateurs SQL : égalité, recherche insensible à la casse, tri décroissant
 import { eq, ilike, desc } from "drizzle-orm";
 
@@ -24,13 +24,69 @@ export async function getAlbumById(id: string) {
 }
 
 /**
- * Récupère un album par son slug (identifiant lisible en URL).
- * @param slug - Slug unique de l'album au sein d'un groupe.
- * @returns L'album trouvé, ou null s'il n'existe pas.
+ * Récupère un album par son slug.
+ *
+ * ⚠️ Le slug n'est unique QUE dans un groupe (contrainte
+ * `albums_band_slug_uq` sur `(band_id, slug)`) : si deux groupes ont une
+ * sortie homonyme (« live », « demo »…), le résultat est arbitraire.
+ * Pour une résolution déterministe, préférer `listAlbumsBySlugWithBand`
+ * ou une lecture bornée par `bandId`.
+ *
+ * @param slug - Slug de l'album.
+ * @returns Un album portant ce slug, ou null s'il n'en existe aucun.
  */
 export async function getAlbumBySlug(slug: string) {
   const [album] = await db.select().from(albums).where(eq(albums.slug, slug));
   return album ?? null;
+}
+
+/**
+ * Liste plate des albums avec le slug de leur groupe (sitemap SEO).
+ *
+ * Les deux slugs sont nécessaires : l'URL canonique d'un album est
+ * band-scopée, son slug seul ne suffisant pas à l'identifier.
+ *
+ * @returns Couples { bandSlug, slug } et date de dernière modification.
+ */
+export async function listAlbumSlugs(): Promise<
+  { bandSlug: string; slug: string; updatedAt: Date }[]
+> {
+  return db
+    .select({
+      bandSlug: bands.slug,
+      slug: albums.slug,
+      updatedAt: albums.updatedAt,
+    })
+    .from(albums)
+    .innerJoin(bands, eq(albums.bandId, bands.id));
+}
+
+/**
+ * Liste TOUS les albums portant un slug donné, avec le groupe propriétaire.
+ *
+ * Sert à résoudre l'URL héritée `/albums/[slug]` : zéro résultat -> 404,
+ * un seul -> redirection vers l'URL canonique band-scopée, plusieurs ->
+ * page de levée d'ambiguïté.
+ *
+ * @param slug - Slug d'album recherché.
+ * @returns Les couples { album, band } correspondants, triés par groupe.
+ */
+export async function listAlbumsBySlugWithBand(slug: string) {
+  return db
+    .select({
+      id: albums.id,
+      title: albums.title,
+      slug: albums.slug,
+      type: albums.type,
+      releaseYear: albums.releaseYear,
+      coverUrl: albums.coverUrl,
+      bandName: bands.name,
+      bandSlug: bands.slug,
+    })
+    .from(albums)
+    .innerJoin(bands, eq(albums.bandId, bands.id))
+    .where(eq(albums.slug, slug))
+    .orderBy(bands.name);
 }
 
 /**

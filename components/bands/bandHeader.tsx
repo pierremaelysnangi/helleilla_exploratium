@@ -49,13 +49,13 @@ export function BandHeader({ band }: BandHeaderProps) {
           </span>
         </p>
 
-        {/* Genres associés -> filtre /genres */}
+        {/* Genres associés -> page du genre (slug unique globalement) */}
         {band.genres.length > 0 && (
           <ul className="mt-3 flex flex-wrap gap-2" aria-label="Genres">
             {band.genres.map((genre) => (
               <li key={genre.id}>
                 <Link
-                  href={`/genres?q=${encodeURIComponent(genre.name)}`}
+                  href={`/genres/${genre.slug}`}
                   className="border-primary/40 bg-primary/10 text-foreground hover:bg-primary/20 rounded-full border px-3 py-1 text-xs font-medium tracking-wide uppercase transition-colors"
                 >
                   {genre.name}

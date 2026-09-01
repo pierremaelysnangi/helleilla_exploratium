@@ -6,7 +6,7 @@
 
 // Requête TanStack + clés média
 import { useQuery, queryOptions } from "@tanstack/react-query";
-import { apiJsonEnvelope } from "./api/client";
+import { apiJson } from "./api/client";
 import { mediaKeys } from "./api/queryKeys";
 import { bandMediaSchema, type BandMedia } from "./api/schemas";
 
@@ -16,10 +16,12 @@ export function bandMediaOptions(id: string | undefined | null) {
     queryKey: mediaKeys.band(id ?? ""),
     enabled: Boolean(id),
     queryFn: async ({ signal }): Promise<BandMedia> => {
-      const payload = await apiJsonEnvelope(`/api/bands/${id}/media`, {
+      // apiJson (et non apiJsonEnvelope) : la route renvoie `{ data: dto }`
+      // et bandMediaSchema décrit le DTO, pas l'enveloppe.
+      const data = await apiJson<unknown>(`/api/bands/${id}/media`, {
         signal,
       });
-      return bandMediaSchema.parse(payload);
+      return bandMediaSchema.parse(data);
     },
     // Le resolver sert déjà depuis son propre cache serveur
     staleTime: 10 * 60_000,

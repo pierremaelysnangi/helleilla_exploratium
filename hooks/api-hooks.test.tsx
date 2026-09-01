@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 // Hooks testés
 import { useBands, useCreateBand } from "./use-bands";
 import { useGlobalSearch } from "./use-search";
+import { useBandMedia } from "./use-band-media";
 
 /** UUID valide (RFC 9562 v4) réutilisable dans les fixtures. */
 const UUID = "7b5e4850-93fd-48f0-bb37-cd67219015a1";
@@ -222,6 +223,62 @@ describe("useGlobalSearch", () => {
     // Laisse le temps à une éventuelle requête de partir
     await act(async () => {});
     // enabled=false : ni chargement ni erreur, pas de fetch déclenché
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("useBandMedia", () => {
+  /** DTO média minimal conforme à bandMediaSchema. */
+  const MEDIA_DTO = {
+    band: {
+      id: UUID,
+      name: "Emperor",
+      slug: "emperor",
+      countryCode: "NO",
+      formedYear: 1991,
+      dissolvedYear: null,
+      bio: null,
+      imageUrl: null,
+    },
+    info: {
+      area: "Norway",
+      lifeSpan: { begin: "1991", end: null, ended: false },
+      members: [{ id: "mb-1", name: "Ihsahn" }],
+      genres: ["black metal"],
+      wikidata: null,
+    },
+    images: [],
+    links: [],
+    previews: [],
+    degraded: false,
+  };
+
+  it("déballe l'enveloppe { data } avant de valider le DTO", async () => {
+    // Régression : le hook validait la réponse ENTIÈRE avec le schéma du
+    // DTO. Comme la route répond `{ data: dto }`, le parse échouait
+    // systématiquement et la section média était toujours en erreur.
+    stubFetch({ data: MEDIA_DTO });
+
+    const { result } = renderHook(() => useBandMedia(UUID), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.band.name).toBe("Emperor");
+    expect(result.current.data?.info.members).toEqual([
+      { id: "mb-1", name: "Ihsahn" },
+    ]);
+  });
+
+  it("reste inactif tant qu'aucun identifiant n'est fourni", async () => {
+    const fetchMock = stubFetch({ data: MEDIA_DTO });
+
+    const { result } = renderHook(() => useBandMedia(null), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {});
     expect(result.current.fetchStatus).toBe("idle");
     expect(fetchMock).not.toHaveBeenCalled();
   });

@@ -15,7 +15,7 @@ Règle stricte : zéro média généré par IA.
 | Prettier          | ✅ passe                                 |
 | Lint              | ✅ passe                                 |
 | Typecheck         | ✅ passe                                 |
-| Tests unitaires   | 344/344 ✅ (44 fichiers)                 |
+| Tests unitaires   | 358/358 ✅ (46 fichiers)                 |
 | Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
 | OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
 | Build             | ✅ passe                                 |
@@ -37,19 +37,30 @@ Règle stricte : zéro média généré par IA.
 
 ---
 
-## Phase B — Pages détail
+## Phase B — Pages détail ✅ TERMINÉE
 
-| Tâche                       | État                                                                        |
-| --------------------------- | --------------------------------------------------------------------------- |
-| `/albums/[slug]`            | 🔴 Placeholder (API + composants existent, le plus "prêt")                  |
-| `/genres/[slug]`            | 🔴 Placeholder (retiré du sitemap en phase A, à y remettre une fois écrite) |
-| `/bands/[slug]/discography` | 🔴 Placeholder (discographie déjà rendue dans la page détail)               |
-| `/bands/[slug]/members`     | 🔴 Placeholder (données éphémères MusicBrainz, aucune table `band_members`) |
-| `/members/[slug]`           | 🔴 Placeholder (même dépendance que ci-dessus)                              |
-| `/about`                    | 🔴 Placeholder                                                              |
-| Créer `albumCard.tsx`       | 🔴 À écrire (le fichier vide a été supprimé)                                |
-| Créer `genreCard.tsx`       | 🔴 À écrire (le fichier vide a été supprimé)                                |
-| Créer `genreFilter.tsx`     | 🔴 À écrire (le fichier vide a été supprimé)                                |
+**Décision structurante** : le slug d'album n'est unique QUE dans son groupe
+(`albums_band_slug_uq` sur `(band_id, slug)`). L'URL canonique d'un album est
+donc **band-scopée** — `/bands/[slug]/albums/[albumSlug]`. Sans cela,
+`/albums/[slug]` affichait un album arbitraire dès que deux groupes ont une
+sortie homonyme (« live », « demo »…).
+
+| Tâche                               | État         | Détail                                                                                                                                                                                                     |
+| ----------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/bands/[slug]/albums/[albumSlug]`  | ✅ Nouveau   | Page détail canonique : pochette, tracklist, fil d'Ariane, JSON-LD `MusicAlbum`, OpenGraph                                                                                                                 |
+| `/albums/[slug]`                    | ✅ Écrite    | Résolveur : 404 si inconnu, redirection **temporaire** vers l'URL canonique si unique, page de levée d'ambiguïté si plusieurs                                                                              |
+| `/genres/[slug]`                    | ✅ Écrite    | Genre + parent + sous-genres + groupes rattachés ; remise au sitemap                                                                                                                                       |
+| `/bands/[slug]/discography`         | ✅ Écrite    | Grille de pochettes SSR groupée par type — vue complémentaire de `<DiscographyTable>` (client, dépliable), pas un doublon                                                                                  |
+| `/bands/[slug]/members`             | ✅ Écrite    | Membres lus à la demande depuis MusicBrainz, chacun lié à sa fiche source. `noindex` : données non persistées                                                                                              |
+| `/members/[slug]`                   | ✅ Supprimée | Aucun modèle de données derrière (pas de table `band_members`, MusicBrainz utilise des MBID). Une route répondant 200 à n'importe quel slug est pire que pas de route. À recréer avec la table, en phase F |
+| `/about`                            | ✅ Écrite    | Porte la règle fondatrice : zéro média IA, preuves officielles obligatoires, déroulé de la modération                                                                                                      |
+| `albumCard.tsx`                     | ✅ Créé      | Carte pochette ; exige `bandSlug` en prop, le lien canonique étant band-scopé                                                                                                                              |
+| `genreCard.tsx` / `genreFilter.tsx` | ✅ Créés     | Extraits de `genresView`, réutilisés par la page genre                                                                                                                                                     |
+
+Effets de bord corrigés au passage : les genres pointaient vers `/bands?q=` et
+`/genres?q=` faute de page dédiée (désormais `/genres/[slug]`), et
+`useBandMedia` validait l'enveloppe `{ data }` avec le schéma du DTO — la
+section média du groupe était donc **toujours** en erreur.
 
 ---
 
