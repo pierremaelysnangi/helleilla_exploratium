@@ -103,6 +103,36 @@ export const bandDetailSchema = bandRowSchema.extend({
 export type BandDetail = z.infer<typeof bandDetailSchema>;
 export type GenreSummary = z.infer<typeof genreSummarySchema>;
 
+/** Groupe résumé projeté dans le détail album ({id,name,slug}). */
+export const bandSummarySchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  slug: z.string(),
+});
+
+/**
+ * Détail public d'un album : ligne + groupe + tracklist ordonnée
+ * (GET /api/albums/by-slug/:bandSlug/:albumSlug).
+ */
+export const albumDetailSchema = albumRowSchema.extend({
+  band: bandSummarySchema,
+  tracks: z.array(trackRowSchema),
+});
+
+/**
+ * Détail public d'un genre : ligne + contexte hiérarchique + groupes
+ * rattachés (GET /api/genres/by-slug/:slug).
+ */
+export const genreDetailSchema = genreRowSchema.extend({
+  parent: genreSummarySchema.nullable(),
+  subgenres: z.array(genreSummarySchema),
+  bands: z.array(bandRowSchema),
+});
+
+export type BandSummary = z.infer<typeof bandSummarySchema>;
+export type AlbumDetail = z.infer<typeof albumDetailSchema>;
+export type GenreDetail = z.infer<typeof genreDetailSchema>;
+
 /** DTO du resolver média (miroir de lib/media/resolver.ts). */
 export const bandMediaSchema = z.object({
   band: z.object({

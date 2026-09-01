@@ -10,6 +10,17 @@ import { z } from "zod";
 export const idParamSchema = z.object({ id: z.uuid() });
 // Paramètre de route `{ slug }` : chaîne non vide bornée
 export const slugParamSchema = z.object({ slug: z.string().min(1).max(200) });
+/**
+ * Paramètres `{ bandSlug, albumSlug }` de l'adressage d'un album par slug.
+ *
+ * Un slug d'album n'est unique QUE dans son groupe (contrainte
+ * `albums_band_slug_uq` sur `(band_id, slug)`) : il faut donc les deux
+ * segments pour désigner un album sans ambiguïté.
+ */
+export const albumBySlugParamsSchema = z.object({
+  bandSlug: z.string().min(1).max(200),
+  albumSlug: z.string().min(1).max(200),
+});
 
 // Query de pagination standard, avec coercion des valeurs texte
 export const paginationSchema = z.object({

@@ -141,6 +141,25 @@ export const BandDetailSchema = z
   })
   .meta({ id: "BandDetail" });
 
+// Composant "AlbumDetail" : album + groupe + tracklist ordonnée
+// (GET /api/albums/by-slug/{bandSlug}/{albumSlug})
+export const AlbumDetailSchema = AlbumSchema.extend({
+  band: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    slug: z.string(),
+  }),
+  tracks: z.array(TrackSchema),
+}).meta({ id: "AlbumDetail" });
+
+// Composant "GenreDetail" : genre + contexte hiérarchique + groupes
+// rattachés (GET /api/genres/by-slug/{slug})
+export const GenreDetailSchema = GenreSchema.extend({
+  parent: GenreSchema.nullable(),
+  subgenres: z.array(GenreSchema),
+  bands: z.array(BandSchema),
+}).meta({ id: "GenreDetail" });
+
 // Corps du PUT /api/bands/{id}/genres : liste complète de genreIds
 export const SetBandGenresRequestSchema = z
   .object({ genreIds: z.array(z.string().uuid()).max(20) })

@@ -40,6 +40,8 @@ export const useDeleteBand = bandsHooks.useDelete;
 // Lecture publique par slug (pages détail SSR)
 import { queryOptions } from "@tanstack/react-query";
 import { apiJson } from "./api/client";
+// Fetch RSC partagé : déballe { data } et distingue 404 de panne
+import { fetchPublicOrNull } from "@/lib/api/client";
 import { bandDetailSchema, type BandDetail } from "./api/schemas";
 
 /**
@@ -59,17 +61,17 @@ export function bandBySlugOptions(slug: string) {
   });
 }
 
-/** Fetch direct (RSC) du détail par slug ; null si 404. */
+/**
+ * Fetch direct (RSC) du détail par slug ; `null` si le groupe n'existe pas.
+ * Une panne (5xx, base indisponible) est propagée et non traduite en 404.
+ */
 export async function fetchBandBySlug(
   slug: string,
   init?: { signal?: AbortSignal },
 ): Promise<BandDetail | null> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/bands/by-slug/${encodeURIComponent(slug)}`,
-    { next: { revalidate: 60 }, signal: init?.signal },
+  return fetchPublicOrNull(
+    `/api/bands/by-slug/${encodeURIComponent(slug)}`,
+    bandDetailSchema,
+    { signal: init?.signal },
   );
-  if (!res.ok) return null;
-  const payload: unknown = await res.json();
-  // Enveloppe { data }
-  return bandDetailSchema.parse((payload as { data: unknown }).data);
 }

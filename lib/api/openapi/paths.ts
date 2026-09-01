@@ -24,6 +24,8 @@ import {
   GlobalSearchQuerySchema,
   GlobalSearchResponseSchema,
   BandDetailSchema,
+  AlbumDetailSchema,
+  GenreDetailSchema,
   SetBandGenresRequestSchema,
   BandGenresSyncedSchema,
   AudioUploadRequestSchema,
@@ -249,6 +251,37 @@ registerPath("/api/bands/by-slug/{slug}", "get", {
   },
   responses: {
     200: jsonOk(BandDetailSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+// Détail album par slug. DEUX segments : la contrainte
+// `albums_band_slug_uq` ne rend le slug unique qu'au sein d'un groupe,
+// un slug seul ne désignerait donc pas un album de façon déterministe.
+registerPath("/api/albums/by-slug/{bandSlug}/{albumSlug}", "get", {
+  tags: ["albums"],
+  summary: "Récupère un album par slug de groupe + slug d'album",
+  requestParams: {
+    path: z.object({
+      bandSlug: z.string().min(1).max(200),
+      albumSlug: z.string().min(1).max(200),
+    }),
+  },
+  responses: {
+    200: jsonOk(AlbumDetailSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+// Détail genre par slug (unique globalement, un seul segment suffit)
+registerPath("/api/genres/by-slug/{slug}", "get", {
+  tags: ["genres"],
+  summary: "Récupère un genre par son slug (parent, sous-genres, groupes)",
+  requestParams: {
+    path: z.object({ slug: z.string().min(1).max(200) }),
+  },
+  responses: {
+    200: jsonOk(GenreDetailSchema),
     ...pick(404, 422, 429, 500),
   },
 });
