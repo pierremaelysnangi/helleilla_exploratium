@@ -34,7 +34,7 @@
     "prepare": "husky",
     "openapi:export": "tsx scripts/export-openapi.ts",
     "openapi:lint": "pnpm openapi:export && redocly lint openapi/openapi.json",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm openapi:lint"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:cov && pnpm openapi:lint"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",

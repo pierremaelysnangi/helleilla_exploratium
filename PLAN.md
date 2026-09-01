@@ -10,28 +10,30 @@ Règle stricte : zéro média généré par IA.
 
 ## État actuel
 
-| Indicateur        | Valeur                                         |
-| ----------------- | ---------------------------------------------- |
-| Lint              | ✅ passe                                       |
-| Typecheck         | ✅ passe                                       |
-| Tests unitaires   | 245/245 ✅                                     |
-| Coverage branches | 36.84 % < 45 % ❌ (seuil)                      |
-| OpenAPI lint      | ✅ valide                                      |
-| Tests E2E         | 48/48 ✅                                       |
-| `pnpm verify`     | ⚠️ passe (test sans cov), CI échoue (test:cov) |
+| Indicateur        | Valeur                                   |
+| ----------------- | ---------------------------------------- |
+| Prettier          | ✅ passe                                 |
+| Lint              | ✅ passe                                 |
+| Typecheck         | ✅ passe                                 |
+| Tests unitaires   | 344/344 ✅ (44 fichiers)                 |
+| Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
+| OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
+| Build             | ✅ passe                                 |
+| `pnpm verify`     | ✅ identique à la CI (format + test:cov) |
 
 ---
 
-## Phase A — Stabilisation (PRÉALABLE AU COMMIT)
+## Phase A — Stabilisation ✅ TERMINÉE
 
-| Tâche                        | État       | Détail                                                                                                                                                                                                                                                           |
-| ---------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1. Échecs RBAC E2E          | ✅ Corrigé | IP unique par client E2E via `x-forwarded-for` (isolation rate-limit) — 48/48 verts                                                                                                                                                                              |
-| A2. Timeout teardown E2E     | ✅ Corrigé | `closeAuthConnections()` ferme Redis auth + pools Postgres (db + authDb)                                                                                                                                                                                         |
-| A3. Coverage < 45 % branches | 🔴 À faire | Tests manquants pour `lib/actions/auth.ts` (0 %), `lib/actions/password-reset.ts` (0 %), `lib/rbac/index.ts` (0 %)                                                                                                                                               |
-| A4. Aligner OpenAPI          | 🔴 À faire | `POST /api/contributions/{id}/evidence` documenté mais route réelle = `POST /api/contributions/{id}` (404 client conforme). `GET/PATCH/DELETE /api/genres/{id}` implémenté mais non documenté                                                                    |
-| A5. Nettoyage résidus        | 🔴 À faire | `app/main/` dossiers vides, `commandPallete.tsx` doublon (0 octet), `albumCard.tsx` (0 octet), `genreCard.tsx` (0 octet), `genreFilter.tsx` (0 octet), `opengraphImage.tsx` mal nommé (devrait être `opengraph-image.tsx`), `lang="en"` devrait être `lang="fr"` |
-| A6. Vérification finale      | 🔴 À faire | `pnpm verify` + `pnpm test:cov` + `pnpm test:e2e` tous verts                                                                                                                                                                                                     |
+| Tâche                      | État       | Détail                                                                                                                                                                                                    |
+| -------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1. Échecs RBAC E2E        | ✅ Corrigé | IP unique par client E2E via `x-forwarded-for` (isolation rate-limit) — 48/48 verts                                                                                                                       |
+| A2. Timeout teardown E2E   | ✅ Corrigé | `closeAuthConnections()` ferme Redis auth + pools Postgres (db + authDb)                                                                                                                                  |
+| A0. Alias `server-only`    | ✅ Corrigé | **Cause racine du 0 %** : `server-only` n'existe pas dans `node_modules` (Next l'aliase au bundling). Vitest ne pouvait pas charger `auth.ts`/`password-reset.ts`. Alias ajouté dans `vitest.config.mts`. |
+| A3. Coverage branches      | ✅ Corrigé | 36,84 % → **100 %** (114/114). +99 tests : auth, password-reset, gardes RBAC, `handleActionError`, validations band + contribution. Seuils relevés à 95/90/95/95.                                         |
+| A4. Aligner OpenAPI        | ✅ Corrigé | `POST` déplacé vers `app/api/contributions/[id]/evidence/route.ts` ; `GET/PATCH/DELETE /api/genres/{id}` documentés. Spec et disque correspondent exactement.                                             |
+| A5. Nettoyage résidus      | ✅ Corrigé | 7 fichiers 0 octet et `app/main/` supprimés ; `opengraphImage.tsx` → `opengraph-image.tsx` (le fichier était mort) ; `lang="fr"` ; `/genres/{slug}` retiré du sitemap ; `<main>` imbriqués supprimés.     |
+| A6. Alignement verify ↔ CI | ✅ Corrigé | `pnpm verify` lance désormais `format:check` et `test:cov` comme la CI — c'était la cause du « verify vert / CI rouge ».                                                                                  |
 
 ---
 
@@ -40,27 +42,28 @@ Règle stricte : zéro média généré par IA.
 | Tâche                       | État                                                                        |
 | --------------------------- | --------------------------------------------------------------------------- |
 | `/albums/[slug]`            | 🔴 Placeholder (API + composants existent, le plus "prêt")                  |
-| `/genres/[slug]`            | 🔴 Placeholder (déjà dans le sitemap → paradoxe SEO)                        |
+| `/genres/[slug]`            | 🔴 Placeholder (retiré du sitemap en phase A, à y remettre une fois écrite) |
 | `/bands/[slug]/discography` | 🔴 Placeholder (discographie déjà rendue dans la page détail)               |
 | `/bands/[slug]/members`     | 🔴 Placeholder (données éphémères MusicBrainz, aucune table `band_members`) |
+| `/members/[slug]`           | 🔴 Placeholder (même dépendance que ci-dessus)                              |
 | `/about`                    | 🔴 Placeholder                                                              |
-| Remplir `albumCard.tsx`     | 🔴 0 octet                                                                  |
-| Remplir `genreCard.tsx`     | 🔴 0 octet                                                                  |
-| Remplir `genreFilter.tsx`   | 🔴 0 octet                                                                  |
+| Créer `albumCard.tsx`       | 🔴 À écrire (le fichier vide a été supprimé)                                |
+| Créer `genreCard.tsx`       | 🔴 À écrire (le fichier vide a été supprimé)                                |
+| Créer `genreFilter.tsx`     | 🔴 À écrire (le fichier vide a été supprimé)                                |
 
 ---
 
 ## Phase C — Parcours contributeur
 
-| Tâche                                         | État                                                                                                             |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Backend workflow                              | ✅ Complet et testé (soumission + preuves anti-IA + médiation 2 relances/60j + promotion MinIO staging → public) |
-| Hook `use-contributions`                      | 🔴 Inexistant                                                                                                    |
-| Server Actions `lib/actions/contribution*.ts` | 🔴 Inexistant                                                                                                    |
-| `components/contributions/`                   | 🔴 Dossier inexistant                                                                                            |
-| Page `/contributions` (formulaire soumission) | 🔴 Aucune page                                                                                                   |
-| Page `/contributions/mes-dossiers`            | 🔴 Aucune page                                                                                                   |
-| File de relecture modérateur                  | 🔴 Aucune page                                                                                                   |
+| Tâche                                         | État                                                                                                                                                           |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend workflow                              | ⚠️ Routes complètes et testées (soumission + preuves anti-IA + médiation 2 relances/30j) mais **l'approbation ne crée aucun groupe** — voir « Dette signalée » |
+| Hook `use-contributions`                      | 🔴 Inexistant                                                                                                                                                  |
+| Server Actions `lib/actions/contribution*.ts` | 🔴 Inexistant                                                                                                                                                  |
+| `components/contributions/`                   | 🔴 Dossier inexistant                                                                                                                                          |
+| Page `/contributions` (formulaire soumission) | 🔴 Aucune page                                                                                                                                                 |
+| Page `/contributions/mes-dossiers`            | 🔴 Aucune page                                                                                                                                                 |
+| File de relecture modérateur                  | 🔴 Aucune page                                                                                                                                                 |
 
 ---
 
@@ -81,9 +84,9 @@ Règle stricte : zéro média généré par IA.
 | ------------------------------------ | ------------------------------------------- |
 | Upload audio MinIO                   | ✅ `POST /api/tracks/{id}/audio` (présigné) |
 | Aperçus Deezer 30s                   | ✅ Via resolver + `albumTracklist`          |
-| `components/audio/audioPlayer.tsx`   | 🔴 0 octet                                  |
-| `components/audio/miniPlayer.tsx`    | 🔴 0 octet                                  |
-| `components/audio/waveform.tsx`      | 🔴 0 octet                                  |
+| `components/audio/audioPlayer.tsx`   | 🔴 À écrire (fichier vide supprimé)         |
+| `components/audio/miniPlayer.tsx`    | 🔴 À écrire (fichier vide supprimé)         |
+| `components/audio/waveform.tsx`      | 🔴 À écrire (fichier vide supprimé)         |
 | `hooks/use-player-audio.ts`          | 🔴 Stub doc-only                            |
 | `stores/audioPlayer.store.ts`        | 🔴 Stub doc-only                            |
 | `stores/preference.store.ts`         | 🔴 Stub doc-only                            |
@@ -109,11 +112,28 @@ Règle stricte : zéro média généré par IA.
 
 ## Ordre d'exécution recommandé
 
-Phase A (stabilisation, 6 tâches restantes)
-└→ Phase B (pages détail, ~6 pages + 3 cartes)
+~~Phase A (stabilisation)~~ ✅ terminée — la CI est verte
+└→ **Phase B (pages détail, 6 pages + 3 cartes)** ← prochaine étape
 └→ Phase C (parcours contributeur, UI pour backend existant)
 └→ Phase D (espace admin, route users + UI)
 └→ Phase E (audio + profil)
 └→ Phase F (enrichissement)
 
-Phase A est un **préalable bloquant** : sans coverage ≥ 45 % et sans OpenAPI aligné, la CI reste en échec et le commit des 62 fichiers en attente ne peut pas être fait proprement.
+---
+
+## Dette signalée, non traitée (décisions à prendre)
+
+Constats relevés pendant la phase A, volontairement laissés de côté car ils
+demandent un arbitrage plutôt qu'un correctif mécanique.
+
+| Sujet                                | Détail                                                                                                                                                                                                                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cloisonnement RGPD non étanche**   | `db/schema/index.ts` ré-exporte `./auth` : `drizzle.config.ts` embarque donc `user/session/account/verification` dans le schéma de la base _contenu_, en doublon de `migrations-auth/`. Aucun code n'en dépend, mais retirer la ré-export génère une migration **destructive**. |
+| **L'approbation ne crée aucun band** | Une contribution approuvée passe en `approved` sans créer ni `band` ni `external_refs` depuis le `payload`. `promoteContributionFiles` n'est de plus jamais atteint pour `band_create` (la garde exige `targetBandId`, propre à `band_update`). À traiter avec la phase C.      |
+| **Délai d'expiration incohérent**    | `CONTRIBUTION_POLICY.evidenceDeadlineDays = 30` alors que les docstrings et `LEXIQUE.md` annoncent 60 jours.                                                                                                                                                                    |
+| **Repli d'URL fragile**              | `process.env.NEXT_PUBLIC_APP_URL ?? "…"` : une variable **définie mais vide** produit un lien de reset relatif cassé (`??` ne rattrape que `undefined`). Un `                                                                                                                   |     | ` suffirait. |
+| **Rôles codés en dur**               | Les deux routes de contributions testent `["moderator","admin"].includes(role)` alors que la matrice exprime déjà `contribution:moderate` / `:delete`.                                                                                                                          |
+| **Doublons**                         | `lib/meili.ts` ↔ `lib/search/meilisearch.ts` (deux clients Meilisearch) ; `scripts/check-tables.ts` ↔ `list-tables.ts`.                                                                                                                                                         |
+| **Thème « metal » rendu en gris**    | `styles/theme.css` bâtit ses accents « rouge sang » sur `var(--primary)`, resté à la valeur shadcn `neutral` (chroma 0). Les tokens de marque n'ont jamais été personnalisés.                                                                                                   |
+| **Duplication de fichiers d'état**   | 5 `loading.tsx` strictement identiques, 2 `error.tsx` quasi identiques exposant `error.message` brut à l'utilisateur.                                                                                                                                                           |
+| **`types/*` entièrement doc-only**   | 4 fichiers sans aucun export ; les types réels vivent dans les schémas zod.                                                                                                                                                                                                     |
