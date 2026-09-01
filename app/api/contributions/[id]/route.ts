@@ -1,10 +1,10 @@
 /**
- * Routes /api/contributions/:id — transitions du workflow de médiation.
- * POST /:id/evidence : le contributeur ajoute des preuves (retour en
- *   `pending`).
- * PATCH /:id : le modérateur applique une transition
- *   (evidence_requested | approved | rejected-admin uniquement) ;
- *   l'approbation promeut les médias staging vers l'espace public.
+ * Route PATCH /api/contributions/:id — transitions du workflow de médiation
+ * appliquées par le modérateur (evidence_requested | approved | rejected,
+ * ce dernier réservé aux admins). L'approbation promeut les médias staging
+ * vers l'espace public.
+ *
+ * L'ajout de preuves par le contributeur vit dans `./evidence/route.ts`.
  */
 
 // Wrapper standard + réponses + erreur typée
@@ -12,47 +12,16 @@ import { route } from "@/lib/api/handler";
 import { ok, fail, ApiError } from "@/lib/api/response";
 import { idParamSchema } from "@/lib/api/schemas";
 // Validation des entrées (source unique)
-import {
-  addEvidenceSchema,
-  requestEvidenceSchema,
-} from "@/lib/validations/contribution";
+import { requestEvidenceSchema } from "@/lib/validations/contribution";
 import { z } from "zod";
 // Mutations workflow + lecture
-import {
-  requestEvidence,
-  addEvidence,
-  updateStatus,
-} from "@/db/mutations/contributions";
+import { requestEvidence, updateStatus } from "@/db/mutations/contributions";
 import { getContributionById } from "@/db/queries/contributions";
 // Promotion des médias MinIO à l'approbation
 import { promoteContributionFiles } from "@/lib/storage/contributions";
 
 /** Contexte de route partagé : paramètre { id }. */
 const paramsConfig = { params: idParamSchema };
-
-/**
- * POST /api/contributions/:id/evidence — ajout de preuves par le
- * contributeur propriétaire. Retourne le dossier en statut `pending`.
- */
-export const POST = route(
-  {
-    ...paramsConfig,
-    body: addEvidenceSchema,
-    permission: { resource: "contribution", action: "update" },
-    rateLimit: { limit: 20, window: 3600 },
-  },
-  async ({ params, body, session }) => {
-    const contribution = await getContributionById(params.id);
-    if (!contribution) return fail("NOT_FOUND", "Contribution introuvable");
-    // Seul l'auteur du dossier peut le compléter
-    if (contribution.submittedBy !== session!.user.id) {
-      return fail("FORBIDDEN", "Seul l'auteur peut compléter ce dossier");
-    }
-
-    const updated = await addEvidence(params.id, body.evidence);
-    return ok(updated);
-  },
-);
 
 /** Corps du PATCH modérateur : union discriminée par `status`. */
 const patchBodySchema = z.discriminatedUnion("status", [

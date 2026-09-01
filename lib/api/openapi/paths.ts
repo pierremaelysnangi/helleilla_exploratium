@@ -35,7 +35,10 @@ import {
 import { createBandSchema, updateBandSchema } from "@/lib/validations/band";
 import { createAlbumSchema, updateAlbumSchema } from "@/lib/validations/album";
 import { createTrackSchema, updateTrackSchema } from "@/lib/validations/track";
-import { createGenreSchema } from "@/lib/validations/genre";
+import {
+  createGenreSchema,
+  updateGenreBodySchema,
+} from "@/lib/validations/genre";
 // Schémas médias & contributions
 import {
   BandMediaSchema,
@@ -172,6 +175,42 @@ registerPath("/api/genres", "post", {
   responses: {
     201: jsonOk(GenreSchema, "Créé"),
     ...pick(401, 403, 409, 422, 429, 500),
+  },
+});
+
+// Détail d'un genre : hors de la boucle `resources` car les genres n'ont ni
+// pagination ni indexation Meilisearch, et la suppression est réservée à
+// l'admin (les autres entités s'arrêtent à moderator).
+registerPath("/api/genres/{id}", "get", {
+  tags: ["genres"],
+  summary: "Récupère un genre",
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(GenreSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/genres/{id}", "patch", {
+  tags: ["genres"],
+  summary: "Modifie un genre (moderator+)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(updateGenreBodySchema),
+  responses: {
+    200: jsonOk(GenreSchema),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/genres/{id}", "delete", {
+  tags: ["genres"],
+  summary: "Supprime un genre (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(z.object({ id: z.string().uuid() })),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
   },
 });
 

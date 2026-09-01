@@ -50,7 +50,8 @@ vi.mock("@/lib/storage/contributions", () => ({
 
 // Imports dynamiques après les mocks.
 const { POST, GET } = await import("./route");
-const { PATCH, POST: postEvidence } = await import("./[id]/route");
+const { PATCH } = await import("./[id]/route");
+const { POST: postEvidence } = await import("./[id]/evidence/route");
 
 const ID = "00000000-0000-4000-8000-000000000001";
 
