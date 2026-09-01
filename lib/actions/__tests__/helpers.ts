@@ -49,6 +49,37 @@ export function expectDenied(res: any) {
   }
 }
 
+/** Forme aplatie d'une erreur zod, telle que renvoyée par les actions. */
+type FlattenedError = {
+  formErrors: string[];
+  fieldErrors: Record<string, string[] | undefined>;
+};
+
+/**
+ * Extrait les erreurs par champ d'un résultat d'action en échec de validation.
+ *
+ * Évite la double garde (`!res.success` puis `typeof error !== "string"`) à
+ * chaque assertion : `ActionResult.error` est une union string | objet, et
+ * TypeScript refuse l'accès aux clés sans ce rétrécissement.
+ *
+ * @param res - Résultat d'une Server Action, attendu en échec de validation.
+ * @returns La map `fieldErrors` produite par `zodError.flatten()`.
+ */
+export function fieldErrorsOf(res: {
+  success: boolean;
+  error?: string | Record<string, unknown>;
+}): Record<string, string[] | undefined> {
+  if (res.success) {
+    throw new Error("Attendu un échec de validation, reçu un succès");
+  }
+  if (typeof res.error === "string") {
+    throw new Error(
+      `Attendu des erreurs de champ, reçu le message : ${res.error}`,
+    );
+  }
+  return (res.error as FlattenedError).fieldErrors;
+}
+
 /** Fabriques de FormData valides, avec champs surchargeables par test. */
 export const fixtures = {
   /** FormData de création d'album valide. */

@@ -5,7 +5,7 @@
  */
 
 // API Vitest : suites, tests, assertions, mocks et hooks
-import { describe, it, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 // Actions sous test
 import {
   createTrackAction,
@@ -18,8 +18,12 @@ import {
   setUser,
   expectAllowed,
   expectDenied,
+  fieldErrorsOf,
   fixtures,
 } from "./__tests__/helpers";
+// Modules mockés, réimportés pour piloter leurs espions
+import { getAlbumById } from "@/db/queries/albums";
+import { getTrackWithAlbum } from "@/db/queries/tracks";
 
 // Mocks des modules Next.js inutilisables hors rendu (headers, cache)
 vi.mock("next/headers", () => ({
@@ -89,7 +93,7 @@ beforeEach(() => {
 });
 
 // Suite principale : matrice des permissions sur les actions track
-describe("album — RBAC", () => {
+describe("track — RBAC", () => {
   it("user ne peut pas créer", async () => {
     setUser("user");
     expectDenied(await createTrackAction(fixtures.track()));
@@ -122,5 +126,52 @@ describe("album — RBAC", () => {
   it("non authentifié refusé", async () => {
     setUser(null);
     expectDenied(await createTrackAction(fixtures.track()));
+  });
+});
+
+/** UUID de la piste utilisé par les fixtures de mise à jour/suppression. */
+const TRACK_ID = "550e8400-e29b-41d4-a716-446655440003";
+
+describe("track — validation et entités parentes", () => {
+  it("createTrack renvoie les erreurs zod pour un albumId non-UUID", async () => {
+    setUser("contributor");
+    const res = await createTrackAction(fixtures.track({ albumId: "nope" }));
+    expect(fieldErrorsOf(res).albumId).toBeDefined();
+  });
+
+  it("createTrack renvoie « Album introuvable. » sans album parent", async () => {
+    setUser("contributor");
+    vi.mocked(getAlbumById).mockResolvedValueOnce(undefined as never);
+
+    const res = await createTrackAction(fixtures.track());
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Album introuvable.");
+  });
+
+  it("updateTrack renvoie les erreurs zod pour un id non-UUID", async () => {
+    setUser("contributor");
+    const res = await updateTrackAction(fixtures.trackUpdate({ id: "nope" }));
+    expect(fieldErrorsOf(res).id).toBeDefined();
+  });
+
+  it("updateTrack renvoie « Piste introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("contributor");
+    vi.mocked(getTrackWithAlbum).mockResolvedValueOnce(undefined as never);
+
+    const res = await updateTrackAction(fixtures.trackUpdate());
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Piste introuvable.");
+  });
+
+  it("deleteTrack renvoie « Piste introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("moderator");
+    vi.mocked(getTrackWithAlbum).mockResolvedValueOnce(undefined as never);
+
+    const res = await deleteTrackAction(TRACK_ID);
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Piste introuvable.");
   });
 });
