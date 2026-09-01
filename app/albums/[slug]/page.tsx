@@ -5,11 +5,11 @@
  */
 export default function AlbumsSlugPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <section>
       <h1 className="text-2xl font-bold">AlbumsSlug</h1>
       <p className="text-muted-foreground mt-2">
         Page en construction — /albums/[slug]
       </p>
-    </main>
+    </section>
   );
 }

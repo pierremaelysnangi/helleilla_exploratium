@@ -56,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   // causés par l'injection du thème (mode sombre) côté client.
   return (
     <html
-      lang="en"
+      lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
