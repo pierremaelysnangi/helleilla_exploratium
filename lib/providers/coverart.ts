@@ -25,6 +25,13 @@ const releaseGroupSchema = z.object({
   id: z.string(),
   title: z.string(),
   "primary-type": z.string().nullish(),
+  /**
+   * Qualificatifs cumulables : « Compilation », « Live », « Demo »…
+   * Toujours renvoyés par l'API browse, ils étaient simplement ignorés.
+   * Sans eux, une compilation et un album studio homonymes sont
+   * indiscernables.
+   */
+  "secondary-types": z.array(z.string()).default([]),
   "first-release-date": z.string().nullish(),
 });
 
@@ -32,6 +39,8 @@ export type ReleaseGroup = z.infer<typeof releaseGroupSchema>;
 
 const releaseGroupListSchema = z.object({
   "release-groups": z.array(releaseGroupSchema).default([]),
+  /** Total côté serveur : borne la pagination. */
+  "release-group-count": z.number().int().default(0),
 });
 
 /** Réponse Cover Art Archive : la liste des visuels d'une œuvre. */
@@ -46,25 +55,55 @@ const coverArtSchema = z.object({
     .default([]),
 });
 
+/** Taille de page maximale acceptée par l'API browse de MusicBrainz. */
+const PAGE_SIZE = 100;
+
+/**
+ * Garde-fou de pagination : au-delà, on cesse de dérouler.
+ *
+ * Aucun groupe du catalogue n'approche ce volume ; la borne existe pour
+ * qu'une réponse aberrante ne fasse pas boucler le script pendant des
+ * heures à une requête par seconde.
+ */
+const MAX_PAGES = 10;
+
 /**
  * Liste les œuvres d'un artiste (albums, EP, singles, live, compilations).
  *
+ * Pagine jusqu'à épuisement : l'API plafonne à 100 par requête, et
+ * certains groupes dépassent ce seuil (Paradise Lost en compte 101).
+ * S'arrêter à la première page perdait silencieusement la fin de la
+ * discographie.
+ *
  * @param artistMbid - Identifiant MusicBrainz de l'artiste.
- * @returns Jusqu'à 100 release-groups ; tableau vide si l'artiste n'en a pas.
+ * @returns Tous les release-groups ; tableau vide si l'artiste n'en a pas.
  */
 export async function listReleaseGroups(
   artistMbid: string,
 ): Promise<ReleaseGroup[]> {
-  // Pas de filtre `type` : passer plusieurs valeurs séparées par `|` à
-  // l'API browse ne renvoyait qu'une poignée de résultats (compilations
-  // seules). L'appariement se fait sur le titre, le type n'apporte rien.
-  const url =
-    `${MB_BASE}/release-group?artist=${encodeURIComponent(artistMbid)}` +
-    `&limit=100&fmt=json`;
-  const result = await fetchJson(url, releaseGroupListSchema, {
-    minIntervalMs: 1100,
-  });
-  return result["release-groups"];
+  const all: ReleaseGroup[] = [];
+  let total = 0;
+
+  for (let page = 0; page < MAX_PAGES; page += 1) {
+    // Pas de filtre `type` : passer plusieurs valeurs séparées par `|` à
+    // l'API browse ne renvoyait qu'une poignée de résultats (compilations
+    // seules). Le tri se fait chez nous, sur le type projeté.
+    const url =
+      `${MB_BASE}/release-group?artist=${encodeURIComponent(artistMbid)}` +
+      `&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}&fmt=json`;
+    const result = await fetchJson(url, releaseGroupListSchema, {
+      minIntervalMs: 1100,
+    });
+
+    const batch = result["release-groups"];
+    all.push(...batch);
+    total = result["release-group-count"];
+
+    // Page incomplète ou total atteint : plus rien à demander
+    if (batch.length < PAGE_SIZE || all.length >= total) break;
+  }
+
+  return all;
 }
 
 /**
@@ -121,29 +160,83 @@ export function normalizeTitle(title: string): string {
     .replace(/[^a-z0-9&]+/g, "");
 }
 
+/** Valeurs de l'enum PostgreSQL `album_type`. */
+export type AlbumType =
+  "album" | "ep" | "single" | "compilation" | "live" | "demo";
+
+/**
+ * Projection des types secondaires MusicBrainz, par ordre de priorité.
+ *
+ * Un qualificatif secondaire l'emporte toujours sur le type primaire :
+ * MusicBrainz classe une compilation en `primary-type: Album` avec
+ * `secondary-types: ["Compilation"]`. Retenir le primaire rangerait
+ * « Are You Morbid? » parmi les albums studio.
+ */
+const SECONDARY_TYPE_MAP: [string, AlbumType][] = [
+  ["Demo", "demo"],
+  ["Live", "live"],
+  ["Compilation", "compilation"],
+];
+
+/** Projection des types primaires MusicBrainz. */
+const PRIMARY_TYPE_MAP: Record<string, AlbumType> = {
+  Album: "album",
+  EP: "ep",
+  Single: "single",
+  Broadcast: "live",
+  Other: "compilation",
+};
+
+/**
+ * Type local d'un release-group MusicBrainz.
+ *
+ * @returns Le type projeté, ou `null` si MusicBrainz n'en déclare aucun
+ *   d'exploitable — auquel cas on préfère ne rien affirmer.
+ */
+export function albumTypeOf(group: ReleaseGroup): AlbumType | null {
+  for (const [label, type] of SECONDARY_TYPE_MAP) {
+    if (group["secondary-types"].includes(label)) return type;
+  }
+  const primary = group["primary-type"];
+  return primary ? (PRIMARY_TYPE_MAP[primary] ?? null) : null;
+}
+
 /**
  * Retrouve l'œuvre correspondant à un album local.
  *
- * L'appariement se fait sur le titre normalisé, puis l'année départage les
- * homonymes — un groupe peut rééditer un album sous le même titre. En cas
- * d'ambiguïté persistante, renvoie `null` : une pochette erronée est pire
- * qu'une pochette absente.
+ * Trois départages successifs sur les homonymes : le titre normalisé,
+ * puis l'année, puis le TYPE de sortie. Le dernier n'est pas théorique —
+ * MusicBrainz publie deux release-groups « Monotheist » datés 2006, l'un
+ * `Album` et l'autre `EP` : sans lui, Celtic Frost restait sans référence
+ * canonique pour cet album, donc sans tracklist.
+ *
+ * En cas d'ambiguïté persistante, renvoie `null` : une pochette erronée
+ * est pire qu'une pochette absente.
  */
 export function matchReleaseGroup(
   groups: ReleaseGroup[],
-  album: { title: string; releaseYear?: number | null },
+  album: { title: string; releaseYear?: number | null; type?: AlbumType },
 ): ReleaseGroup | null {
   const wanted = normalizeTitle(album.title);
-  const sameTitle = groups.filter((g) => normalizeTitle(g.title) === wanted);
+  let candidates = groups.filter((g) => normalizeTitle(g.title) === wanted);
 
-  if (sameTitle.length === 0) return null;
-  if (sameTitle.length === 1) return sameTitle[0];
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
 
   if (album.releaseYear) {
-    const sameYear = sameTitle.filter((g) =>
+    const sameYear = candidates.filter((g) =>
       g["first-release-date"]?.startsWith(String(album.releaseYear)),
     );
     if (sameYear.length === 1) return sameYear[0];
+    // Un filtre qui ne laisse rien n'est pas un filtre : on garde
+    // l'ensemble précédent pour laisser sa chance au type.
+    if (sameYear.length > 1) candidates = sameYear;
   }
+
+  if (album.type) {
+    const sameType = candidates.filter((g) => albumTypeOf(g) === album.type);
+    if (sameType.length === 1) return sameType[0];
+  }
+
   return null;
 }

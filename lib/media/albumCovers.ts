@@ -56,6 +56,9 @@ export async function resolveAlbumCoversForBand(
       .select({
         id: albums.id,
         title: albums.title,
+        // Le type départage les homonymes de même année (« Monotheist »
+        // existe en album et en EP, tous deux datés 2006).
+        type: albums.type,
         releaseYear: albums.releaseYear,
         coverUrl: albums.coverUrl,
       })
