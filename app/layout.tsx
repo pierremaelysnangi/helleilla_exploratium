@@ -9,6 +9,7 @@ import { Providers } from "@/providers";
 // Chrome global du site : en-tête, pied de page et palette Ctrl+K
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { ConsoleWarning } from "@/components/layout/consoleWarning";
 import { CommandPalette } from "@/components/search/commandPalette";
 // Lecteur audio global : élément <audio> unique de l'application
 import { MiniPlayer } from "@/components/audio/miniPlayer";
@@ -65,6 +66,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <Providers>
           <Header />
+          {/* Avertissement anti-auto-XSS dans la console du navigateur */}
+          <ConsoleWarning />
           {/* Palette de recherche rapide, disponible sur toutes les pages */}
           <CommandPalette />
           {/* flex-1 : le contenu pousse le footer en bas de viewport */}
