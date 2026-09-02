@@ -149,11 +149,12 @@ discographies et taxonomie des genres, avec recherche plein-texte.
 
 ## 10. Authentification UI (formulaires)
 
-| Terme                    | Définition                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Argon2id**             | Fonction de hachage de mots de passe (OWASP) utilisée par Better Auth via `@node-rs/argon2` — sel intégré, résistant GPU. **Ne jamais remplacer par un hash hex (SHA-256)** : cassable par force brute. |
-| **CSPRNG**               | Générateur aléatoire cryptographique : `crypto.getRandomValues` côté navigateur (`hooks/use-password-generator.ts`). Math.random est prévisible et interdit pour les secrets.                           |
-| **zxcvbn**               | Estimation de force réelle d'un mot de passe (`@zxcvbn-ts/core`, hook `use-password-strength`) : dictionnaires de fuites, motifs clavier, l33t. Score 0–4 ; 3 requis pour soumettre le formulaire.      |
-| **Turnstile**            | CAPTCHA invisible Cloudflare vérifié **côté serveur** dans `signUpAction` (`lib/auth/turnstile.ts`, API siteverify). Fail-closed ; se désactive proprement sans `TURNSTILE_SECRET_KEY`.                 |
-| **Anti-énumération**     | Message d'erreur unique « Email ou mot de passe incorrect » : impossible de distinguer un compte inexistant d'un mauvais mot de passe, empêchant la découverte de comptes.                              |
-| **`(auth)` route group** | Segment Next.js `app/(auth)/` : pages /sign-in et /sign-up avec layout centré dédié, sans préfixe d'URL. Les Server Actions (`lib/actions/auth.ts`) portent toute la sécurité serveur.                  |
+| Terme                           | Définition                                                                                                                                                                                                 |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Argon2id**                    | Fonction de hachage de mots de passe (OWASP) utilisée par Better Auth via `@node-rs/argon2` — sel intégré, résistant GPU. **Ne jamais remplacer par un hash hex (SHA-256)** : cassable par force brute.    |
+| **CSPRNG**                      | Générateur aléatoire cryptographique : `crypto.getRandomValues` côté navigateur (`hooks/use-password-generator.ts`). Math.random est prévisible et interdit pour les secrets.                              |
+| **zxcvbn**                      | Estimation de force réelle d'un mot de passe (`@zxcvbn-ts/core`, hook `use-password-strength`) : dictionnaires de fuites, motifs clavier, l33t. Score 0–4 ; 3 requis pour soumettre le formulaire.         |
+| **Turnstile**                   | CAPTCHA invisible Cloudflare vérifié **côté serveur** dans `signUpAction` (`lib/auth/turnstile.ts`, API siteverify). Fail-closed ; se désactive proprement sans `TURNSTILE_SECRET_KEY`.                    |
+| **Anti-énumération**            | Message d'erreur unique « Email ou mot de passe incorrect » : impossible de distinguer un compte inexistant d'un mauvais mot de passe, empêchant la découverte de comptes.                                 |
+| **`(auth)` route group**        | Segment Next.js `app/(auth)/` : pages /sign-in et /sign-up avec layout centré dédié, sans préfixe d'URL. Les Server Actions (`lib/actions/auth.ts`) portent toute la sécurité serveur.                     |
+| **Interdiction médias générés** | Règle stricte projet : aucun média (image/son/vidéo) généré par IA. Tout média provient des plateformes officielles via `external_refs`/providers. Exception : animations UI (motion/CSS). Voir AGENTS.md. |

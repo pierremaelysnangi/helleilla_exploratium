@@ -8,7 +8,7 @@ import Link from "next/link";
 // Formulaire client (générateur + jauge + Turnstile)
 import { SignUpForm } from "@/components/auth/signUpForm";
 
-export const metadata = { title: "Inscription" };
+export const metadata = { robots: { index: false }, title: "Inscription" };
 
 export default function SignUpPage() {
   return (

@@ -28,4 +28,27 @@ describe("RBAC permissions matrix", () => {
     expect(can("admin", "band", "delete")).toBe(true);
     expect(can("admin", "genre", "create")).toBe(true);
   });
+
+  // La ressource `user` n'est déclarée que pour admin : pour tous les autres
+  // rôles la recherche dans la matrice retourne undefined, et le repli doit
+  // refuser (jamais autoriser par absence de règle).
+  it("refuse une ressource absente de la matrice du rôle", () => {
+    expect(can("user", "user", "read")).toBe(false);
+    expect(can("contributor", "user", "read")).toBe(false);
+    expect(can("moderator", "user", "moderate")).toBe(false);
+  });
+
+  it("réserve la gestion des utilisateurs à l'admin", () => {
+    expect(can("admin", "user", "read")).toBe(true);
+    expect(can("admin", "user", "delete")).toBe(true);
+    // Même l'admin ne peut pas créer un utilisateur via la matrice :
+    // l'inscription passe exclusivement par Better Auth.
+    expect(can("admin", "user", "create")).toBe(false);
+  });
+
+  it("réserve le rejet terminal d'une contribution à l'admin", () => {
+    expect(can("moderator", "contribution", "moderate")).toBe(true);
+    expect(can("moderator", "contribution", "delete")).toBe(false);
+    expect(can("admin", "contribution", "delete")).toBe(true);
+  });
 });

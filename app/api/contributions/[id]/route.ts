@@ -1,58 +1,31 @@
 /**
- * Routes /api/contributions/:id — transitions du workflow de médiation.
- * POST /:id/evidence : le contributeur ajoute des preuves (retour en
- *   `pending`).
- * PATCH /:id : le modérateur applique une transition
- *   (evidence_requested | approved | rejected-admin uniquement) ;
- *   l'approbation promeut les médias staging vers l'espace public.
+ * Route PATCH /api/contributions/:id — transitions du workflow de médiation
+ * appliquées par le modérateur (evidence_requested | approved | rejected,
+ * ce dernier réservé aux admins). L'approbation matérialise le dossier :
+ * création ou enrichissement du groupe, références externes et promotion
+ * des médias (voir lib/contributions/approve.ts).
+ *
+ * L'ajout de preuves par le contributeur vit dans `./evidence/route.ts`.
  */
 
-// Wrapper standard + réponses + erreur typée
+// Wrapper standard + réponses
 import { route } from "@/lib/api/handler";
-import { ok, fail, ApiError } from "@/lib/api/response";
+// Matrice RBAC : `contribution:delete` exprime déjà le rejet terminal
+import { can } from "@/lib/rbac/permissions";
+import type { Role } from "@/lib/rbac/roles";
+import { ok, fail } from "@/lib/api/response";
 import { idParamSchema } from "@/lib/api/schemas";
 // Validation des entrées (source unique)
-import {
-  addEvidenceSchema,
-  requestEvidenceSchema,
-} from "@/lib/validations/contribution";
+import { requestEvidenceSchema } from "@/lib/validations/contribution";
 import { z } from "zod";
 // Mutations workflow + lecture
-import {
-  requestEvidence,
-  addEvidence,
-  updateStatus,
-} from "@/db/mutations/contributions";
+import { requestEvidence, updateStatus } from "@/db/mutations/contributions";
 import { getContributionById } from "@/db/queries/contributions";
-// Promotion des médias MinIO à l'approbation
-import { promoteContributionFiles } from "@/lib/storage/contributions";
+// Approbation : création/enrichissement du groupe, refs et médias
+import { approveContribution } from "@/lib/contributions/approve";
 
 /** Contexte de route partagé : paramètre { id }. */
 const paramsConfig = { params: idParamSchema };
-
-/**
- * POST /api/contributions/:id/evidence — ajout de preuves par le
- * contributeur propriétaire. Retourne le dossier en statut `pending`.
- */
-export const POST = route(
-  {
-    ...paramsConfig,
-    body: addEvidenceSchema,
-    permission: { resource: "contribution", action: "update" },
-    rateLimit: { limit: 20, window: 3600 },
-  },
-  async ({ params, body, session }) => {
-    const contribution = await getContributionById(params.id);
-    if (!contribution) return fail("NOT_FOUND", "Contribution introuvable");
-    // Seul l'auteur du dossier peut le compléter
-    if (contribution.submittedBy !== session!.user.id) {
-      return fail("FORBIDDEN", "Seul l'auteur peut compléter ce dossier");
-    }
-
-    const updated = await addEvidence(params.id, body.evidence);
-    return ok(updated);
-  },
-);
 
 /** Corps du PATCH modérateur : union discriminée par `status`. */
 const patchBodySchema = z.discriminatedUnion("status", [
@@ -64,8 +37,10 @@ const patchBodySchema = z.discriminatedUnion("status", [
 /**
  * PATCH /api/contributions/:id — transition modérateur :
  * - `evidence_requested` : demande de preuves (+ relance, échéance) ;
- * - `approved` : validation — promotion MinIO staging -> public ;
+ * - `approved` : groupe créé/enrichi, refs synchronisées, médias promus ;
  * - `rejected` : rejet TERMINAL réservé aux admins.
+ *
+ * @returns Le dossier mis à jour ; l'approbation joint `bandId`.
  */
 export const PATCH = route(
   {
@@ -90,8 +65,11 @@ export const PATCH = route(
 
     // --- Rejet terminal : admin uniquement ---
     if (body.status === "rejected") {
-      const role = session!.user.role ?? "user";
-      if (role !== "admin") {
+      // `contribution:delete` n'est accordé qu'à l'admin dans la matrice :
+      // c'est exactement la règle du rejet terminal, inutile de la
+      // redéclarer sous forme de comparaison de rôle.
+      const role = (session!.user.role ?? "user") as Role;
+      if (!can(role, "contribution", "delete")) {
         return fail(
           "FORBIDDEN",
           "Le rejet terminal est réservé aux administrateurs (demandez des preuves)",
@@ -100,30 +78,11 @@ export const PATCH = route(
       return ok(await updateStatus(params.id, "rejected", session!.user.id));
     }
 
-    // --- Approbation : promotion transactionnelle des médias ---
-    const contributionPayload = contribution.payload as {
-      targetBandId?: string | null;
-    };
-    if (
-      contribution.type !== "band_create" ||
-      !contributionPayload.targetBandId
-    ) {
-      // Sans bande cible connue (band_update), pas de promotion média
-      return ok(await updateStatus(params.id, "approved", session!.user.id));
-    }
-
-    try {
-      await promoteContributionFiles(
-        params.id,
-        String(contributionPayload.targetBandId),
-      );
-    } catch (err) {
-      console.error("[contributions] Promotion MinIO échouée:", err);
-      throw new ApiError(
-        "UNAVAILABLE",
-        "Stockage indisponible : approbation non finalisée, réessayez",
-      );
-    }
-    return ok(await updateStatus(params.id, "approved", session!.user.id));
+    // --- Approbation : matérialise le groupe, les références et les médias ---
+    const { contribution: approved, bandId } = await approveContribution(
+      contribution,
+      session!.user.id,
+    );
+    return ok({ ...approved, bandId });
   },
 );

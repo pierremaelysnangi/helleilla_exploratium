@@ -24,6 +24,15 @@ import {
   GlobalSearchQuerySchema,
   GlobalSearchResponseSchema,
   BandDetailSchema,
+  AdminUserSchema,
+  ProfileSchema,
+  LabelSchema,
+  MemberSchema,
+  BandMembershipSchema,
+  RatingSummarySchema,
+  CollectionEntrySchema,
+  AlbumDetailSchema,
+  GenreDetailSchema,
   SetBandGenresRequestSchema,
   BandGenresSyncedSchema,
   AudioUploadRequestSchema,
@@ -35,7 +44,21 @@ import {
 import { createBandSchema, updateBandSchema } from "@/lib/validations/band";
 import { createAlbumSchema, updateAlbumSchema } from "@/lib/validations/album";
 import { createTrackSchema, updateTrackSchema } from "@/lib/validations/track";
-import { createGenreSchema } from "@/lib/validations/genre";
+import {
+  createGenreSchema,
+  updateGenreBodySchema,
+} from "@/lib/validations/genre";
+// Contrat d'administration des comptes (source unique avec la route)
+import { updateUserSchema } from "@/lib/validations/user";
+import { updateProfileSchema } from "@/lib/validations/profile";
+import {
+  createMemberSchema,
+  setBandMembersSchema,
+} from "@/lib/validations/member";
+import {
+  setRatingSchema,
+  setCollectionSchema,
+} from "@/lib/validations/collection";
 // Schémas médias & contributions
 import {
   BandMediaSchema,
@@ -175,6 +198,42 @@ registerPath("/api/genres", "post", {
   },
 });
 
+// Détail d'un genre : hors de la boucle `resources` car les genres n'ont ni
+// pagination ni indexation Meilisearch, et la suppression est réservée à
+// l'admin (les autres entités s'arrêtent à moderator).
+registerPath("/api/genres/{id}", "get", {
+  tags: ["genres"],
+  summary: "Récupère un genre",
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(GenreSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/genres/{id}", "patch", {
+  tags: ["genres"],
+  summary: "Modifie un genre (moderator+)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(updateGenreBodySchema),
+  responses: {
+    200: jsonOk(GenreSchema),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/genres/{id}", "delete", {
+  tags: ["genres"],
+  summary: "Supprime un genre (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(z.object({ id: z.string().uuid() })),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
 // Recherche globale publique : multi-index Meilisearch, rate limitée
 registerPath("/api/search", "get", {
   tags: ["search"],
@@ -211,6 +270,276 @@ registerPath("/api/bands/by-slug/{slug}", "get", {
   responses: {
     200: jsonOk(BandDetailSchema),
     ...pick(404, 422, 429, 500),
+  },
+});
+
+// Détail album par slug. DEUX segments : la contrainte
+// `albums_band_slug_uq` ne rend le slug unique qu'au sein d'un groupe,
+// un slug seul ne désignerait donc pas un album de façon déterministe.
+registerPath("/api/albums/by-slug/{bandSlug}/{albumSlug}", "get", {
+  tags: ["albums"],
+  summary: "Récupère un album par slug de groupe + slug d'album",
+  requestParams: {
+    path: z.object({
+      bandSlug: z.string().min(1).max(200),
+      albumSlug: z.string().min(1).max(200),
+    }),
+  },
+  responses: {
+    200: jsonOk(AlbumDetailSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+// Détail genre par slug (unique globalement, un seul segment suffit)
+registerPath("/api/genres/by-slug/{slug}", "get", {
+  tags: ["genres"],
+  summary: "Récupère un genre par son slug (parent, sous-genres, groupes)",
+  requestParams: {
+    path: z.object({ slug: z.string().min(1).max(200) }),
+  },
+  responses: {
+    200: jsonOk(GenreDetailSchema),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+// Administration des comptes. Réservée aux admins : c'est la seule
+// famille de routes qui expose des emails, et la seule voie de changement
+// de rôle (Better Auth interdit au client de se l'attribuer).
+registerPath("/api/users", "get", {
+  tags: ["users"],
+  summary: "Liste les comptes (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+      role: z.enum(["user", "contributor", "moderator", "admin"]).optional(),
+    }),
+  },
+  responses: {
+    200: jsonOk(listSchema(AdminUserSchema)),
+    ...pick(401, 403, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "get", {
+  tags: ["users"],
+  summary: "Récupère un compte (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(AdminUserSchema),
+    ...pick(401, 403, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "patch", {
+  tags: ["users"],
+  summary: "Change le rôle ou le bannissement d'un compte (admin)",
+  description:
+    "409 si l'opération retirerait ses droits au dernier administrateur ; 403 si l'administrateur se vise lui-même.",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  requestBody: json(updateUserSchema),
+  responses: {
+    200: jsonOk(AdminUserSchema),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "delete", {
+  tags: ["users"],
+  summary: "Supprime un compte (admin)",
+  description:
+    "Les contributions déjà soumises sont conservées et deviennent anonymes.",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(z.object({ deleted: z.boolean(), id: z.string() })),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+// Profil de l'utilisateur connecté : lit la projection publique, pas la
+// base identité — le nom affiché suffit, l'email n'a pas à circuler ici.
+registerPath("/api/profile", "get", {
+  tags: ["profile"],
+  summary: "Profil public de l'utilisateur connecté",
+  security: [{ sessionCookie: [] }],
+  responses: {
+    200: jsonOk(ProfileSchema),
+    ...pick(401, 404, 429, 500),
+  },
+});
+
+registerPath("/api/profile", "patch", {
+  tags: ["profile"],
+  summary: "Met à jour son nom affiché",
+  description:
+    "Passe par Better Auth : ses hooks répliquent le nom vers la projection publique.",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(updateProfileSchema),
+  responses: {
+    200: jsonOk(ProfileSchema),
+    ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+// --- Phase F : membres, labels, appréciations, collections ---
+
+registerPath("/api/members", "get", {
+  tags: ["members"],
+  summary: "Annuaire paginé des membres",
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+    }),
+  },
+  responses: { 200: jsonOk(listSchema(MemberSchema)), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/members", "post", {
+  tags: ["members"],
+  summary: "Crée une fiche membre (contributor+)",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(createMemberSchema),
+  responses: {
+    201: jsonOk(MemberSchema, "Créé"),
+    ...pick(401, 403, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/members/by-slug/{slug}", "get", {
+  tags: ["members"],
+  summary: "Fiche d'un membre (groupes et albums)",
+  requestParams: { path: z.object({ slug: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(
+      MemberSchema.extend({
+        bands: z.array(z.any()),
+        albums: z.array(z.any()),
+      }),
+    ),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/bands/{id}/members", "get", {
+  tags: ["bands"],
+  summary: "Formation d'un groupe",
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(z.array(BandMembershipSchema)),
+    ...pick(422, 429, 500),
+  },
+});
+
+registerPath("/api/bands/{id}/members", "put", {
+  tags: ["bands"],
+  summary: "Remplace la formation d'un groupe (sync complète)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(setBandMembersSchema),
+  responses: {
+    200: jsonOk(z.array(BandMembershipSchema)),
+    ...pick(401, 403, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/labels", "get", {
+  tags: ["labels"],
+  summary: "Annuaire paginé des labels",
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+    }),
+  },
+  responses: { 200: jsonOk(listSchema(LabelSchema)), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/labels", "post", {
+  tags: ["labels"],
+  summary: "Crée un label (moderator+)",
+  security: [{ sessionCookie: [] }],
+  responses: {
+    201: jsonOk(LabelSchema, "Créé"),
+    ...pick(401, 403, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/albums/{id}/ratings", "get", {
+  tags: ["albums"],
+  summary: "Moyenne des notes d'un album",
+  description:
+    "Agrégat public uniquement ; `mine` n'est renseigné que pour un appelant connecté, et ne contient jamais la note d'autrui.",
+  requestParams: { path: UuidParamSchema },
+  responses: { 200: jsonOk(RatingSummarySchema), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/albums/{id}/ratings", "put", {
+  tags: ["albums"],
+  summary: "Enregistre sa note (1 à 5)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(setRatingSchema),
+  responses: {
+    200: jsonOk(RatingSummarySchema),
+    ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/albums/{id}/ratings", "delete", {
+  tags: ["albums"],
+  summary: "Retire sa note",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(RatingSummarySchema),
+    ...pick(401, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "get", {
+  tags: ["collection"],
+  summary: "Collection et liste d'envies de l'appelant",
+  description:
+    "Toujours cadrée sur la session : aucun identifiant d'utilisateur n'est accepté en entrée.",
+  security: [{ sessionCookie: [] }],
+  requestParams: {
+    query: z.object({ status: z.enum(["owned", "wanted"]).optional() }),
+  },
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "put", {
+  tags: ["collection"],
+  summary: "Ajoute un album ou change son statut",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(setCollectionSchema),
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "delete", {
+  tags: ["collection"],
+  summary: "Retire un album de sa liste",
+  security: [{ sessionCookie: [] }],
+  requestParams: { query: z.object({ albumId: z.string().uuid() }) },
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 422, 429, 500),
   },
 });
 

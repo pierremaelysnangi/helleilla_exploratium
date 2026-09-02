@@ -28,6 +28,7 @@ const mocks = vi.hoisted(() => ({
   addEvidence: vi.fn(),
   updateStatus: vi.fn(),
   promoteFiles: vi.fn(),
+  approveContribution: vi.fn(),
   presignUpload: vi.fn(),
 }));
 
@@ -47,10 +48,14 @@ vi.mock("@/lib/storage/contributions", () => ({
   presignContributionUpload: mocks.presignUpload,
   promoteContributionFiles: mocks.promoteFiles,
 }));
+vi.mock("@/lib/contributions/approve", () => ({
+  approveContribution: mocks.approveContribution,
+}));
 
 // Imports dynamiques après les mocks.
 const { POST, GET } = await import("./route");
-const { PATCH, POST: postEvidence } = await import("./[id]/route");
+const { PATCH } = await import("./[id]/route");
+const { POST: postEvidence } = await import("./[id]/evidence/route");
 
 const ID = "00000000-0000-4000-8000-000000000001";
 
@@ -178,29 +183,47 @@ describe("PATCH /api/contributions/[id]", () => {
     expect(res.status).toBe(403);
   });
 
-  it("rejet terminal accepté pour un admin + promotion média à l'approbation", async () => {
+  it("rejet terminal accepté pour un admin", async () => {
     setUser("admin");
-    mocks.getContributionById.mockResolvedValue({
-      id: ID,
-      type: "band_create",
-      payload: { targetBandId: "b1" },
-    });
+    mocks.getContributionById.mockResolvedValue({ id: ID });
     mocks.updateStatus.mockResolvedValue({ id: ID, status: "rejected" });
-    mocks.promoteFiles.mockResolvedValue({ promotedKeys: [] });
 
     const res = await PATCH(
       mkReq("http://localhost/x", "PATCH", { status: "rejected" }),
       ctx({ id: ID }),
     );
-    expect(res.status).toBe(200);
 
-    // Approbation déclenche la promotion MinIO
-    const approve = await PATCH(
+    expect(res.status).toBe(200);
+    expect(mocks.updateStatus).toHaveBeenCalledWith(
+      ID,
+      "rejected",
+      expect.any(String),
+    );
+  });
+
+  it("l'approbation délègue la matérialisation et renvoie le bandId", async () => {
+    setUser("moderator");
+    const dossier = { id: ID, type: "band_create", payload: { slug: "x" } };
+    mocks.getContributionById.mockResolvedValue(dossier);
+    mocks.approveContribution.mockResolvedValue({
+      contribution: { id: ID, status: "approved" },
+      bandId: "00000000-0000-4000-8000-0000000000b1",
+    });
+
+    const res = await PATCH(
       mkReq("http://localhost/x", "PATCH", { status: "approved" }),
       ctx({ id: ID }),
     );
-    expect(approve.status).toBe(200);
-    expect(mocks.promoteFiles).toHaveBeenCalledWith(ID, "b1");
+
+    expect(res.status).toBe(200);
+    // La route arbitre et délègue ; la logique d'approbation est testée
+    // dans lib/contributions/approve.test.ts
+    expect(mocks.approveContribution).toHaveBeenCalledWith(
+      dossier,
+      expect.any(String),
+    );
+    const json = await res.json();
+    expect(json.data.bandId).toBe("00000000-0000-4000-8000-0000000000b1");
   });
 });
 

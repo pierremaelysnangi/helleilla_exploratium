@@ -19,8 +19,10 @@ type FetchOpts = {
   signal?: AbortSignal;
 };
 
-// Base des URLs d'API (configurable via variable d'environnement)
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+// Base des URLs d'API (configurable via variable d'environnement).
+// `||` et non `??` : une variable définie mais VIDE doit aussi retomber sur
+// le défaut, sinon `new URL()` reçoit une base invalide.
+const BASE = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /**
  * Effectue une requête vers l'API et retourne la réponse validée.
@@ -67,6 +69,40 @@ export async function apiFetch<S extends z.ZodTypeAny>(
   }
 
   return schema.parse(json);
+}
+
+/**
+ * Lecture publique d'une ressource depuis un composant serveur, en
+ * déballant l'enveloppe `{ data }` et en distinguant « absent » de « en
+ * panne ».
+ *
+ * Retourne `null` UNIQUEMENT sur 404, pour que l'appelant réponde
+ * `notFound()`. Toute autre erreur est propagée : une base indisponible
+ * doit déclencher la frontière d'erreur, jamais se déguiser en 404.
+ *
+ * @param path - Chemin de l'API (ex : "/api/genres/by-slug/black-metal").
+ * @param schema - Schéma zod du contenu de `data`.
+ * @param opts - Fenêtre de revalidation ISR (60 s par défaut) et signal.
+ * @returns Les données validées, ou `null` si la ressource n'existe pas.
+ */
+export async function fetchPublicOrNull<S extends z.ZodTypeAny>(
+  path: string,
+  schema: S,
+  opts: { revalidate?: number; signal?: AbortSignal } = {},
+): Promise<z.infer<S> | null> {
+  try {
+    // L'inférence de `z.object({ data: S })` avec S générique dépasse ce
+    // que TypeScript sait résoudre en zod v4. La validation runtime est
+    // bien faite par apiFetch ; on ne restaure ici que le type de sortie.
+    const payload = (await apiFetch(path, z.object({ data: schema }), {
+      revalidate: opts.revalidate ?? 60,
+      signal: opts.signal,
+    })) as { data: z.infer<S> };
+    return payload.data;
+  } catch (err) {
+    if (err instanceof ApiError && err.code === "NOT_FOUND") return null;
+    throw err;
+  }
 }
 
 // Ré-export pour que les consommateurs du client aient ApiError sous la main

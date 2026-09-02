@@ -30,7 +30,9 @@ export class ApiClientError extends Error {
 }
 
 type ApiJsonOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  // PUT inclus : plusieurs routes appliquent une synchronisation complète
+  // (genres, refs, formation, collection) plutôt qu'un patch partiel.
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   /** Corps JSON sérialisé automatiquement (ignoré pour GET). */
   body?: unknown;
   /** Query params sérialisés dans l'URL ; valeurs null/undefined ignorées. */

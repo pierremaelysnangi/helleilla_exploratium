@@ -17,7 +17,9 @@ import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 
 import { db } from "@/db"; // Instance Drizzle de la base CONTENU (profils publics)
+import { closeDb } from "@/db"; // Fermeture du pool applicatif (teardown tests)
 import { authDb } from "@/lib/auth-db"; // Instance Drizzle DÉDIÉE identité (RGPD)
+import { closeAuthDb } from "@/lib/auth-db"; // Fermeture du pool identité (teardown tests)
 // Tables d'identité : seules celles-ci vivent dans la base dédiée
 import { user, session, account, verification } from "@/db/schema/auth";
 import { profiles } from "@/db/schema/profiles";
@@ -93,6 +95,13 @@ export const auth = betterAuth({
         hash(password, { memoryCost: 19456, timeCost: 2, parallelism: 1 }),
       verify: ({ hash: h, password }) => verify(h, password),
     },
+
+    // Envoi du lien de réinitialisation (SMTP optionnel : dégradation
+    // journalisée en console, voir lib/auth/mail.ts)
+    sendResetPassword: async ({ user, url }) => {
+      const { sendResetPasswordEmail } = await import("@/lib/auth/mail");
+      await sendResetPasswordEmail(user.email, url);
+    },
   },
 
   // Limitation de débit globale + règles spécifiques plus strictes sur login/signup.
@@ -163,3 +172,13 @@ export const auth = betterAuth({
 
 // Type de session inféré automatiquement par Better Auth (utilisé côté app)
 export type Session = typeof auth.$Infer.Session;
+
+/**
+ * Ferme toutes les connexions ouvertes par l'instance d'auth (Redis
+ * secondary storage + pools Postgres contenu/identité). Utilisé par le
+ * teardown global des tests E2E pour libérer l'event loop du runner ;
+ * ne doit pas être appelé en cours d'exécution applicative.
+ */
+export async function closeAuthConnections() {
+  await Promise.all([redis.quit(), closeDb(), closeAuthDb()]);
+}

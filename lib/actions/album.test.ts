@@ -19,8 +19,15 @@ import {
   setUser,
   expectAllowed,
   expectDenied,
+  fieldErrorsOf,
   fixtures,
 } from "./__tests__/helpers";
+// Modules mockés, réimportés pour piloter/observer leurs espions
+import { getBandById } from "@/db/queries/bands";
+import { getAlbumById } from "@/db/queries/albums";
+import { listTrackIdsByAlbumId } from "@/db/queries/tracks";
+import { uploadImage, deleteImage } from "@/lib/storage/images";
+import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
 // Mocks des modules Next.js inutilisables hors rendu (headers, cache)
 vi.mock("next/headers", () => ({
@@ -135,5 +142,132 @@ describe("album — RBAC", () => {
   it("non authentifié refusé", async () => {
     setUser(null);
     expectDenied(await createAlbumAction(fixtures.album()));
+  });
+});
+
+/** UUID de l'album utilisé par les fixtures de mise à jour/suppression. */
+const ALBUM_ID = "550e8400-e29b-41d4-a716-446655440002";
+
+/** Fabrique un fichier de pochette non vide. */
+function coverFile(name = "cover.png") {
+  return new File(["binaire"], name, { type: "image/png" });
+}
+
+describe("createAlbumAction — validation et pochette", () => {
+  it("renvoie les erreurs zod pour un bandId non-UUID", async () => {
+    setUser("contributor");
+    const res = await createAlbumAction(fixtures.album({ bandId: "nope" }));
+    expect(fieldErrorsOf(res).bandId).toBeDefined();
+  });
+
+  it("renvoie « Groupe introuvable. » quand le groupe parent n'existe pas", async () => {
+    setUser("contributor");
+    vi.mocked(getBandById).mockResolvedValueOnce(undefined as never);
+
+    const res = await createAlbumAction(fixtures.album());
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Groupe introuvable.");
+  });
+
+  it("téléverse la pochette quand un fichier non vide est fourni", async () => {
+    setUser("contributor");
+    const fd = fixtures.album();
+    fd.set("cover", coverFile());
+
+    expectAllowed(await createAlbumAction(fd));
+    expect(uploadImage).toHaveBeenCalledWith(expect.any(File), "covers");
+  });
+
+  it("ignore une pochette vide", async () => {
+    setUser("contributor");
+    const fd = fixtures.album();
+    fd.set("cover", new File([], "vide.png", { type: "image/png" }));
+
+    expectAllowed(await createAlbumAction(fd));
+    expect(uploadImage).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateAlbumAction — validation et pochette", () => {
+  it("renvoie les erreurs zod pour un id non-UUID", async () => {
+    setUser("contributor");
+    const res = await updateAlbumAction(fixtures.albumUpdate({ id: "nope" }));
+    expect(fieldErrorsOf(res).id).toBeDefined();
+  });
+
+  it("renvoie « Album introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("contributor");
+    vi.mocked(getAlbumById).mockResolvedValueOnce(undefined as never);
+
+    const res = await updateAlbumAction(fixtures.albumUpdate());
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Album introuvable.");
+  });
+
+  it("supprime l'ancienne pochette avant de téléverser la nouvelle", async () => {
+    setUser("contributor");
+    vi.mocked(getAlbumById).mockResolvedValueOnce({
+      id: ALBUM_ID,
+      bandId: "550e8400-e29b-41d4-a716-446655440001",
+      title: "Existing",
+      slug: "existing",
+      coverUrl: "http://fake/ancienne.webp",
+    } as never);
+
+    const fd = fixtures.albumUpdate();
+    fd.set("cover", coverFile("nouvelle.png"));
+    expectAllowed(await updateAlbumAction(fd));
+
+    expect(deleteImage).toHaveBeenCalledWith("http://fake/ancienne.webp");
+    expect(uploadImage).toHaveBeenCalledWith(expect.any(File), "covers");
+  });
+
+  it("téléverse sans rien supprimer quand l'album n'avait pas de pochette", async () => {
+    setUser("contributor");
+    const fd = fixtures.albumUpdate();
+    fd.set("cover", coverFile());
+
+    expectAllowed(await updateAlbumAction(fd));
+
+    expect(uploadImage).toHaveBeenCalled();
+    expect(deleteImage).not.toHaveBeenCalled();
+  });
+});
+
+describe("deleteAlbumAction — cascade", () => {
+  it("renvoie « Album introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("moderator");
+    vi.mocked(getAlbumById).mockResolvedValueOnce(undefined as never);
+
+    const res = await deleteAlbumAction(ALBUM_ID);
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Album introuvable.");
+  });
+
+  it("supprime la pochette existante", async () => {
+    setUser("moderator");
+    vi.mocked(getAlbumById).mockResolvedValueOnce({
+      id: ALBUM_ID,
+      bandId: "550e8400-e29b-41d4-a716-446655440001",
+      title: "Existing",
+      slug: "existing",
+      coverUrl: "http://fake/cover.webp",
+    } as never);
+
+    expectAllowed(await deleteAlbumAction(ALBUM_ID));
+    expect(deleteImage).toHaveBeenCalledWith("http://fake/cover.webp");
+  });
+
+  it("désindexe les pistes collectées avant la suppression cascade", async () => {
+    setUser("moderator");
+    vi.mocked(listTrackIdsByAlbumId).mockResolvedValueOnce(["t1", "t2"]);
+
+    expectAllowed(await deleteAlbumAction(ALBUM_ID));
+
+    expect(enqueueTrackIndex).toHaveBeenCalledTimes(2);
+    expect(enqueueTrackIndex).toHaveBeenCalledWith("t1", "delete");
   });
 });

@@ -9,6 +9,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 // Actions sous test
 import { createBandAction, updateBandAction, deleteBandAction } from "./band";
+// Helper partagé d'extraction des erreurs de champ
+import { fieldErrorsOf } from "./__tests__/helpers";
+// Modules mockés, réimportés pour piloter/observer leurs espions
+import { getBandById } from "@/db/queries/bands";
+import { listAlbumIdsByBandId } from "@/db/queries/albums";
+import { listTrackIdsByAlbumIds } from "@/db/queries/tracks";
+import { uploadImage, deleteImage } from "@/lib/storage/images";
+import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
+import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
 
 // Conteneur hoisté partagé entre les tests et le mock de @/lib/auth
 const mockSession = vi.hoisted(() => ({ current: null as any }));
@@ -87,6 +96,14 @@ function bandForm(overrides: Record<string, string> = {}) {
   return fd;
 }
 
+/** UUID valide réutilisé par les tests de mise à jour. */
+const BAND_ID = "550e8400-e29b-41d4-a716-446655440000";
+
+/** Fabrique un fichier image non vide accepté par les actions. */
+function logoFile(name = "logo.png") {
+  return new File(["binaire"], name, { type: "image/png" });
+}
+
 // Réinitialise les espions entre chaque test
 beforeEach(() => {
   vi.clearAllMocks();
@@ -160,5 +177,139 @@ describe("deleteBandAction — RBAC", () => {
     setUser("moderator");
     const res = await deleteBandAction("fake-id");
     expect(res.success).toBe(true);
+  });
+});
+
+// Validation zod : le contrat d'erreur exposé aux formulaires
+describe("createBandAction — validation", () => {
+  it("renvoie les erreurs zod aplaties pour un slug non kebab-case", async () => {
+    setUser("contributor");
+    const res = await createBandAction(bandForm({ slug: "Pas Un Slug" }));
+    // Le formulaire attend `fieldErrors`, pas une chaîne : contrat à figer
+    expect(fieldErrorsOf(res).slug).toBeDefined();
+  });
+
+  it("refuse une dissolution antérieure à la formation", async () => {
+    setUser("contributor");
+    const res = await createBandAction(
+      bandForm({ formedYear: "1995", dissolvedYear: "1990" }),
+    );
+    expect(res.success).toBe(false);
+  });
+});
+
+// Cycle de vie du logo : upload à la création, remplacement à la mise à jour
+describe("createBandAction — logo", () => {
+  it("téléverse le logo quand un fichier image non vide est fourni", async () => {
+    setUser("contributor");
+    const fd = bandForm();
+    fd.set("image", logoFile());
+
+    const res = await createBandAction(fd);
+
+    expect(res.success).toBe(true);
+    expect(uploadImage).toHaveBeenCalledWith(expect.any(File), "logos");
+  });
+
+  it("ignore un fichier image vide", async () => {
+    setUser("contributor");
+    const fd = bandForm();
+    fd.set("image", new File([], "vide.png", { type: "image/png" }));
+
+    const res = await createBandAction(fd);
+
+    expect(res.success).toBe(true);
+    expect(uploadImage).not.toHaveBeenCalled();
+  });
+});
+
+describe("updateBandAction — validation et logo", () => {
+  it("renvoie les erreurs zod pour un id non-UUID", async () => {
+    setUser("contributor");
+    const res = await updateBandAction(bandForm({ id: "pas-un-uuid" }));
+    expect(fieldErrorsOf(res).id).toBeDefined();
+  });
+
+  it("renvoie « Groupe introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("contributor");
+    vi.mocked(getBandById).mockResolvedValueOnce(undefined as never);
+
+    const res = await updateBandAction(bandForm({ id: BAND_ID }));
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Groupe introuvable.");
+  });
+
+  it("supprime l'ancien logo avant de téléverser le nouveau", async () => {
+    setUser("contributor");
+    vi.mocked(getBandById).mockResolvedValueOnce({
+      id: BAND_ID,
+      name: "Existing",
+      slug: "existing",
+      imageUrl: "http://fake/ancien.webp",
+    } as never);
+
+    const fd = bandForm({ id: BAND_ID });
+    fd.set("image", logoFile("nouveau.png"));
+    const res = await updateBandAction(fd);
+
+    expect(res.success).toBe(true);
+    expect(deleteImage).toHaveBeenCalledWith("http://fake/ancien.webp");
+    expect(uploadImage).toHaveBeenCalledWith(expect.any(File), "logos");
+  });
+
+  it("téléverse sans rien supprimer quand le groupe n'avait pas de logo", async () => {
+    setUser("contributor");
+    const fd = bandForm({ id: BAND_ID });
+    fd.set("image", logoFile());
+
+    const res = await updateBandAction(fd);
+
+    expect(res.success).toBe(true);
+    expect(uploadImage).toHaveBeenCalled();
+    expect(deleteImage).not.toHaveBeenCalled();
+  });
+});
+
+describe("deleteBandAction — cascade", () => {
+  it("renvoie « Groupe introuvable. » quand l'id ne correspond à rien", async () => {
+    setUser("moderator");
+    vi.mocked(getBandById).mockResolvedValueOnce(undefined as never);
+
+    const res = await deleteBandAction(BAND_ID);
+
+    expect(res.success).toBe(false);
+    if (!res.success) expect(res.error).toBe("Groupe introuvable.");
+  });
+
+  it("supprime le logo existant", async () => {
+    setUser("moderator");
+    vi.mocked(getBandById).mockResolvedValueOnce({
+      id: BAND_ID,
+      name: "Existing",
+      slug: "existing",
+      imageUrl: "http://fake/logo.webp",
+    } as never);
+
+    const res = await deleteBandAction(BAND_ID);
+
+    expect(res.success).toBe(true);
+    expect(deleteImage).toHaveBeenCalledWith("http://fake/logo.webp");
+  });
+
+  it("désindexe la descendance albums et pistes du groupe supprimé", async () => {
+    setUser("moderator");
+    vi.mocked(listAlbumIdsByBandId).mockResolvedValueOnce(["a1", "a2"]);
+    vi.mocked(listTrackIdsByAlbumIds).mockResolvedValueOnce(["t1", "t2", "t3"]);
+
+    const res = await deleteBandAction(BAND_ID);
+
+    expect(res.success).toBe(true);
+    // La descendance est collectée AVANT la suppression cascade en base :
+    // sans cela, Meilisearch garderait des documents orphelins.
+    expect(enqueueAlbumIndex).toHaveBeenCalledTimes(2);
+    expect(enqueueAlbumIndex).toHaveBeenCalledWith("a1", "delete");
+    expect(enqueueTrackIndex).toHaveBeenCalledTimes(3);
+    expect(enqueueTrackIndex).toHaveBeenCalledWith("t3", "delete");
   });
 });

@@ -22,6 +22,8 @@ import {
 import { sql } from "drizzle-orm";
 // Table `bands` référencée par la clé étrangère `band_id`
 import { bands } from "./bands";
+// Label éditeur de la sortie (nullable : autoproduction ou label inconnu)
+import { labels } from "./labels";
 
 /**
  * Énumération du type de sortie musicale :
@@ -60,6 +62,13 @@ export const albums = pgTable(
     releaseYear: integer("release_year"),
     /** URL de la pochette de l'album. */
     coverUrl: text("cover_url"),
+    /**
+     * Label ayant publié la sortie. Nullable et `set null` à la
+     * suppression : perdre un label ne doit pas effacer les albums.
+     */
+    labelId: uuid("label_id").references(() => labels.id, {
+      onDelete: "set null",
+    }),
     /** Horodatage de création (fuseau horaire inclus). */
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -76,5 +85,7 @@ export const albums = pgTable(
     index("albums_title_trgm_idx").using("gin", sql`${t.title} gin_trgm_ops`),
     // Un slug d'album est unique à l'intérieur d'un groupe donné
     uniqueIndex("albums_band_slug_uq").on(t.bandId, t.slug),
+    // Recherche « tous les albums d'un label »
+    index("albums_label_idx").on(t.labelId),
   ],
 );

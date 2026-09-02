@@ -6,6 +6,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 // Providers clients (theming, etc.) enveloppant toute l'application
 import { Providers } from "@/providers";
+// Chrome global du site : en-tête, pied de page et palette Ctrl+K
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { CommandPalette } from "@/components/search/commandPalette";
+// Lecteur audio global : élément <audio> unique de l'application
+import { MiniPlayer } from "@/components/audio/miniPlayer";
+import { ErrorBoundary } from "@/components/shared/errorBoundary";
 
 // Police sans-serif principale, exposée via la variable CSS --font-geist-sans
 const geistSans = Geist({
@@ -22,12 +29,21 @@ const geistMono = Geist_Mono({
 // Métadonnées globales : titre par défaut avec template (%s remplacé par chaque page)
 // et description du site utilisée pour le SEO.
 export const metadata: Metadata = {
+  // Base absolue requise pour résoudre les URLs OpenGraph/canonical
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  ),
   title: {
     default: "Helleilla Exploratium",
     template: "%s | Helleilla Exploratium",
   },
   description:
     "L'encyclopédie collaborative du metal — genres, groupes, albums, membres.",
+  openGraph: {
+    type: "website",
+    siteName: "Helleilla Exploratium",
+    locale: "fr_FR",
+  },
 };
 
 /**
@@ -42,12 +58,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   // causés par l'injection du thème (mode sombre) côté client.
   return (
     <html
-      lang="en"
+      lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {/* Palette de recherche rapide, disponible sur toutes les pages */}
+          <CommandPalette />
+          {/* flex-1 : le contenu pousse le footer en bas de viewport */}
+          <main className="site-container flex-1 py-6">
+            {/* Capture les erreurs de rendu des composants clients */}
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </main>
+          {/* Barre de lecture persistante, au-dessus du pied de page */}
+          <MiniPlayer />
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

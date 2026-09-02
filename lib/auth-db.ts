@@ -5,9 +5,10 @@
  * (user, session, account, verification) — emails, hashes de mots de
  * passe, jetons de session — séparées de la base applicative.
  *
- * - Si `AUTH_DATABASE_URL` est définie -> base dédiée (cible finale) ;
- * - Sinon -> repli transparent sur DATABASE_URL (mode mono-base actuel),
- *   ce qui permet une migration progressive sans rupture.
+ * Priorité de résolution :
+ * 1. IDENTITY_AUTH_DATABASE_URL -> projet identités dédié (cible finale) ;
+ * 2. AUTH_DATABASE_URL          -> repli historique mono-base ;
+ * 3. DATABASE_URL               -> repli ultime (démarrage initial).
  */
 
 // Driver postgres-js réutilisé pour la seconde instance
@@ -18,8 +19,11 @@ import { user, session, account, verification } from "@/db/schema/auth";
 // Environnement validé au boot
 import { env } from "@/lib/env";
 
-/** URL de la base d'identité (dédiée si configurée, sinon partagée). */
-const authConnectionString = env.AUTH_DATABASE_URL ?? process.env.DATABASE_URL!;
+/** URL de la base identité selon la chaîne de priorité ci-dessus. */
+const authConnectionString =
+  env.IDENTITY_AUTH_DATABASE_URL ??
+  env.AUTH_DATABASE_URL ??
+  process.env.DATABASE_URL!;
 
 /**
  * Client SQL de la base identité. `prepare: false` requis derrière un
@@ -39,3 +43,6 @@ const authClient = postgres(authConnectionString, {
 export const authDb = drizzle(authClient, {
   schema: { user, session, account, verification },
 });
+
+/** Ferme le pool de la base identité (usage : teardown de tests). */
+export const closeAuthDb = () => authClient.end({ timeout: 5 });

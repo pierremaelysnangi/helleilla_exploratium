@@ -14,10 +14,11 @@
 import { route } from "@/lib/api/handler";
 import { ok, okPaginated } from "@/lib/api/response";
 import { listQuerySchema } from "@/lib/api/schemas";
+import { z } from "zod";
 import { createTrackSchema } from "@/lib/validations/track";
 import { db } from "@/db";
 import { tracks } from "@/db/schema";
-import { desc, asc, ilike, sql, type SQL } from "drizzle-orm";
+import { desc, asc, ilike, and, eq, sql, type SQL } from "drizzle-orm";
 import { trackIndexQueue } from "@/lib/queue/client";
 
 /**
@@ -39,14 +40,23 @@ const SORT_COLUMNS = {
  * Exécute en parallèle la requête de données et celle de comptage total.
  * Limité à 60 requêtes par minute.
  */
+/**
+ * Query de liste pistes : pagination + filtre par album (`albumId`)
+ * pour la tracklist d'un album.
+ */
+const trackListQuerySchema = listQuerySchema.extend({
+  albumId: z.string().uuid().optional(),
+});
+
 export const GET = route(
-  { query: listQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  { query: trackListQuerySchema, rateLimit: { limit: 60, window: 60 } },
   async ({ query }) => {
-    const { page, perPage, q, sort, order } = query;
+    const { page, perPage, q, sort, order, albumId } = query;
     const offset = (page - 1) * perPage;
-    const where: SQL | undefined = q
-      ? ilike(tracks.title, `%${q}%`)
-      : undefined;
+    const where: SQL | undefined = and(
+      q ? ilike(tracks.title, `%${q}%`) : undefined,
+      albumId ? eq(tracks.albumId, albumId) : undefined,
+    );
     const dir = order === "asc" ? asc : desc;
     const column =
       SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? tracks.createdAt;

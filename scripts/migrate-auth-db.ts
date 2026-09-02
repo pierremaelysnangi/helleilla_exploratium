@@ -18,8 +18,10 @@
 import postgres from "postgres";
 import { createHash } from "crypto";
 
+// Source : base contenu (comptes existants) ; cible : base identités dédiée
 const SOURCE_URL = process.env.DATABASE_URL;
-const TARGET_URL = process.env.AUTH_DATABASE_URL;
+const TARGET_URL =
+  process.env.IDENTITY_AUTH_DATABASE_URL ?? process.env.AUTH_DATABASE_URL;
 
 /** Tables d'identité à copier, dans l'ordre des dépendances FK. */
 const TABLES = ["user", "session", "account", "verification"] as const;
@@ -27,7 +29,7 @@ const TABLES = ["user", "session", "account", "verification"] as const;
 async function main() {
   if (!SOURCE_URL || !TARGET_URL) {
     console.error(
-      "❌ DATABASE_URL et AUTH_DATABASE_URL sont requis. Configurez d'abord la base identité dédiée.",
+      "❌ DATABASE_URL et IDENTITY_AUTH_DATABASE_URL sont requis. Configurez d'abord le projet identités dédié.",
     );
     process.exit(1);
   }

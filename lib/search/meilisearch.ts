@@ -15,10 +15,22 @@ export const meilisearch = new Meilisearch({
   apiKey: env.MEILI_MASTER_KEY,
 });
 
+/**
+ * Noms des trois index, source unique partagée par les workers, le script
+ * d'initialisation et les requêtes. Un second client Meilisearch existait
+ * en parallèle (`lib/meili.ts`) : deux connexions pour la même instance,
+ * et deux endroits où corriger un nom d'index.
+ */
+export const INDEXES = {
+  bands: "bands",
+  albums: "albums",
+  tracks: "tracks",
+} as const;
+
 // Handles des trois index de recherche, prêts pour les requêtes
-export const bandsIndex = meilisearch.index("bands");
-export const albumsIndex = meilisearch.index("albums");
-export const tracksIndex = meilisearch.index("tracks");
+export const bandsIndex = meilisearch.index(INDEXES.bands);
+export const albumsIndex = meilisearch.index(INDEXES.albums);
+export const tracksIndex = meilisearch.index(INDEXES.tracks);
 
 /**
  * Vérifie la santé de l'instance Meilisearch et affiche le statut en console.

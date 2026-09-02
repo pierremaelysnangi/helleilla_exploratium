@@ -8,6 +8,9 @@
 
 // Wrapper standard : validation + RBAC + rate limit
 import { route } from "@/lib/api/handler";
+// Matrice RBAC : la règle d'accès vit là, pas dans un test de chaîne
+import { can } from "@/lib/rbac/permissions";
+import type { Role } from "@/lib/rbac/roles";
 import { ok, fail } from "@/lib/api/response";
 // Validation des dossiers et preuves (source unique)
 import { createContributionSchema } from "@/lib/validations/contribution";
@@ -89,9 +92,12 @@ export const GET = route(
   { query: listQuerySchema, auth: true },
   async ({ query, session }) => {
     if (query.scope === "review") {
-      // Contrôle manuel : la route n'exige pas de permission globale
-      const role = session!.user.role ?? "user";
-      if (!["moderator", "admin"].includes(role)) {
+      // Permission vérifiée ici et non dans la config de route : `scope=mine`
+      // reste ouvert à tout utilisateur connecté. On interroge la MATRICE
+      // plutôt qu'une liste de rôles en dur, sans quoi ajouter un rôle
+      // obligerait à retrouver chaque test disséminé dans les routes.
+      const role = (session!.user.role ?? "user") as Role;
+      if (!can(role, "contribution", "moderate")) {
         return fail("FORBIDDEN", "File de modération réservée aux modérateurs");
       }
       return ok(await listContributionsForReview(query.status));

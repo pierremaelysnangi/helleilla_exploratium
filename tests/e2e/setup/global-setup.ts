@@ -64,7 +64,8 @@ export default async function globalSetup() {
   // 2. Seed des comptes : signUp via Better Auth puis rôle forcé en SQL
   //    (le champ role est interdit en entrée côté API Better Auth).
   const { auth } = await import("@/lib/auth");
-  const { user } = await import("@/db/schema");
+  // Table identité : import explicite depuis son module dédié
+  const { user } = await import("@/db/schema/auth");
   const { eq } = await import("drizzle-orm");
   for (const u of Object.values(TEST_USERS)) {
     try {
@@ -157,5 +158,10 @@ export default async function globalSetup() {
       }
     }
     await sql.end({ timeout: 5 });
+    // Ferme les connexions (Redis + pools Postgres) ouvertes dans ce
+    // processus par l'import de @/lib/auth lors du seed : sans cela
+    // l'event loop du runner Vitest ne se vide pas → « close timed out ».
+    const { closeAuthConnections } = await import("@/lib/auth");
+    await closeAuthConnections().catch(() => undefined);
   };
 }

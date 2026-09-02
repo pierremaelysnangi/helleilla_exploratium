@@ -8,7 +8,9 @@
 import { auth } from "@/lib/auth"; // Serveur Better Auth (pour signUpEmail)
 import { authDb } from "@/lib/auth-db"; // Base IDENTITÉ dédiée (RGPD)
 import { db } from "@/db"; // Base CONTENU (profils publics)
-import { user } from "@/db/schema";
+// Table identité importée explicitement : elle n'est plus ré-exportée par
+// le baril de la base contenu (cloisonnement RGPD)
+import { user } from "@/db/schema/auth";
 import { profiles } from "@/db/schema/profiles";
 import { eq } from "drizzle-orm"; // Opérateur de comparaison SQL
 

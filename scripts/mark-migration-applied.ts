@@ -3,6 +3,12 @@
  * comme appliquée dans la table interne `drizzle.__drizzle_migrations`.
  * Recrée le schéma/table si absents, puis insère le hash SHA-256 du fichier
  * SQL (utile quand Drizzle échoue à moitié sur une migration déjà jouée).
+ *
+ * Usage : `tsx --env-file=.env.local scripts/mark-migration-applied.ts <fichier.sql>`
+ *
+ * Le nom du fichier était auparavant CODÉ EN DUR sur la toute première
+ * migration : passé 0000, l'outil marquait donc silencieusement la
+ * mauvaise migration comme appliquée.
  */
 
 // Client PostgreSQL bas niveau (sans préparation de requêtes)
@@ -15,11 +21,19 @@ import { createHash } from "crypto";
 // Connexion directe à la base via DIRECT_URL
 const sql = postgres(process.env.DIRECT_URL!, { prepare: false });
 
+// Migration visée, passée en argument (nom de fichier ou chemin complet)
+const arg = process.argv[2];
+if (!arg) {
+  console.error(
+    "Usage : tsx scripts/mark-migration-applied.ts <migration.sql>\n" +
+      "Exemple : tsx scripts/mark-migration-applied.ts 0005_clever_peter_parker.sql",
+  );
+  process.exit(1);
+}
+const migrationPath = arg.includes("/") ? arg : `db/migrations/${arg}`;
+
 // Lecture du fichier de migration à marquer comme appliqué
-const migrationSQL = readFileSync(
-  "db/migrations/0000_grey_luckman.sql",
-  "utf-8",
-);
+const migrationSQL = readFileSync(migrationPath, "utf-8");
 // Hash SHA-256, identique au format attendu par Drizzle Kit
 const hash = createHash("sha256").update(migrationSQL).digest("hex");
 
@@ -43,7 +57,7 @@ async function main() {
     INSERT INTO drizzle.__drizzle_migrations (hash, created_at)
     VALUES (${hash}, ${Date.now()});
   `;
-  console.log("Migration marked as applied:", hash);
+  console.log(`Migration ${migrationPath} marquée comme appliquée :`, hash);
   await sql.end();
 }
 

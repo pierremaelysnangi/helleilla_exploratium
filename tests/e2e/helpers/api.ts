@@ -7,8 +7,25 @@
 // URL du serveur sous test
 import { BASE_URL } from "../config";
 
+/**
+ * Compteur d'adresses IP de test uniques. Chaque client E2E reçoit une
+ * IP distincte (plage TEST-NET-2 198.51.100.0/24, réservée à la doc) afin
+ * d'isoler les buckets du rate limiter applicatif : sans cela, tous les
+ * rôles partageant 127.0.0.1 saturent de façon non-déterministe un même
+ * bucket (ex. POST /api/bands à 10/min) et rendent les suites flaky.
+ * Le rate limiting reste ainsi exercé (chaque bucket est vérifié) sans
+ * interférer entre clients.
+ */
+let ipCounter = 0;
+function nextTestIp(): string {
+  ipCounter += 1;
+  return `198.51.100.${ipCounter}`;
+}
+
 /** Client HTTP attaché à une session (cookie jar minimal). */
 export class ApiClient {
+  /** IP simulée envoyée via `x-forwarded-for` (isolation du rate limit). */
+  private readonly ip = nextTestIp();
   /** Cookies reçus du serveur, renvoyés à chaque requête suivante. */
   private cookies = new Map<string, string>();
 
@@ -43,6 +60,8 @@ export class ApiClient {
     if (init.body !== undefined)
       headers.set("Content-Type", "application/json");
     if (this.cookieHeader) headers.set("Cookie", this.cookieHeader);
+    // IP simulée distincte par client : isole les buckets de rate limit.
+    headers.set("x-forwarded-for", this.ip);
     return fetch(`${BASE_URL}${path}`, { ...init, headers });
   }
 

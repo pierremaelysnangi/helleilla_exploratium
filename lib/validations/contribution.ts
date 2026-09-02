@@ -21,6 +21,31 @@ export const evidenceKindSchema = z.enum([
 
 export type EvidenceKind = z.infer<typeof evidenceKindSchema>;
 
+/**
+ * Types de preuve considérés comme OFFICIELS.
+ *
+ * Un dossier doit en contenir au moins un : c'est la barrière
+ * anti-contenu-IA, un groupe inventé ne pouvant produire de référence
+ * vérifiable. Exportée pour que le formulaire client affiche la même
+ * règle que celle appliquée côté serveur, sans la redéclarer.
+ */
+export const OFFICIAL_EVIDENCE_KINDS = [
+  "musicbrainz",
+  "discogs",
+  "label",
+  "official-site",
+] as const satisfies readonly EvidenceKind[];
+
+/** Nombre minimal de preuves exigées à la soumission. */
+export const MIN_EVIDENCE_COUNT = 2;
+
+/** Indique si un jeu de preuves satisfait la barrière anti-contenu-IA. */
+export function hasOfficialEvidence(kinds: readonly EvidenceKind[]): boolean {
+  return kinds.some((kind) =>
+    (OFFICIAL_EVIDENCE_KINDS as readonly EvidenceKind[]).includes(kind),
+  );
+}
+
 /** Une preuve : lien vérifiable + note explicative optionnelle. */
 export const evidenceItemSchema = z.object({
   kind: evidenceKindSchema,
@@ -70,26 +95,16 @@ export const createContributionSchema = z
     payload: contributionPayloadSchema,
     evidence: z.array(evidenceItemSchema).max(20),
   })
-  .refine((data) => data.evidence.length >= 2, {
+  .refine((data) => data.evidence.length >= MIN_EVIDENCE_COUNT, {
     message:
       "Au moins deux preuves sont requises (dont une référence officielle vérifiable)",
     path: ["evidence"],
   })
-  .refine(
-    (data) =>
-      data.evidence.some(
-        (e) =>
-          e.kind === "musicbrainz" ||
-          e.kind === "discogs" ||
-          e.kind === "label" ||
-          e.kind === "official-site",
-      ),
-    {
-      message:
-        "Une preuve à caractère officiel est requise (MusicBrainz, Discogs, label ou site officiel)",
-      path: ["evidence"],
-    },
-  )
+  .refine((data) => hasOfficialEvidence(data.evidence.map((e) => e.kind)), {
+    message:
+      "Une preuve à caractère officiel est requise (MusicBrainz, Discogs, label ou site officiel)",
+    path: ["evidence"],
+  })
   .refine((data) => data.type !== "band_update" || data.targetBandId, {
     message: "targetBandId requis pour une contribution band_update",
     path: ["targetBandId"],

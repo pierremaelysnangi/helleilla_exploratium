@@ -141,6 +141,119 @@ export const BandDetailSchema = z
   })
   .meta({ id: "BandDetail" });
 
+// Composant "AlbumDetail" : album + groupe + tracklist ordonnée
+// (GET /api/albums/by-slug/{bandSlug}/{albumSlug})
+export const AlbumDetailSchema = AlbumSchema.extend({
+  band: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    slug: z.string(),
+  }),
+  tracks: z.array(TrackSchema),
+}).meta({ id: "AlbumDetail" });
+
+// Composant "GenreDetail" : genre + contexte hiérarchique + groupes
+// rattachés (GET /api/genres/by-slug/{slug})
+export const GenreDetailSchema = GenreSchema.extend({
+  parent: GenreSchema.nullable(),
+  subgenres: z.array(GenreSchema),
+  bands: z.array(BandSchema),
+}).meta({ id: "GenreDetail" });
+
+// Composant "AdminUser" : compte tel qu'exposé à l'administration.
+// Le seul schéma de l'API portant un email — d'où une route réservée aux
+// administrateurs (`user:read`).
+export const AdminUserSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+    emailVerified: z.boolean(),
+    role: z.enum(["user", "contributor", "moderator", "admin"]),
+    banned: z.boolean().nullable(),
+    banReason: z.string().nullable(),
+    banExpires: z.string().datetime().nullable(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "AdminUser" });
+
+// Composant "Profile" : projection publique d'un compte (base contenu)
+export const ProfileSchema = z
+  .object({
+    userId: z.string(),
+    displayName: z.string(),
+    role: z.string(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "Profile" });
+
+// Composant "Label" : maison de disques
+export const LabelSchema = z
+  .object({
+    id: z.string().uuid(),
+    name: z.string().meta({ example: "Peaceville" }),
+    slug: z.string(),
+    countryCode: z.string().nullable(),
+    foundedYear: z.number().int().nullable(),
+    websiteUrl: z.string().nullable(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "Label" });
+
+// Composant "Member" : personne ayant joué dans un ou plusieurs groupes
+export const MemberSchema = z
+  .object({
+    id: z.string().uuid(),
+    name: z.string().meta({ example: "Ihsahn" }),
+    slug: z.string(),
+    bio: z.string().nullable(),
+    musicbrainzId: z.string().nullable(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "Member" });
+
+// Composant "BandMembership" : une ligne de formation d'un groupe
+export const BandMembershipSchema = z
+  .object({
+    membershipId: z.string().uuid(),
+    id: z.string().uuid(),
+    name: z.string(),
+    slug: z.string(),
+    musicbrainzId: z.string().nullable(),
+    role: z.string().nullable(),
+    joinedYear: z.number().int().nullable(),
+    leftYear: z.number().int().nullable(),
+  })
+  .meta({ id: "BandMembership" });
+
+// Composant "RatingSummary" : agrégat public + note personnelle éventuelle.
+// Aucune identité de votant n'est exposée : seule la moyenne est publique.
+export const RatingSummarySchema = z
+  .object({
+    average: z.number().nullable(),
+    count: z.number().int(),
+    mine: z.number().int().nullable(),
+  })
+  .meta({ id: "RatingSummary" });
+
+// Composant "CollectionEntry" : un album dans la liste d'un utilisateur
+export const CollectionEntrySchema = z
+  .object({
+    albumId: z.string().uuid(),
+    title: z.string(),
+    slug: z.string(),
+    releaseYear: z.number().int().nullable(),
+    coverUrl: z.string().nullable(),
+    bandName: z.string(),
+    bandSlug: z.string(),
+    status: z.enum(["owned", "wanted"]),
+    addedAt: z.string().datetime(),
+  })
+  .meta({ id: "CollectionEntry" });
+
 // Corps du PUT /api/bands/{id}/genres : liste complète de genreIds
 export const SetBandGenresRequestSchema = z
   .object({ genreIds: z.array(z.string().uuid()).max(20) })

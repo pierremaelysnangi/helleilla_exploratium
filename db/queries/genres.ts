@@ -64,3 +64,15 @@ export async function searchGenresByName(query: string) {
     .where(ilike(genres.name, `%${query}%`))
     .limit(20);
 }
+
+/**
+ * Liste plate des slugs de genres (sitemap SEO).
+ */
+export async function listGenreSlugs(): Promise<
+  { slug: string; updatedAt: Date }[]
+> {
+  return db
+    .select({ slug: genres.slug, updatedAt: genres.updatedAt })
+    .from(genres)
+    .limit(5_000);
+}

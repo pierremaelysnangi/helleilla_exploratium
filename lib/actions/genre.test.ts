@@ -19,6 +19,7 @@ import {
   setUser,
   expectAllowed,
   expectDenied,
+  fieldErrorsOf,
 } from "./__tests__/helpers";
 
 // Mocks des modules Next.js inutilisables hors rendu (headers, cache)
@@ -143,5 +144,38 @@ describe("genre — RBAC", () => {
     expectDenied(
       await deleteGenreAction("550e8400-e29b-41d4-a716-446655440004"),
     );
+  });
+});
+
+// Validation zod et invalidation de cache
+describe("genre — validation et revalidation", () => {
+  it("create : renvoie les erreurs zod pour un slug non kebab-case", async () => {
+    setUser("moderator");
+    const res = await createGenreAction(genreForm({ slug: "Pas Un Slug" }));
+    expect(fieldErrorsOf(res).slug).toBeDefined();
+  });
+
+  it("update : renvoie les erreurs zod pour un id non-UUID", async () => {
+    setUser("moderator");
+    const res = await updateGenreAction(genreUpdateForm({ id: "pas-un-uuid" }));
+    expect(fieldErrorsOf(res).id).toBeDefined();
+  });
+
+  it("update : n'invalide pas l'ancienne URL quand le slug est inchangé", async () => {
+    const { getGenreById } = await import("@/db/queries/genres");
+    const { revalidatePath } = await import("next/cache");
+    // updateGenre renvoie le slug soumis : on fait renvoyer le même à la
+    // lecture pour simuler une modification qui ne touche pas au slug.
+    vi.mocked(getGenreById).mockResolvedValueOnce({
+      id: "550e8400-e29b-41d4-a716-446655440004",
+      name: "Existing Genre",
+      slug: "blackened-death-metal",
+    } as any);
+    setUser("moderator");
+
+    expectAllowed(await updateGenreAction(genreUpdateForm()));
+
+    // /genres + /genres/<slug>, sans troisième purge de l'ancien slug
+    expect(revalidatePath).toHaveBeenCalledTimes(2);
   });
 });

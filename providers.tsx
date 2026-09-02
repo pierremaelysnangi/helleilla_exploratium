@@ -4,6 +4,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // Fournisseur de thème (clair/sombre) basé sur next-themes
 import { ThemeProvider } from "next-themes";
+// Adaptateur nuqs requis pour les query params typés en App Router
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 // useState pour créer le QueryClient une seule fois par montage client
 import { useState } from "react";
 
@@ -33,7 +35,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     // Thème géré via la classe HTML, sombre par défaut, système respecté
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <NuqsAdapter>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </NuqsAdapter>
     </ThemeProvider>
   );
 }

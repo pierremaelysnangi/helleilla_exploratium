@@ -81,7 +81,7 @@ export function buildDocument(): ReturnType<typeof createDocument> {
       },
     },
     servers: [
-      { url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000" },
+      { url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000" },
     ],
     tags: [
       { name: "bands", description: "Groupes et projets musicaux." },

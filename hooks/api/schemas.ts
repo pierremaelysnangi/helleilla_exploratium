@@ -87,3 +87,171 @@ export type ListParams = {
   perPage?: number;
   q?: string;
 };
+
+/** Genre résumé projeté dans le détail groupe ({id,name,slug}). */
+export const genreSummarySchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  slug: z.string(),
+});
+
+/** Détail public d'un groupe : ligne + genres associés (GET by-slug / :id). */
+export const bandDetailSchema = bandRowSchema.extend({
+  genres: z.array(genreSummarySchema),
+});
+
+export type BandDetail = z.infer<typeof bandDetailSchema>;
+export type GenreSummary = z.infer<typeof genreSummarySchema>;
+
+/** Groupe résumé projeté dans le détail album ({id,name,slug}). */
+export const bandSummarySchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  slug: z.string(),
+});
+
+/**
+ * Détail public d'un album : ligne + groupe + tracklist ordonnée
+ * (GET /api/albums/by-slug/:bandSlug/:albumSlug).
+ */
+export const albumDetailSchema = albumRowSchema.extend({
+  band: bandSummarySchema,
+  tracks: z.array(trackRowSchema),
+});
+
+/**
+ * Détail public d'un genre : ligne + contexte hiérarchique + groupes
+ * rattachés (GET /api/genres/by-slug/:slug).
+ */
+export const genreDetailSchema = genreRowSchema.extend({
+  parent: genreSummarySchema.nullable(),
+  subgenres: z.array(genreSummarySchema),
+  bands: z.array(bandRowSchema),
+});
+
+export type BandSummary = z.infer<typeof bandSummarySchema>;
+export type AlbumDetail = z.infer<typeof albumDetailSchema>;
+export type GenreDetail = z.infer<typeof genreDetailSchema>;
+
+/** Statuts du workflow de médiation (enum PostgreSQL `contribution_status`). */
+export const contributionStatusSchema = z.enum([
+  "pending",
+  "evidence_requested",
+  "approved",
+  "expired",
+  "rejected",
+]);
+
+/** Une preuve telle que stockée dans le dossier. */
+export const evidenceRowSchema = z.object({
+  kind: z.enum([
+    "official-site",
+    "label",
+    "press",
+    "musicbrainz",
+    "discogs",
+    "other",
+  ]),
+  url: z.string(),
+  note: z.string().nullish(),
+});
+
+/**
+ * Ligne « contribution » sérialisée (GET /api/contributions).
+ *
+ * `payload` reste volontairement permissif : sa forme est contractualisée
+ * à l'écriture par `contributionPayloadSchema`, et le front n'en lit que
+ * quelques champs d'affichage.
+ */
+export const contributionRowSchema = z.object({
+  id: z.uuid(),
+  type: z.enum(["band_create", "band_update"]),
+  status: contributionStatusSchema,
+  payload: z.object({
+    name: z.string().optional(),
+    slug: z.string().optional(),
+    targetBandId: z.string().nullish(),
+  }),
+  evidence: z.array(evidenceRowSchema),
+  reviewNotes: z.string().nullish(),
+  submittedBy: z.string(),
+  reviewedBy: z.string().nullish(),
+  reminderCount: z.number().int(),
+  deadlineAt: z.string().nullish(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type ContributionStatus = z.infer<typeof contributionStatusSchema>;
+export type EvidenceRow = z.infer<typeof evidenceRowSchema>;
+export type ContributionRow = z.infer<typeof contributionRowSchema>;
+
+/**
+ * Compte tel qu'exposé par l'administration (GET /api/users).
+ *
+ * Seule ligne de l'API portant un email : elle ne transite que vers
+ * l'espace admin, derrière la permission `user:read`.
+ */
+export const adminUserRowSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  emailVerified: z.boolean(),
+  role: z.enum(["user", "contributor", "moderator", "admin"]),
+  banned: z.boolean().nullish(),
+  banReason: z.string().nullish(),
+  banExpires: z.string().nullish(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type AdminUserRow = z.infer<typeof adminUserRowSchema>;
+export type UserRole = AdminUserRow["role"];
+
+/** DTO du resolver média (miroir de lib/media/resolver.ts). */
+export const bandMediaSchema = z.object({
+  band: z.object({
+    id: z.uuid(),
+    name: z.string(),
+    slug: z.string(),
+    countryCode: z.string().nullish(),
+    formedYear: z.number().nullish(),
+    dissolvedYear: z.number().nullish(),
+    bio: z.string().nullish(),
+    imageUrl: z.string().nullish(),
+  }),
+  info: z.object({
+    area: z.string().nullish(),
+    lifeSpan: z
+      .object({
+        begin: z.string().nullish(),
+        end: z.string().nullish(),
+        ended: z.boolean().optional(),
+      })
+      .nullish(),
+    members: z.array(z.object({ id: z.string(), name: z.string() })),
+    genres: z.array(z.string()),
+    wikidata: z
+      .object({
+        id: z.string(),
+        extract: z.string().optional(),
+        imageUrl: z.string().optional(),
+      })
+      .nullish(),
+  }),
+  images: z.array(z.object({ provider: z.string(), url: z.string() })),
+  links: z.array(
+    z.object({ provider: z.string(), label: z.string(), url: z.string() }),
+  ),
+  previews: z.array(
+    z.object({
+      title: z.string(),
+      artistName: z.string(),
+      previewUrl: z.string(),
+      coverUrl: z.string().nullish(),
+    }),
+  ),
+  degraded: z.boolean(),
+});
+
+export type BandMedia = z.infer<typeof bandMediaSchema>;
