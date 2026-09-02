@@ -10,6 +10,20 @@ import { z } from "zod";
 
 const BASE = "https://api.deezer.com";
 
+/**
+ * Durée de cache des recherches de pistes : 15 minutes.
+ *
+ * Les URLs d'extrait renvoyées par Deezer portent un jeton Akamai
+ * (`hdnea=exp=…`) valable environ une heure. Le cache par défaut de 24 h
+ * servait donc des liens expirés pendant vingt-trois heures sur
+ * vingt-quatre : la lecture échouait en 403, sans message, ce qui se
+ * lisait comme « le lecteur ne fonctionne pas pour certains sons ».
+ *
+ * Quinze minutes gardent l'essentiel du bénéfice du cache tout en
+ * laissant une marge confortable avant expiration.
+ */
+const PREVIEW_CACHE_TTL = 900;
+
 /** Piste Deezer : extrait 30 s (`preview`) + métadonnées d'affichage. */
 const trackSchema = z.object({
   id: z.number(),
@@ -62,7 +76,7 @@ export async function searchTracks(
     // occupent sinon toutes les places avant le filtrage.
     `${BASE}/search?q=${encodeURIComponent(query)}&limit=${artistName ? 25 : 5}`,
     searchResponseSchema,
-    { minIntervalMs: 300 },
+    { minIntervalMs: 300, cacheTtlSeconds: PREVIEW_CACHE_TTL },
   );
 
   // Seules les pistes ayant réellement un extrait sont exploitables

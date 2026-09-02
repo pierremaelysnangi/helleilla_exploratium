@@ -22,6 +22,8 @@ import {
 } from "@/stores/audioPlayer.store";
 // Types validés côté client
 import type { TrackRow } from "@/hooks/api/schemas";
+// Extraits officiels 30 s, agrégés par le resolver média
+import { useBandMedia } from "@/hooks/use-band-media";
 // Liens officiels par plateforme
 import { trackSearchLinks, trackLyricsLinks } from "@/lib/media/platformLinks";
 // Extrait Deezer optionnel associé à une piste
@@ -34,8 +36,15 @@ type AlbumTracklistProps = {
   tracks: TrackRow[];
   /** Nom du groupe (construit les requêtes de recherche plateforme). */
   artistName: string;
-  /** Extraits Deezer disponibles pour l'album (resolver média). */
-  previews?: TrackPreview[];
+  /**
+   * Identifiant du groupe : les extraits de 30 s sont chargés depuis le
+   * resolver média.
+   *
+   * Sans lui, la page d'un album n'avait AUCUN extrait — le bouton
+   * « Écouter » n'apparaissait jamais, ce qui donnait un lecteur
+   * inopérant sur toute cette partie du site.
+   */
+  bandId?: string;
 };
 
 /** Formate une durée en minutes:secondes. */
@@ -63,8 +72,16 @@ function findPreview(
 export function AlbumTracklist({
   tracks,
   artistName,
-  previews = [],
+  bandId,
 }: AlbumTracklistProps) {
+  // Le resolver média sert déjà depuis son cache serveur, et la requête
+  // est partagée avec la fiche du groupe via la clé TanStack.
+  const media = useBandMedia(bandId);
+  const previews: TrackPreview[] = (media.data?.previews ?? []).map((p) => ({
+    title: p.title,
+    previewUrl: p.previewUrl,
+  }));
+
   // Une seule piste dépliée à la fois (index dans la liste)
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const play = useAudioPlayerStore((s) => s.play);

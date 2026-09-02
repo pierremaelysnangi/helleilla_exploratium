@@ -28,8 +28,19 @@ import { officialLinkLabel } from "@/lib/media/linkLabels";
 // Cache Redis partagé
 import { redis } from "@/lib/redis";
 
-/** Durée de cache du DTO agrégé (24 h) ; invalidé par PUT refs. */
-const MEDIA_CACHE_TTL = 86_400;
+/**
+ * Durée de cache du DTO agrégé.
+ *
+ * Bornée à quinze minutes par les EXTRAITS : les URLs Deezer portent un
+ * jeton signé valable environ une heure, et un cache de 24 h les servait
+ * expirées la quasi-totalité du temps — la lecture échouait alors en 403
+ * sans que rien ne l'indique.
+ *
+ * Le reste du DTO (informations, images, liens) supporterait une durée
+ * bien plus longue ; les séparer imposerait deux clés et deux cycles
+ * d'invalidation pour un gain marginal à cette volumétrie.
+ */
+const MEDIA_CACHE_TTL = 900;
 
 /**
  * Libellés français des types de relation MusicBrainz retenus comme

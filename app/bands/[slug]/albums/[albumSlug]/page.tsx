@@ -227,6 +227,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             <AlbumTracklist
               tracks={album.tracks}
               artistName={album.band.name}
+              bandId={album.band.id}
             />
           )}
         </section>
