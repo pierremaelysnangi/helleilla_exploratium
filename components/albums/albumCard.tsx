@@ -6,9 +6,9 @@
  * un monogramme quand aucune pochette officielle n'est référencée.
  */
 
-// Lien Next + image optimisée (pochette externe si référencée)
+// Lien Next + pochette avec repli (l'archive amont peut être lente)
 import Link from "next/link";
-import Image from "next/image";
+import { CoverImage } from "./coverImage";
 // Type de ligne validée côté client
 import type { AlbumRow } from "@/hooks/api/schemas";
 
@@ -40,24 +40,13 @@ export function AlbumCard({ album, bandSlug }: AlbumCardProps) {
       href={`/bands/${bandSlug}/albums/${album.slug}`}
       className="metal-card hover:bg-accent/30 group block overflow-hidden"
     >
-      {/* Pochette carrée, ou monogramme sur fond acier */}
+      {/* Pochette carrée, ou monogramme si absente ou injoignable */}
       <div className="bg-muted relative aspect-square w-full">
-        {album.coverUrl ? (
-          <Image
-            src={album.coverUrl}
-            alt={`Pochette de ${album.title}`}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="font-heading text-muted-foreground absolute inset-0 flex items-center justify-center text-4xl font-black uppercase"
-          >
-            {album.title.charAt(0)}
-          </span>
-        )}
+        <CoverImage
+          src={album.coverUrl}
+          title={album.title}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1536px) 200px, 160px"
+        />
       </div>
 
       <div className="flex flex-col gap-1 p-3">

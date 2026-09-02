@@ -192,6 +192,67 @@ qui demande des arbitrages plutôt que du code.
 
 ---
 
+## Front — état mesuré
+
+Chiffres relevés au navigateur, pas estimés.
+
+### Pochettes
+
+18 pochettes réelles sur 22 albums, via **Cover Art Archive** (l'archive
+adossée à MusicBrainz, hébergée par l'Internet Archive) : publique et sans
+jeton, là où le provider Discogs se désactive faute de `DISCOGS_TOKEN`.
+
+- `lib/providers/coverart.ts` : release-groups MusicBrainz + manifeste CAA
+- `lib/media/albumCovers.ts` : appariement par titre normalisé, l'année
+  départageant les homonymes. Sans correspondance certaine, rien n'est
+  écrit — une pochette erronée est pire qu'absente.
+- `pnpm covers:sync` — idempotent, rejouable, indépendant du seed
+- `<CoverImage>` retombe sur le monogramme si l'archive répond 504
+
+Le release-group est stocké dans `external_refs` (donnée canonique) et
+`albums.cover_url` reçoit l'URL **stable** `coverartarchive.org` — jamais
+celle de redirection, qui pointe vers un nœud Internet Archive au nom
+variable et serait périmée dès l'écriture.
+
+### Cross-browser
+
+| Moteur   | État                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------- |
+| Chromium | ✅ 21 vues (7 pages × 3 tailles) — aucun constat                                                         |
+| Firefox  | ✅ 21 vues — aucun constat                                                                               |
+| WebKit   | ⚠️ non testé : le binaire refuse de démarrer sans dépendances système (installation `sudo` indisponible) |
+
+Contrôles par vue : débordement horizontal, `<h1>` unique, images sans
+`alt`, boutons sans nom accessible, `lang`. Zéro anomalie.
+
+**Socle navigateur** : « tous les navigateurs existants » n'est pas
+atteignable ici, et ce n'est pas notre code qui l'empêche — **Tailwind 4**
+exige `oklch()`, `color-mix()`, `@property` et les cascade layers. Le
+plancher réel est Chrome/Edge 111+, Safari 16.4+, Firefox 128+. Il est
+désormais **déclaré** dans `browserslist` plutôt que subi : Next calibre sa
+transpilation dessus au lieu de viser un socle plus ancien inutilement.
+
+### Performance (build de production, 1440×900)
+
+| Page                  | LCP   | CLS   |
+| --------------------- | ----- | ----- |
+| `/`                   | 172ms | 0.043 |
+| `/bands`              | 240ms | 0.003 |
+| `/bands/emperor`      | 264ms | 0.052 |
+| `/genres/black-metal` | 104ms | 0.003 |
+| détail album          | 168ms | 0.010 |
+
+- CLS **tous sous 0,1** (seuil « bon »)
+- JS : 532 ko décompressés → **~112 ko transférés** (gzip actif)
+- HTML : 29,4 ko → **6,3 ko** transférés
+- Assets statiques : `public, max-age=31536000, immutable`
+
+⚠️ Les LCP sont mesurés en local, sans latence réseau : ce sont des
+planchers, pas des valeurs terrain. Une mesure représentative demande un
+déploiement et du RUM.
+
+---
+
 ## Dette résorbée
 
 Les constats relevés au fil des phases ont été traités.

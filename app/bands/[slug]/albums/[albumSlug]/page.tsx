@@ -14,7 +14,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { CoverImage } from "@/components/albums/coverImage";
 // Fetch serveur par slugs
 import { fetchAlbumBySlug } from "@/hooks/use-albums";
 // Type du détail validé
@@ -145,20 +145,12 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       </nav>
 
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start">
-        {album.coverUrl ? (
-          <Image
-            src={album.coverUrl}
-            alt={`Pochette de ${album.title}`}
-            width={224}
-            height={224}
-            priority
-            className="border-border h-56 w-56 rounded-lg border object-cover"
-          />
-        ) : (
-          <span className="metal-title border-border bg-muted flex h-56 w-56 shrink-0 items-center justify-center rounded-lg border text-6xl">
-            {album.title.charAt(0)}
-          </span>
-        )}
+        {/* Même repli que dans les grilles : l'archive amont peut renvoyer
+            un 504, et une image brisée en tête de page est plus visible
+            qu'ailleurs. */}
+        <div className="border-border bg-muted relative h-56 w-56 shrink-0 overflow-hidden rounded-lg border">
+          <CoverImage src={album.coverUrl} title={album.title} sizes="224px" />
+        </div>
 
         <div className="min-w-0 flex-1">
           <h1 className="metal-title text-3xl sm:text-4xl">{album.title}</h1>
