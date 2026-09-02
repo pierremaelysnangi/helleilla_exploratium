@@ -65,6 +65,18 @@ export const bandShape = {
     .max(CURRENT_YEAR)
     .optional()
     .nullable(),
+
+  /**
+   * Thèmes des textes du groupe.
+   *
+   * Bornés à dix entrées courtes : c'est une caractérisation, pas un
+   * résumé des paroles — lesquelles ne sont jamais reproduites ici.
+   */
+  themes: z
+    .array(z.string().trim().min(2).max(60))
+    .max(10, "Dix thèmes au maximum")
+    .optional()
+    .nullable(),
 };
 
 // Objet Zod construit à partir de la forme de base

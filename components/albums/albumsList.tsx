@@ -1,10 +1,16 @@
 "use client";
 
 /**
- * <AlbumsList> — catalogue des albums virtualisé (même mécanique que
- * BandList) : infinite query + filtres URL. Chaque album renvoie vers
- * la page de son groupe (le slug album est unique par groupe, pas
- * globalement).
+ * <AlbumsList> — catalogue des albums en grille de cartes.
+ *
+ * Filtres synchronisés à l'URL (recherche, genre) et chargement
+ * progressif. La grille remplace la liste virtualisée : une pochette se
+ * lit d'un coup d'œil, une ligne de texte non — et le nombre de colonnes
+ * s'adapte du smartphone au 4K, ce qu'une virtualisation par lignes ne
+ * sait pas faire proprement.
+ *
+ * Chaque carte renvoie vers l'URL band-scopée de l'album, la seule qui
+ * le désigne sans ambiguïté (son slug n'est unique qu'au sein du groupe).
  */
 
 // Filtres URL + infinite query
@@ -15,19 +21,8 @@ import { apiJsonEnvelope } from "@/hooks/api/client";
 import { albumKeys } from "@/hooks/api/queryKeys";
 import { albumListItemSchema, type AlbumListItem } from "@/hooks/api/schemas";
 import { GenreSelect } from "@/components/genres/genreSelect";
-import { VirtualInfiniteList } from "@/components/shared/virtualInfiniteList";
-import Link from "next/link";
-import { CoverImage } from "./coverImage";
-
-/** Libellés français du type de sortie (enum PostgreSQL `album_type`). */
-const TYPE_LABELS: Record<AlbumListItem["type"], string> = {
-  album: "Album",
-  ep: "EP",
-  single: "Single",
-  compilation: "Compilation",
-  live: "Live",
-  demo: "Démo",
-};
+import { InfiniteGrid } from "@/components/shared/infiniteGrid";
+import { AlbumCard } from "./albumCard";
 
 const pageSchema = z.object({
   data: z.array(albumListItemSchema),
@@ -93,65 +88,30 @@ export function AlbumsList() {
         )}
       </div>
 
-      <div className="h-[calc(100vh-320px)] min-h-[400px]">
-        {infinite.isPending ? (
-          <p className="text-muted-foreground">Chargement des albums…</p>
-        ) : infinite.isError ? (
-          <p role="alert" className="text-destructive text-sm">
-            Impossible de charger les albums.
-          </p>
-        ) : rows.length === 0 ? (
-          <p className="text-muted-foreground">Aucun album trouvé.</p>
-        ) : (
-          <VirtualInfiniteList
-            items={rows}
-            getItemKey={(album) => album.id}
-            estimateSize={() => 96}
-            renderItem={(album) => (
-              <div className="py-1">
-                <AlbumRowCard album={album} />
-              </div>
-            )}
-            hasMore={infinite.hasNextPage}
-            isLoadingMore={infinite.isFetchingNextPage}
-            onLoadMore={() => void infinite.fetchNextPage()}
-          />
-        )}
-      </div>
+      {infinite.isPending ? (
+        <p className="text-muted-foreground">Chargement des albums…</p>
+      ) : infinite.isError ? (
+        <p role="alert" className="text-destructive text-sm">
+          Impossible de charger les albums.
+        </p>
+      ) : rows.length === 0 ? (
+        <p className="text-muted-foreground">Aucun album trouvé.</p>
+      ) : (
+        <InfiniteGrid
+          items={rows}
+          getItemKey={(album) => album.id}
+          renderItem={(album) => (
+            <AlbumCard
+              album={album}
+              bandSlug={album.band.slug}
+              bandName={album.band.name}
+            />
+          )}
+          hasMore={infinite.hasNextPage}
+          isLoadingMore={infinite.isFetchingNextPage}
+          onLoadMore={() => void infinite.fetchNextPage()}
+        />
+      )}
     </div>
-  );
-}
-
-/**
- * Ligne d'album du catalogue : pochette, titre, groupe, année et type.
- *
- * La liste est virtualisée à hauteur fixe, donc les cartes carrées de
- * <AlbumCard> (utilisées dans les grilles) ne conviennent pas ici : on
- * reprend la même information dans une ligne, pochette comprise.
- */
-function AlbumRowCard({ album }: { album: AlbumListItem }) {
-  return (
-    <Link
-      href={`/bands/${album.band.slug}/albums/${album.slug}`}
-      className="metal-card hover:bg-accent/30 flex items-center gap-4 p-3 transition-colors"
-    >
-      <span className="bg-muted relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
-        <CoverImage src={album.coverUrl} title={album.title} sizes="64px" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-semibold">
-          {album.title}
-        </span>
-        <span className="text-muted-foreground block truncate text-xs">
-          {album.band.name}
-        </span>
-      </span>
-      <span className="text-muted-foreground shrink-0 font-mono text-sm">
-        {album.releaseYear ?? "—"}
-      </span>
-      <span className="border-border text-muted-foreground shrink-0 rounded border px-2 py-0.5 text-xs tracking-wide uppercase">
-        {TYPE_LABELS[album.type]}
-      </span>
-    </Link>
   );
 }

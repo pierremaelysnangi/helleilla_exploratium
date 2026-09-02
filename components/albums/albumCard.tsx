@@ -2,8 +2,9 @@
  * <AlbumCard> — carte d'album pour les grilles (discographie, sélections).
  * Composant serveur : pas d'état, pas d'interaction — il ne rend qu'un lien.
  *
- * Pendant « pochette » de <BandCard>, avec la même mécanique de repli sur
- * un monogramme quand aucune pochette officielle n'est référencée.
+ * Carte haut/bas : pochette carrée puis titre, groupe éventuel, année et
+ * type de sortie. Le repli visuel est le même que partout ailleurs quand
+ * aucune pochette officielle n'est référencée.
  */
 
 // Lien Next + pochette avec repli (l'archive amont peut être lente)
@@ -24,6 +25,8 @@ const TYPE_LABELS: Record<AlbumRow["type"], string> = {
 
 type AlbumCardProps = {
   album: AlbumRow;
+  /** Nom du groupe, affiché quand la carte sort du contexte d'une fiche. */
+  bandName?: string;
   /**
    * Slug du groupe propriétaire.
    *
@@ -34,13 +37,13 @@ type AlbumCardProps = {
   bandSlug: string;
 };
 
-export function AlbumCard({ album, bandSlug }: AlbumCardProps) {
+export function AlbumCard({ album, bandSlug, bandName }: AlbumCardProps) {
   return (
     <Link
       href={`/bands/${bandSlug}/albums/${album.slug}`}
       className="metal-card hover:bg-accent/30 group block overflow-hidden"
     >
-      {/* Pochette carrée, ou monogramme si absente ou injoignable */}
+      {/* Pochette carrée, ou repli neutre si absente ou injoignable */}
       <div className="bg-muted relative aspect-square w-full">
         <CoverImage
           src={album.coverUrl}
@@ -53,6 +56,9 @@ export function AlbumCard({ album, bandSlug }: AlbumCardProps) {
         <h3 className="truncate text-sm font-semibold" title={album.title}>
           {album.title}
         </h3>
+        {bandName && (
+          <p className="text-muted-foreground truncate text-xs">{bandName}</p>
+        )}
         <p className="text-muted-foreground flex items-center gap-2 text-xs">
           <span className="font-mono">{album.releaseYear ?? "—"}</span>
           <span className="border-border rounded border px-1.5 py-0.5 tracking-wide uppercase">

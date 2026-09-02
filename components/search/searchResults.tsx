@@ -2,13 +2,23 @@
 
 /**
  * <SearchResults> — résultats de la recherche globale groupés.
+ *
  * Consomme `useGlobalSearch` (debounce 300 ms) et affiche trois
- * sections : groupes, albums, pistes — avec liens vers les pages détail.
+ * sections : groupes, albums, pistes. Albums et pistes sont rendus en
+ * cartes avec leur pochette : un titre seul ne se reconnaît pas, une
+ * pochette si.
+ *
+ * Les liens d'album étaient auparavant construits comme
+ * `/bands/{slug-de-l-album}` — une adresse qui n'existe pas et menait
+ * systématiquement à une 404. Le document indexé porte désormais le slug
+ * du groupe, seul moyen d'écrire l'URL band-scopée correcte.
  */
 
 // Hook de recherche debouncée + types du DTO
 import { useGlobalSearch } from "@/hooks/use-search";
 import Link from "next/link";
+import { CoverImage } from "@/components/albums/coverImage";
+import { trackSearchLinks } from "@/lib/media/platformLinks";
 
 type SearchResultsProps = {
   /** Terme brut saisi (le debounce est géré par le hook). */
@@ -95,20 +105,39 @@ export function SearchResults({ q }: SearchResultsProps) {
         </section>
       )}
 
-      {/* Albums -> page groupe (slug album unique par groupe) */}
+      {/* Albums -> URL band-scopée, la seule qui désigne un album */}
       {data && data.albums.length > 0 && (
         <section>
           <SectionHeader label="Albums" count={data.albums.length} />
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          <ul className="3xl:grid-cols-8 mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {data.albums.map((album) => (
               <li key={album.id}>
                 <Link
-                  href={`/bands/${album.slug}`}
-                  className="metal-card hover:bg-accent/30 block p-3"
+                  href={`/bands/${album.bandSlug}/albums/${album.slug}`}
+                  className="metal-card hover:bg-accent/30 group block overflow-hidden"
                 >
-                  <span className="font-medium">{album.title}</span>
-                  <span className="text-muted-foreground ml-2 text-xs uppercase">
-                    {album.type}
+                  <span className="bg-muted relative block aspect-square w-full">
+                    <CoverImage
+                      src={album.coverUrl}
+                      title={album.title}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                    />
+                  </span>
+                  <span className="flex flex-col gap-1 p-3">
+                    <span className="truncate text-sm font-semibold">
+                      {album.title}
+                    </span>
+                    <span className="text-muted-foreground truncate text-xs">
+                      {album.bandName}
+                    </span>
+                    <span className="text-muted-foreground flex items-center gap-2 text-xs">
+                      <span className="font-mono">
+                        {album.releaseYear ?? "—"}
+                      </span>
+                      <span className="border-border rounded border px-1.5 py-0.5 tracking-wide uppercase">
+                        {album.type}
+                      </span>
+                    </span>
                   </span>
                 </Link>
               </li>
@@ -117,22 +146,41 @@ export function SearchResults({ q }: SearchResultsProps) {
         </section>
       )}
 
-      {/* Pistes -> recherche plateforme directe (pas de page détail piste) */}
+      {/* Pistes : la carte mène à l'album qui les porte, et le lien
+          d'écoute à la plateforme (il n'y a pas de page piste). */}
       {data && data.tracks.length > 0 && (
         <section>
           <SectionHeader label="Pistes" count={data.tracks.length} />
-          <ul className="divide-border border-border mt-2 divide-y rounded-lg border">
+          <ul className="3xl:grid-cols-8 mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {data.tracks.map((track) => (
-              <li
-                key={track.id}
-                className="flex items-center justify-between gap-3 px-4 py-2"
-              >
-                <span className="min-w-0 truncate text-sm">{track.title}</span>
+              <li key={track.id} className="metal-card overflow-hidden">
+                <Link
+                  href={`/bands/${track.bandSlug}/albums/${track.albumSlug}`}
+                  className="hover:bg-accent/30 group block"
+                >
+                  <span className="bg-muted relative block aspect-square w-full">
+                    <CoverImage
+                      src={track.coverUrl}
+                      title={track.albumTitle}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
+                    />
+                  </span>
+                  <span className="flex flex-col gap-1 p-3">
+                    <span className="truncate text-sm font-semibold">
+                      {track.title}
+                    </span>
+                    <span className="text-muted-foreground truncate text-xs">
+                      {track.bandName} · {track.albumTitle}
+                    </span>
+                  </span>
+                </Link>
                 <a
-                  href={`https://www.deezer.com/search/${encodeURIComponent(track.title)}/track`}
+                  href={
+                    trackSearchLinks(track.bandName, track.title).deezer.url
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="metal-nav-link text-xs"
+                  className="border-border text-muted-foreground hover:text-foreground block border-t px-3 py-2 text-xs"
                 >
                   Écouter ↗
                 </a>

@@ -1,7 +1,7 @@
 /**
  * <BandHeader> — en-tête héro du détail d'un groupe (Server-friendly).
  * Reçoit le détail validé (`bandDetailSchema`) : image/logo, nom,
- * pays, période, genres cliquables et bio locale.
+ * pays, période, thèmes des textes, genres cliquables et bio locale.
  */
 
 // Image optimisée + lien genres
@@ -53,6 +53,16 @@ export function BandHeader({ band }: BandHeaderProps) {
             {band.dissolvedYear ? `${band.dissolvedYear} (séparé)` : "actif"}
           </span>
         </p>
+
+        {/* Thèmes des textes : caractérisent le propos du groupe, que
+            les genres seuls ne disent pas. Aucune parole n'est reproduite. */}
+        {band.themes && band.themes.length > 0 && (
+          <p className="text-muted-foreground mt-3 text-sm">
+            <span className="tracking-wide uppercase">Thèmes</span>
+            {" · "}
+            {band.themes.join(", ")}
+          </p>
+        )}
 
         {/* Genres associés -> page du genre (slug unique globalement) */}
         {band.genres.length > 0 && (

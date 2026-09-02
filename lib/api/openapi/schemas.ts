@@ -67,9 +67,15 @@ export const BandSchema = z
     id: z.string().uuid(),
     name: z.string().meta({ example: "Necrofrost" }),
     slug: z.string().meta({ example: "necrofrost" }),
-    country: z.string().nullable(),
+    countryCode: z.string().nullable().meta({ example: "NO" }),
     formedYear: z.number().int().nullable(),
+    dissolvedYear: z.number().int().nullable(),
     bio: z.string().nullable(),
+    imageUrl: z.string().nullable(),
+    themes: z
+      .array(z.string())
+      .nullable()
+      .meta({ description: "Thèmes des textes (donnée éditoriale)" }),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
   })

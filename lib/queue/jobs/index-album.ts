@@ -13,6 +13,7 @@ import { getAlbumById } from "@/db/queries/albums";
 import { meilisearch } from "@/lib/search/meilisearch";
 // Projection partagée avec la réindexation en masse (source unique)
 import { albumDocument } from "@/lib/search/documents";
+import { getBandById } from "@/db/queries/bands";
 
 /** Charge utile du job : id de l'album + action à effectuer. */
 export type AlbumIndexJobData = {
@@ -68,7 +69,15 @@ export async function processAlbumIndex(data: AlbumIndexJobData) {
     return;
   }
 
-  await meilisearch.index("albums").addDocuments([albumDocument(album)]);
+  // Le document porte le contexte du groupe : c'est lui qui rend le
+  // résultat de recherche cliquable vers l'URL band-scopée de l'album.
+  const band = await getBandById(album.bandId);
+  if (!band) {
+    console.warn(`⚠️ Groupe ${album.bandId} introuvable, album non indexé`);
+    return;
+  }
+
+  await meilisearch.index("albums").addDocuments([albumDocument(album, band)]);
 
   console.log(`✅ Album ${album.title} indexé dans Meilisearch`);
 }

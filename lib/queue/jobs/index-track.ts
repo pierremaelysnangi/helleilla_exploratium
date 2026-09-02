@@ -8,7 +8,7 @@
 // File dédiée aux jobs d'indexation des pistes
 import { trackIndexQueue } from "@/lib/queue/client";
 // Relecture de la piste depuis la base au moment du traitement
-import { getTrackById } from "@/db/queries/tracks";
+import { getTrackWithAlbum } from "@/db/queries/tracks";
 // Client Meilisearch partagé
 import { meilisearch } from "@/lib/search/meilisearch";
 // Projection partagée avec la réindexation en masse (source unique)
@@ -62,13 +62,18 @@ export async function processTrackIndex(data: TrackIndexJobData) {
     return;
   }
 
-  const track = await getTrackById(data.trackId);
+  // `getTrackWithAlbum` remonte l'album ET son groupe : le document
+  // indexé doit porter de quoi construire un lien et afficher une
+  // pochette, qu'un identifiant seul ne permet pas.
+  const track = await getTrackWithAlbum(data.trackId);
   if (!track) {
     console.warn(`⚠️ Track ${data.trackId} introuvable`);
     return;
   }
 
-  await meilisearch.index("tracks").addDocuments([trackDocument(track)]);
+  await meilisearch
+    .index("tracks")
+    .addDocuments([trackDocument(track, track.album, track.album.band)]);
 
   console.log(`✅ Track ${track.title} indexé dans Meilisearch`);
 }

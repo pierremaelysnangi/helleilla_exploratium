@@ -21,6 +21,8 @@ export const bandRowSchema = z.object({
   formedYear: z.number().int().nullable().optional(),
   dissolvedYear: z.number().int().nullable().optional(),
   imageUrl: z.string().nullable().optional(),
+  /** Thèmes des textes du groupe (donnée éditoriale, pas de source API). */
+  themes: z.array(z.string()).nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

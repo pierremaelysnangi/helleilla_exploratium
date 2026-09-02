@@ -85,12 +85,14 @@ export function CommandPalette() {
               <Command.Item
                 key={album.id}
                 value={`album-${album.id}`}
-                onSelect={() => go(`/bands/${album.slug}`)}
+                onSelect={() =>
+                  go(`/bands/${album.bandSlug}/albums/${album.slug}`)
+                }
                 className="data-[selected=true]:bg-accent/40 cursor-pointer rounded-md px-3 py-2 text-sm"
               >
                 {album.title}{" "}
                 <span className="text-muted-foreground ml-1 text-xs">
-                  ({album.type})
+                  {album.bandName} · {album.type}
                 </span>
               </Command.Item>
             ))}
@@ -106,14 +108,18 @@ export function CommandPalette() {
               <Command.Item
                 key={track.id}
                 value={`track-${track.id}`}
+                // La palette navigue avec le routeur Next : lui passer une
+                // URL externe ne fonctionne pas. On ouvre l'album qui porte
+                // la piste, d'où partent les liens d'écoute et de paroles.
                 onSelect={() =>
-                  go(
-                    `https://www.deezer.com/search/${encodeURIComponent(track.title)}/track`,
-                  )
+                  go(`/bands/${track.bandSlug}/albums/${track.albumSlug}`)
                 }
                 className="data-[selected=true]:bg-accent/40 cursor-pointer rounded-md px-3 py-2 text-sm"
               >
-                {track.title}
+                {track.title}{" "}
+                <span className="text-muted-foreground ml-1 text-xs">
+                  {track.bandName} · {track.albumTitle}
+                </span>
               </Command.Item>
             ))}
           </Command.Group>

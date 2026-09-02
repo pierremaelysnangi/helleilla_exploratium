@@ -14,6 +14,7 @@
 
 import { db } from "@/db";
 import { bands, albums, tracks } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { meilisearch, INDEXES } from "@/lib/search/meilisearch";
 import {
   bandDocument,
@@ -47,16 +48,30 @@ async function pushAll<T>(
 async function main() {
   console.log("Réindexation Meilisearch depuis la base\n");
 
+  // Les albums et les pistes sont lus AVEC leur contexte : un document
+  // indexé doit porter de quoi bâtir un lien band-scopé et afficher une
+  // pochette. La jointure remplace trois requêtes par entité.
   const [bandRows, albumRows, trackRows] = await Promise.all([
     db.select().from(bands),
-    db.select().from(albums),
-    db.select().from(tracks),
+    db
+      .select({ album: albums, band: bands })
+      .from(albums)
+      .innerJoin(bands, eq(bands.id, albums.bandId)),
+    db
+      .select({ track: tracks, album: albums, band: bands })
+      .from(tracks)
+      .innerJoin(albums, eq(albums.id, tracks.albumId))
+      .innerJoin(bands, eq(bands.id, albums.bandId)),
   ]);
 
   const counts = {
     bands: await pushAll(INDEXES.bands, bandRows, bandDocument),
-    albums: await pushAll(INDEXES.albums, albumRows, albumDocument),
-    tracks: await pushAll(INDEXES.tracks, trackRows, trackDocument),
+    albums: await pushAll(INDEXES.albums, albumRows, (row) =>
+      albumDocument(row.album, row.band),
+    ),
+    tracks: await pushAll(INDEXES.tracks, trackRows, (row) =>
+      trackDocument(row.track, row.album, row.band),
+    ),
   };
 
   for (const [name, n] of Object.entries(counts)) {

@@ -43,6 +43,16 @@ export const bands = pgTable(
     /** URL de l'image/photo du groupe. */
     imageUrl: text("image_url"),
     /**
+     * Thèmes traités par les textes du groupe (mythologie, nature,
+     * histoire, misanthropie…).
+     *
+     * Donnée ÉDITORIALE : aucune source ouverte ne l'expose (Metal
+     * Archives, qui la documente le mieux, n'a pas d'API publique et son
+     * contenu n'est pas réutilisable). Elle est donc saisie par les
+     * contributeurs, avec les mêmes exigences de preuve que le reste.
+     */
+    themes: text("themes").array(),
+    /**
      * Vecteur d'embedding (1536 dimensions, compatible OpenAI text-embedding)
      * destiné à la recherche sémantique via pgvector.
      */

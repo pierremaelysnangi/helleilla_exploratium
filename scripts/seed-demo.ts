@@ -145,10 +145,11 @@ async function seedBands(
         countryCode: band.countryCode,
         formedYear: band.formedYear,
         dissolvedYear: band.dissolvedYear ?? null,
+        themes: band.themes,
       })
       .onConflictDoUpdate({
         target: bands.slug,
-        set: { name: band.name, bio: band.bio },
+        set: { name: band.name, bio: band.bio, themes: band.themes },
       })
       .returning({ id: bands.id });
 

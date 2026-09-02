@@ -13,6 +13,23 @@
 
 import type { bands, albums, tracks } from "@/db/schema";
 
+/**
+ * Contexte du groupe joint aux documents album et piste.
+ *
+ * Indispensable, pas décoratif : l'URL canonique d'un album est
+ * band-scopée. Sans le slug du groupe, un résultat de recherche ne peut
+ * pas produire de lien valide — le composant en fabriquait un faux, qui
+ * menait à une page inexistante.
+ */
+export type BandContext = { slug: string; name: string };
+
+/** Contexte de l'album joint aux documents piste. */
+export type AlbumContext = {
+  slug: string;
+  title: string;
+  coverUrl: string | null;
+};
+
 /** Document « groupe » indexé. */
 export function bandDocument(band: typeof bands.$inferSelect) {
   return {
@@ -26,23 +43,39 @@ export function bandDocument(band: typeof bands.$inferSelect) {
 }
 
 /** Document « album » indexé. */
-export function albumDocument(album: typeof albums.$inferSelect) {
+export function albumDocument(
+  album: typeof albums.$inferSelect,
+  band: BandContext,
+) {
   return {
     id: album.id,
     title: album.title,
     slug: album.slug,
     bandId: album.bandId,
+    bandSlug: band.slug,
+    bandName: band.name,
     type: album.type,
+    releaseYear: album.releaseYear,
     releaseDate: album.releaseDate,
+    coverUrl: album.coverUrl,
   };
 }
 
 /** Document « piste » indexé. */
-export function trackDocument(track: typeof tracks.$inferSelect) {
+export function trackDocument(
+  track: typeof tracks.$inferSelect,
+  album: AlbumContext,
+  band: BandContext,
+) {
   return {
     id: track.id,
     title: track.title,
     albumId: track.albumId,
+    albumSlug: album.slug,
+    albumTitle: album.title,
+    bandSlug: band.slug,
+    bandName: band.name,
+    coverUrl: album.coverUrl,
     trackNumber: track.trackNumber,
     durationMs: track.durationMs,
   };

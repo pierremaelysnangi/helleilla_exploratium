@@ -29,6 +29,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/albums`, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/genres`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/about`, changeFrequency: "monthly", priority: 0.4 },
+    {
+      url: `${BASE_URL}/credits`,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
   ];
 
   try {

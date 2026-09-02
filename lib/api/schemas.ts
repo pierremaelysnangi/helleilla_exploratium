@@ -75,8 +75,14 @@ export const albumHitSchema = z.object({
   title: z.string(),
   slug: z.string(),
   bandId: z.uuid(),
+  // Le slug du groupe fait partie du document indexé : sans lui, un
+  // résultat ne permet pas de construire l'URL band-scopée de l'album.
+  bandSlug: z.string(),
+  bandName: z.string(),
   type: z.enum(ALBUM_TYPES),
+  releaseYear: z.number().int().nullable(),
   releaseDate: z.string().nullable(),
+  coverUrl: z.string().nullable(),
 });
 
 // Résultat "piste" tel qu'indexé dans Meilisearch
@@ -84,6 +90,11 @@ export const trackHitSchema = z.object({
   id: z.uuid(),
   title: z.string(),
   albumId: z.uuid(),
+  albumSlug: z.string(),
+  albumTitle: z.string(),
+  bandSlug: z.string(),
+  bandName: z.string(),
+  coverUrl: z.string().nullable(),
   trackNumber: z.number().int(),
   durationMs: z.number().int().nullable(),
 });

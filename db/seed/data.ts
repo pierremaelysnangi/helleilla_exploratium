@@ -260,6 +260,8 @@ export type SeedBand = {
   formedYear: number;
   dissolvedYear?: number;
   bio: string;
+  /** Thèmes des textes, documentés publiquement pour chacun de ces groupes. */
+  themes: string[];
   genres: string[];
   albums: SeedAlbum[];
   members: SeedMember[];
@@ -273,6 +275,7 @@ export const BANDS: SeedBand[] = [
     formedYear: 1991,
     dissolvedYear: 2001,
     bio: "Groupe norvégien formé à Notodden, figure majeure de la seconde vague de black metal. Sa fusion d'arrangements symphoniques et de black metal a durablement marqué le genre.",
+    themes: ["Occultisme", "Mythologie nordique", "Nature", "Philosophie"],
     genres: ["black-metal", "symphonic-black-metal"],
     members: [
       {
@@ -360,6 +363,7 @@ export const BANDS: SeedBand[] = [
     countryCode: "NO",
     formedYear: 1986,
     bio: "Groupe norvégien originaire de Kolbotn, d'abord orienté death metal avant de basculer vers un black metal volontairement brut. Le duo Nocturno Culto / Fenriz en constitue le noyau depuis 1991.",
+    themes: ["Misanthropie", "Hiver", "Satanisme", "Contre-culture"],
     genres: ["black-metal", "death-metal"],
     members: [
       {
@@ -420,6 +424,7 @@ export const BANDS: SeedBand[] = [
     countryCode: "GB",
     formedYear: 1990,
     bio: "Groupe anglais de Halifax, l'un des trois piliers du death-doom britannique aux côtés de Paradise Lost et Anathema. Violon et chant clair y côtoient des tempos lents et des textes mélancoliques.",
+    themes: ["Deuil", "Amour perdu", "Religion", "Mélancolie"],
     genres: ["doom-metal", "death-doom"],
     members: [
       {
@@ -474,6 +479,7 @@ export const BANDS: SeedBand[] = [
     countryCode: "SE",
     formedYear: 1990,
     bio: "Groupe suédois de Göteborg, dont l'album Slaughter of the Soul a défini le death metal mélodique dit « son de Göteborg » et influencé une génération entière de groupes.",
+    themes: ["Existentialisme", "Aliénation", "Mort", "Chaos"],
     genres: ["death-metal", "melodic-death-metal"],
     members: [
       {
@@ -532,6 +538,7 @@ export const BANDS: SeedBand[] = [
     formedYear: 1984,
     dissolvedYear: 2008,
     bio: "Groupe suisse issu de la dissolution de Hellhammer. Son approche expérimentale du metal extrême, notamment sur To Mega Therion, a ouvert la voie au black et au death metal européens.",
+    themes: ["Mythologie", "Occultisme", "Art", "Décadence"],
     genres: ["thrash-metal", "black-metal"],
     members: [
       {
@@ -584,6 +591,7 @@ export const BANDS: SeedBand[] = [
     countryCode: "GB",
     formedYear: 1988,
     bio: "Groupe anglais de Halifax, pionnier du death-doom puis du gothic metal. Son album Gothic a donné son nom à tout un sous-genre.",
+    themes: ["Perte", "Désespoir", "Religion", "Introspection"],
     genres: ["doom-metal", "death-doom"],
     members: [
       {

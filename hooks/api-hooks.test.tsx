@@ -193,8 +193,12 @@ describe("useGlobalSearch", () => {
             title: "Anthems to the Welkin at Dusk",
             slug: "anthems",
             bandId: UUID,
+            bandSlug: "emperor",
+            bandName: "Emperor",
             type: "album",
+            releaseYear: 1997,
             releaseDate: null,
+            coverUrl: null,
           },
         ],
         tracks: [],
@@ -208,6 +212,9 @@ describe("useGlobalSearch", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.bands).toHaveLength(1);
     expect(result.current.data?.albums[0].type).toBe("album");
+    // Le slug du groupe fait partie du contrat : sans lui, le résultat ne
+    // permet pas d'écrire l'URL band-scopée de l'album.
+    expect(result.current.data?.albums[0].bandSlug).toBe("emperor");
     expect(result.current.data?.tracks).toEqual([]);
   });
 
