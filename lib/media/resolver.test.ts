@@ -242,7 +242,7 @@ describe("resolveBandMedia", () => {
     );
   });
 
-  it("sert depuis le cache Redis si présent (aucun provider appelé)", async () => {
+  it("sert depuis le cache Redis, mais re-résout les extraits", async () => {
     const cached = {
       band: { id: "b1", name: "Cached", slug: "cached" },
       info: { memberships: [], genres: [] },
@@ -253,10 +253,22 @@ describe("resolveBandMedia", () => {
     };
     redisStore.store.set("media:band:b1", JSON.stringify(cached));
 
+    providersMock.deezerSearch.mockResolvedValue([]);
+
     const media = await resolveBandMedia("b1");
+
     expect(media.band.name).toBe("Cached");
+    // La partie coûteuse vient bien du cache : MusicBrainz est limité à
+    // une requête par seconde, la reconstruire à chaque visite laissait
+    // la fiche vide plusieurs secondes.
     expect(providersMock.mbGetArtist).not.toHaveBeenCalled();
-    expect(providersMock.deezerSearch).not.toHaveBeenCalled();
+    // Les extraits, eux, sont TOUJOURS refaits : leurs URLs portent un
+    // jeton signé d'environ une heure, et un lien mis en cache 24 h
+    // renvoyait un 403 silencieux à la lecture.
+    expect(providersMock.deezerSearch).toHaveBeenCalledWith(
+      "Emperor",
+      "Emperor",
+    );
   });
 
   it("ignore une entrée de cache au format obsolète et recalcule", async () => {

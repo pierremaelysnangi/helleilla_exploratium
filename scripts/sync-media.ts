@@ -80,7 +80,7 @@ async function main() {
       "Sources : MusicBrainz, Wikidata et Cover Art Archive — publiques,\n" +
       "sans jeton, limitées à une requête par seconde.\n" +
       (DISCOGRAPHY
-        ? "Import de discographie ACTIF : albums, EP, démos et live.\n"
+        ? "Import de discographie ACTIF : tous les types de sortie.\n"
         : "") +
       "\n",
   );

@@ -4,24 +4,38 @@
  */
 
 import Link from "next/link";
-// Formulaire client
 import { SignInForm } from "@/components/auth/signInForm";
+import { AuthHeading } from "@/components/auth/authHeading";
 
 export const metadata = { robots: { index: false }, title: "Connexion" };
 
 export default function SignInPage() {
   return (
     <>
-      <h1>Se connecter</h1>
+      <AuthHeading
+        title="Se connecter"
+        subtitle="Pour contribuer, noter les albums et tenir votre liste."
+      />
+
       <SignInForm />
-      <p className="text-sm">
-        <Link href="/forgot-password" className="metal-nav-link underline">
+
+      <div className="border-border/60 flex flex-col gap-2 border-t pt-4 text-sm">
+        <Link
+          href="/forgot-password"
+          className="text-muted-foreground hover:text-foreground underline underline-offset-4"
+        >
           Mot de passe oublié ?
         </Link>
-      </p>
-      <p className="text-sm">
-        Pas encore de compte ? <Link href="/sign-up">S&apos;inscrire</Link>
-      </p>
+        <p className="text-muted-foreground">
+          Pas encore de compte ?{" "}
+          <Link
+            href="/sign-up"
+            className="text-foreground font-medium underline underline-offset-4"
+          >
+            S&apos;inscrire
+          </Link>
+        </p>
+      </div>
     </>
   );
 }

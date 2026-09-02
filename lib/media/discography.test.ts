@@ -30,7 +30,7 @@ vi.mock("@/lib/redis", () => ({
   redis: { get: vi.fn(async () => null), set: vi.fn(async () => "OK") },
 }));
 
-const { importDiscographyForBand, MAIN_RELEASE_TYPES } =
+const { importDiscographyForBand, IMPORTED_RELEASE_TYPES } =
   await import("./discography");
 
 /** Chaîne de lecture Drizzle réduite à ce que le module appelle. */
@@ -85,19 +85,21 @@ beforeEach(() => {
   dbMock.select.mockReturnValue(selectChain([]));
 });
 
-describe("MAIN_RELEASE_TYPES", () => {
-  it("retient les sorties principales et rien d'autre", () => {
-    expect([...MAIN_RELEASE_TYPES].sort()).toEqual([
+describe("IMPORTED_RELEASE_TYPES", () => {
+  it("couvre tous les types de l'énum album_type", () => {
+    expect([...IMPORTED_RELEASE_TYPES].sort()).toEqual([
       "album",
+      "compilation",
       "demo",
       "ep",
       "live",
+      "single",
     ]);
   });
 });
 
 describe("importDiscographyForBand", () => {
-  it("écarte singles, compilations et sorties sans type", async () => {
+  it("importe tous les types, et n'écarte que les sorties sans type", async () => {
     const { albumValues } = captureInserts();
     dbMock.select.mockReturnValueOnce(selectChain([]));
     providerMock.listReleaseGroups.mockResolvedValue([
@@ -107,18 +109,14 @@ describe("importDiscographyForBand", () => {
       rg("Un Live", "Album", ["Live"]),
       rg("Un Single", "Single"),
       rg("Une Compilation", "Album", ["Compilation"]),
+      // Sans type, une sortie ne peut être ni classée ni présentée
       rg("Sans Type", null),
     ]);
 
     const result = await importDiscographyForBand("band-1", "mbid-1");
 
-    expect(result.imported).toBe(4);
-    expect(albumValues.map((a) => a.title).sort()).toEqual([
-      "Un Album",
-      "Un EP",
-      "Un Live",
-      "Une Démo",
-    ]);
+    expect(result.imported).toBe(6);
+    expect(albumValues.map((a) => a.title)).not.toContain("Sans Type");
   });
 
   it("n'écrase pas une sortie déjà présente, mais pose sa référence", async () => {

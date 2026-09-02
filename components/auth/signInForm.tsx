@@ -2,14 +2,16 @@
 
 /**
  * <SignInForm> — formulaire de connexion.
+ *
  * Les messages d'erreur sont volontairement génériques côté serveur
- * (anti-énumération) ; pas de générateur ici, uniquement saisie +
- * autocomplete natif du gestionnaire de mots de passe.
+ * (anti-énumération : jamais « ce compte n'existe pas ») ; pas de
+ * générateur ici, uniquement la saisie et l'autocomplétion native du
+ * gestionnaire de mots de passe.
  */
 
-// Server Action de connexion
 import { signInAction, type AuthFormState } from "@/lib/actions/auth";
 import { useActionState } from "react";
+import { AuthField, AuthSubmit, AuthError } from "./authField";
 
 export function SignInForm() {
   const [state, formAction, isPending] = useActionState<
@@ -18,38 +20,34 @@ export function SignInForm() {
   >(signInAction, {});
 
   return (
-    <form action={formAction}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          maxLength={200}
-          autoComplete="email"
-        />
+    <form action={formAction} className="flex flex-col gap-4">
+      <AuthField
+        id="email"
+        name="email"
+        type="email"
+        label="Adresse e-mail"
+        required
+        maxLength={200}
+        autoComplete="email"
+      />
 
-        <label htmlFor="password">Mot de passe</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-        />
+      <AuthField
+        id="password"
+        name="password"
+        type="password"
+        label="Mot de passe"
+        required
+        autoComplete="current-password"
+      />
 
-        {state.error && (
-          // Message unique : ne distingue jamais compte inexistant / mdp erroné
-          <p role="alert" style={{ color: "#c62828" }}>
-            {state.error}
-          </p>
-        )}
+      {/* Message unique : ne distingue jamais compte inexistant et mot de
+          passe erroné, sans quoi le formulaire deviendrait un moyen de
+          vérifier qu'une adresse est inscrite. */}
+      {state.error && <AuthError>{state.error}</AuthError>}
 
-        <button type="submit" disabled={isPending}>
-          {isPending ? "Connexion…" : "Se connecter"}
-        </button>
-      </div>
+      <AuthSubmit pending={isPending}>
+        {isPending ? "Connexion…" : "Se connecter"}
+      </AuthSubmit>
     </form>
   );
 }

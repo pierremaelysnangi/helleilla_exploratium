@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { ForgotPasswordForm } from "@/components/auth/forgotPasswordForm";
+import { AuthHeading } from "@/components/auth/authHeading";
 
 export const metadata = {
   robots: { index: false },
@@ -15,17 +16,18 @@ export const metadata = {
 export default function ForgotPasswordPage() {
   return (
     <>
-      <h1 className="metal-title text-2xl">Mot de passe oublié</h1>
-      <div className="metal-rule mt-2 w-40" />
-      <p className="text-muted-foreground mt-4 text-sm">
-        Indiquez votre email : si un compte existe, vous recevrez un lien
-        valable une heure pour définir un nouveau mot de passe.
-      </p>
-      <div className="mt-6">
-        <ForgotPasswordForm />
-      </div>
-      <p className="mt-6 text-sm">
-        <Link href="/sign-in" className="metal-nav-link underline">
+      <AuthHeading
+        title="Mot de passe oublié"
+        subtitle="Indiquez votre adresse : si un compte existe, vous recevrez un lien valable une heure."
+      />
+
+      <ForgotPasswordForm />
+
+      <p className="border-border/60 border-t pt-4 text-sm">
+        <Link
+          href="/sign-in"
+          className="text-muted-foreground hover:text-foreground underline underline-offset-4"
+        >
           Retour à la connexion
         </Link>
       </p>

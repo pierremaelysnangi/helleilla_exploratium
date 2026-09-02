@@ -5,19 +5,32 @@
  */
 
 import Link from "next/link";
-// Formulaire client (générateur + jauge + Turnstile)
 import { SignUpForm } from "@/components/auth/signUpForm";
+import { AuthHeading } from "@/components/auth/authHeading";
 
 export const metadata = { robots: { index: false }, title: "Inscription" };
 
 export default function SignUpPage() {
   return (
     <>
-      <h1>Créer un compte</h1>
+      <AuthHeading
+        title="Créer un compte"
+        subtitle="Une contribution vaut par ses sources : chaque fiche proposée demande des preuves vérifiables."
+      />
+
       <SignUpForm />
-      <p>
-        Déjà inscrit ? <Link href="/sign-in">Se connecter</Link>
-      </p>
+
+      <div className="border-border/60 border-t pt-4 text-sm">
+        <p className="text-muted-foreground">
+          Déjà inscrit ?{" "}
+          <Link
+            href="/sign-in"
+            className="text-foreground font-medium underline underline-offset-4"
+          >
+            Se connecter
+          </Link>
+        </p>
+      </div>
     </>
   );
 }

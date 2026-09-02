@@ -17,6 +17,8 @@ import {
 import { usePasswordStrength } from "@/hooks/use-password-strength";
 // État local du champ et de la visibilité
 import { useState } from "react";
+// Classes de champ partagées avec les autres formulaires d'authentification
+import { FIELD_CLASS } from "./authField";
 
 /** Props du champ. */
 type PasswordFieldProps = {
@@ -61,84 +63,111 @@ export function PasswordField({
   const meetsLength = value.length >= MIN_LENGTH;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      <label htmlFor="password">{label}</label>
-      <div style={{ display: "flex", gap: "0.5rem" }}>
+    <div className="flex flex-col gap-2">
+      <label htmlFor="password" className="text-sm font-medium">
+        {label}
+      </label>
+
+      <div className="flex gap-2">
         <input
           id="password"
           name="password"
           type={visible ? "text" : "password"}
           value={value}
-          autoComplete={
-            label.includes("confirmer") ? "new-password" : "new-password"
-          }
+          autoComplete="new-password"
           required
           minLength={MIN_LENGTH}
           onChange={(e) => onChange(e.target.value)}
-          style={{ flex: 1 }}
+          className={`${FIELD_CLASS} flex-1`}
         />
-        <button type="button" onClick={() => setVisible((v) => !v)}>
-          {visible ? "Masquer" : "Afficher"}
-        </button>
-        <button type="button" onClick={handleGenerate}>
-          Générer
-        </button>
-        <button
-          type="button"
-          onClick={() => void handleCopy()}
-          disabled={!value}
-        >
-          Copier
-        </button>
+      </div>
+
+      {/* Actions du champ, sur leur propre ligne : à trois boutons, les
+          aligner avec la saisie réduisait celle-ci à quelques caractères
+          sur un écran de téléphone. */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          {
+            label: visible ? "Masquer" : "Afficher",
+            onClick: () => setVisible((v) => !v),
+            disabled: false,
+          },
+          { label: "Générer", onClick: handleGenerate, disabled: false },
+          {
+            label: "Copier",
+            onClick: () => void handleCopy(),
+            disabled: !value,
+          },
+        ].map((action) => (
+          <button
+            key={action.label}
+            type="button"
+            onClick={action.onClick}
+            disabled={action.disabled}
+            className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase transition-colors disabled:opacity-40"
+          >
+            {action.label}
+          </button>
+        ))}
       </div>
 
       {/* Longueur générée souhaitée */}
-      <label style={{ fontSize: "0.85em" }}>
-        Longueur générée : {generatedLength}{" "}
+      <label className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+        <span>Longueur générée : {generatedLength}</span>
         <input
           type="range"
           min={16}
           max={64}
           value={generatedLength}
           onChange={(e) => setGeneratedLength(Number(e.target.value))}
-        />{" "}
-        (~
-        {entropyBits(generatedLength, [
-          "lowercase",
-          "uppercase",
-          "digits",
-          "symbols",
-        ])}{" "}
-        bits, cible ≥ {MIN_ENTROPY_BITS})
+          className="accent-primary flex-1"
+        />
+        <span>
+          ~
+          {entropyBits(generatedLength, [
+            "lowercase",
+            "uppercase",
+            "digits",
+            "symbols",
+          ])}{" "}
+          bits (cible ≥ {MIN_ENTROPY_BITS})
+        </span>
       </label>
 
       {/* Jauge zxcvbn */}
       {strength && (
-        <div>
-          <span aria-live="polite">
+        <div className="flex flex-col gap-1.5">
+          <span aria-live="polite" className="text-muted-foreground text-xs">
             Force : {strength.label} ({strength.score}/4)
           </span>
+          {/* Largeur proportionnelle au score, et non plus une barre
+              pleine dont seule la couleur changeait : la progression se
+              lit alors sans distinguer les couleurs. */}
           <div
             role="progressbar"
             aria-valuenow={strength.score}
             aria-valuemin={0}
             aria-valuemax={4}
-            style={{
-              height: 6,
-              background:
+            className="bg-muted h-1.5 w-full overflow-hidden rounded-full"
+          >
+            <div
+              className={`h-full rounded-full transition-all ${
                 strength.score >= 3
-                  ? "#2e7d32"
+                  ? "bg-emerald-500"
                   : strength.score === 2
-                    ? "#f9a825"
-                    : "#c62828",
-              borderRadius: 3,
-            }}
-          />
+                    ? "bg-amber-500"
+                    : "bg-destructive"
+              }`}
+              style={{ width: `${((strength.score + 1) / 5) * 100}%` }}
+            />
+          </div>
           {!meetsLength && (
-            <small>Au moins {MIN_LENGTH} caractères requis.</small>
+            <p className="text-muted-foreground text-xs">
+              Au moins {MIN_LENGTH} caractères requis.
+            </p>
           )}
           {strength.feedback.suggestions.length > 0 && (
-            <ul style={{ fontSize: "0.85em" }}>
+            <ul className="text-muted-foreground list-disc pl-4 text-xs">
               {strength.feedback.suggestions.map((s) => (
                 <li key={s}>{s}</li>
               ))}

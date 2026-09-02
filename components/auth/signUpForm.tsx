@@ -21,6 +21,8 @@ import {
 import { usePasswordStrength } from "@/hooks/use-password-strength";
 // CAPTCHA invisible Cloudflare
 import { TurnstileWidget } from "@/components/auth/turnstileWidget";
+// Primitives de formulaire partagées par les quatre pages d'authentification
+import { AuthField, AuthSubmit, AuthError } from "./authField";
 
 export function SignUpForm() {
   const [state, formAction, isPending] = useActionState<
@@ -36,56 +38,52 @@ export function SignUpForm() {
   const policyOk = passwordMeetsPolicy(password, strength?.score ?? null);
 
   return (
-    <form action={formAction}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        <label htmlFor="name">Nom affiché</label>
-        <input
-          id="name"
-          name="name"
-          required
-          maxLength={100}
-          autoComplete="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+    <form action={formAction} className="flex flex-col gap-4">
+      <AuthField
+        id="name"
+        name="name"
+        label="Nom affiché"
+        required
+        maxLength={100}
+        autoComplete="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        hint="Visible sur vos contributions."
+      />
 
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          maxLength={200}
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <AuthField
+        id="email"
+        name="email"
+        type="email"
+        label="Adresse e-mail"
+        required
+        maxLength={200}
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <PasswordField
-          value={password}
-          onChange={setPassword}
-          userInputs={[email, name]}
-        />
+      <PasswordField
+        value={password}
+        onChange={setPassword}
+        userInputs={[email, name]}
+      />
 
-        <TurnstileWidget />
+      <TurnstileWidget />
 
-        {/* Erreur générique renvoyée par la Server Action */}
-        {state.error && (
-          <p role="alert" style={{ color: "#c62828" }}>
-            {state.error}
-          </p>
-        )}
+      {/* Erreur générique renvoyée par la Server Action */}
+      {state.error && <AuthError>{state.error}</AuthError>}
 
-        <button type="submit" disabled={isPending || !policyOk}>
-          {isPending ? "Création…" : "Créer mon compte"}
-        </button>
-        {!policyOk && (
-          <small>
-            Mot de passe requis : {MIN_LENGTH} caractères minimum et score de
-            force suffisant (utilisez « Générer »).
-          </small>
-        )}
-      </div>
+      <AuthSubmit pending={isPending || !policyOk}>
+        {isPending ? "Création…" : "Créer mon compte"}
+      </AuthSubmit>
+
+      {!policyOk && (
+        <p className="text-muted-foreground text-xs">
+          Mot de passe requis : {MIN_LENGTH} caractères minimum et score de
+          force suffisant — le bouton « Générer » en produit un valide.
+        </p>
+      )}
     </form>
   );
 }

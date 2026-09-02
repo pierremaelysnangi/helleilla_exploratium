@@ -29,18 +29,18 @@ import { officialLinkLabel } from "@/lib/media/linkLabels";
 import { redis } from "@/lib/redis";
 
 /**
- * Durée de cache du DTO agrégé.
+ * Durée de cache du DTO agrégé, extraits EXCLUS (24 h).
  *
- * Bornée à quinze minutes par les EXTRAITS : les URLs Deezer portent un
- * jeton signé valable environ une heure, et un cache de 24 h les servait
- * expirées la quasi-totalité du temps — la lecture échouait alors en 403
- * sans que rien ne l'indique.
+ * Cette partie coûte cher à reconstruire : MusicBrainz est limité à une
+ * requête par seconde, et s'y ajoutent trois appels Wikidata. Un cache
+ * court se payait par une fiche vide pendant plusieurs secondes à chaque
+ * première visite — précisément le symptôme « l'image apparaît seulement
+ * après un rafraîchissement ».
  *
- * Le reste du DTO (informations, images, liens) supporterait une durée
- * bien plus longue ; les séparer imposerait deux clés et deux cycles
- * d'invalidation pour un gain marginal à cette volumétrie.
+ * Les extraits Deezer, eux, ne sont JAMAIS servis depuis ce cache : voir
+ * `resolvePreviews`.
  */
-const MEDIA_CACHE_TTL = 900;
+const MEDIA_CACHE_TTL = 86_400;
 
 /**
  * Libellés français des types de relation MusicBrainz retenus comme
@@ -166,7 +166,13 @@ export async function resolveBandMedia(
 ): Promise<BandMedia> {
   const key = bandMediaCacheKey(bandId);
 
-  // 1. Cache
+  // Le nom du groupe est requis dès la lecture du cache, pour re-résoudre
+  // les extraits ; la requête est locale et négligeable.
+  const band = await getBandById(bandId);
+  if (!band) throw new Error(`Groupe introuvable : ${bandId}`);
+
+  // 1. Cache — les extraits sont volontairement laissés de côté et
+  // re-résolus à chaque appel : leurs URLs expirent en une heure.
   if (!force) {
     const cached = await redis.get(key).catch(() => null);
     if (cached) {
@@ -174,12 +180,11 @@ export async function resolveBandMedia(
       // entrées à l'ancien format pendant 24 h : elles doivent être
       // ignorées et recalculées, jamais propagées en erreur 500.
       const parsed = bandMediaSchema.safeParse(safeJson(cached));
-      if (parsed.success) return parsed.data;
+      if (parsed.success) {
+        return { ...parsed.data, previews: await resolvePreviews(band.name) };
+      }
     }
   }
-
-  const band = await getBandById(bandId);
-  if (!band) throw new Error(`Groupe introuvable : ${bandId}`);
 
   const refs = await getExternalRefs("band", bandId);
   const mbRef = refs.find((r) => r.provider === "musicbrainz");
@@ -339,9 +344,16 @@ export async function resolveBandMedia(
     degraded,
   });
 
-  // Mise en cache même en cas de dégradation (évite le martèlement)
+  // Mise en cache même en cas de dégradation (évite le martèlement).
+  // Les extraits sont retirés avant écriture : leurs URLs seraient
+  // expirées bien avant l'échéance du cache.
   await redis
-    .set(key, JSON.stringify(payload), "EX", MEDIA_CACHE_TTL)
+    .set(
+      key,
+      JSON.stringify({ ...payload, previews: [] }),
+      "EX",
+      MEDIA_CACHE_TTL,
+    )
     .catch(() => undefined);
   return payload;
 }
@@ -359,6 +371,34 @@ function dedupeImages(images: BandMedia["images"]): BandMedia["images"] {
     if (!seen.has(url)) seen.set(url, { ...image, url });
   }
   return [...seen.values()];
+}
+
+/**
+ * Extraits officiels de 30 s d'un groupe, TOUJOURS frais.
+ *
+ * Les URLs renvoyées par Deezer portent un jeton signé (`hdnea=exp=…`)
+ * valable environ une heure. Les conserver dans le cache long du DTO
+ * revenait à servir des liens morts la quasi-totalité du temps : la
+ * lecture échouait en 403, sans message.
+ *
+ * L'appel reste peu coûteux — un seul aller-retour, lui-même mémorisé
+ * quinze minutes par le client HTTP — et une panne Deezer rend une liste
+ * vide plutôt que de faire échouer toute la fiche.
+ */
+async function resolvePreviews(
+  bandName: string,
+): Promise<BandMedia["previews"]> {
+  try {
+    const tracks = await dataProviders.deezer.searchTracks(bandName, bandName);
+    return tracks.map((t) => ({
+      title: t.title,
+      artistName: t.artist.name,
+      previewUrl: t.preview,
+      coverUrl: t.album.cover_medium ?? null,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /** Analyse une entrée de cache, sans jamais lever sur du JSON abîmé. */

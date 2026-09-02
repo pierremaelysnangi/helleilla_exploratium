@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { ResetPasswordForm } from "@/components/auth/resetPasswordForm";
+import { AuthHeading } from "@/components/auth/authHeading";
 
 export const metadata = {
   robots: { index: false },
@@ -24,15 +25,15 @@ export default async function ResetPasswordPage({
 
   return (
     <>
-      <h1 className="metal-title text-2xl">Nouveau mot de passe</h1>
-      <div className="metal-rule mt-2 w-40" />
+      <AuthHeading
+        title="Nouveau mot de passe"
+        subtitle="Choisissez un mot de passe long : le générateur en produit un valide."
+      />
 
       {token ? (
-        <div className="mt-6">
-          <ResetPasswordForm token={token} />
-        </div>
+        <ResetPasswordForm token={token} />
       ) : (
-        <p className="text-muted-foreground mt-4 text-sm">
+        <p className="text-muted-foreground text-sm">
           Lien incomplet.{" "}
           <Link href="/forgot-password" className="underline">
             Refaites une demande

@@ -12,6 +12,7 @@ import {
 } from "@/lib/actions/password-reset";
 import { useActionState } from "react";
 import { TurnstileWidget } from "@/components/auth/turnstileWidget";
+import { AuthField, AuthSubmit, AuthError } from "./authField";
 
 export function ForgotPasswordForm() {
   const [state, formAction, isPending] = useActionState<
@@ -21,38 +22,32 @@ export function ForgotPasswordForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <label htmlFor="email">Email du compte</label>
-      <input
+      <AuthField
         id="email"
         name="email"
         type="email"
+        label="Adresse e-mail du compte"
         required
         maxLength={200}
         autoComplete="email"
-        className="border-border bg-card focus:border-primary/50 rounded-md border px-3 py-2 text-sm outline-none"
       />
 
       <TurnstileWidget />
 
       {/* Succès ET erreur anti-énumération : mêmes messages quel que soit le cas réel */}
       {state.success && (
-        <p role="status" className="text-sm text-green-600">
+        <p
+          role="status"
+          className="rounded-md border border-emerald-600/40 bg-emerald-600/10 px-3 py-2 text-sm text-emerald-400"
+        >
           {state.success}
         </p>
       )}
-      {state.error && (
-        <p role="alert" className="text-destructive text-sm">
-          {state.error}
-        </p>
-      )}
+      {state.error && <AuthError>{state.error}</AuthError>}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-widest uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
-      >
+      <AuthSubmit pending={isPending}>
         {isPending ? "Envoi…" : "Recevoir le lien"}
-      </button>
+      </AuthSubmit>
     </form>
   );
 }

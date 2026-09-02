@@ -14,10 +14,10 @@
  *   autorité sur son travail. L'appariement passe par la MÊME fonction
  *   que la résolution des pochettes (`matchReleaseGroup`) : deux notions
  *   divergentes de « même œuvre » créaient des doublons ;
- * - **périmètre restreint** : albums, EP, démos et live officiels. Les
- *   singles, compilations, rééditions et enregistrements de répétition
- *   noieraient la discographie sans rien apprendre — Celtic Frost compte
- *   34 release-groups pour une douzaine de sorties qui font sens.
+ * - **discographie complète** : albums, EP, singles, live, démos et
+ *   compilations. Tout ce que MusicBrainz type est repris ; les sections
+ *   par type, sur la fiche du groupe, gardent l'ensemble lisible sans
+ *   avoir à en écarter une partie.
  *
  * Aucun média n'est téléchargé : l'import n'écrit que du texte et des
  * identifiants. Pochettes et tracklists suivent, via `albumCovers.ts` et
@@ -41,16 +41,20 @@ import { slugify, uniqueSlug } from "@/lib/utils/slug";
 import { linkAlbumToReleaseGroup } from "./refs";
 
 /**
- * Types de sortie retenus par l'import.
+ * Types de sortie retenus par l'import : tous ceux que l'énum
+ * `album_type` sait représenter.
  *
- * Exporté et nommé pour que la règle soit modifiable sans relire la
- * boucle : élargir le périmètre revient à ajouter une valeur ici.
+ * Exporté et nommé pour que la règle reste modifiable sans relire la
+ * boucle. Seules sont écartées les œuvres que MusicBrainz ne type pas du
+ * tout — sans type, une sortie ne peut être ni classée ni présentée.
  */
-export const MAIN_RELEASE_TYPES: ReadonlySet<AlbumType> = new Set([
+export const IMPORTED_RELEASE_TYPES: ReadonlySet<AlbumType> = new Set([
   "album",
   "ep",
-  "demo",
+  "single",
   "live",
+  "demo",
+  "compilation",
 ]);
 
 /** Bilan d'un import, du même style que `CoverResolution`. */
@@ -144,7 +148,7 @@ export async function importDiscographyForBand(
     if (consumed.has(group.id)) continue;
 
     const type = albumTypeOf(group);
-    if (!type || !MAIN_RELEASE_TYPES.has(type)) continue;
+    if (!type || !IMPORTED_RELEASE_TYPES.has(type)) continue;
 
     const key = workKey(group.title, type);
     if (takenKeys.has(key)) continue;
