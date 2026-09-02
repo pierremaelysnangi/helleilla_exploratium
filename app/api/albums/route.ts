@@ -88,6 +88,8 @@ export const GET = route(
             id: bands.id,
             name: bands.name,
             slug: bands.slug,
+            // Repli de pochette : voir `bandSummarySchema`
+            imageUrl: bands.imageUrl,
           },
         })
         .from(albums)

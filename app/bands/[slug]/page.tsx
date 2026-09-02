@@ -16,7 +16,9 @@ import { fetchBandBySlug } from "@/hooks/use-bands";
 // Présentation
 import { BandHeader } from "@/components/bands/bandHeader";
 import { BandMediaSection } from "@/components/bands/bandMediaSection";
-import { DiscographyTable } from "@/components/bands/discographyTable";
+import { DiscographySections } from "@/components/bands/discographySections";
+// Chargement serveur de la discographie complète
+import { fetchDiscography } from "@/lib/api/discography";
 
 /** Props App Router : params est une promesse en Next 15+. */
 type BandDetailPageProps = {
@@ -87,6 +89,8 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
   // Slug inconnu -> page 404 applicative
   if (!band) notFound();
 
+  const discography = await fetchDiscography(band.id);
+
   return (
     <article className="flex flex-col gap-8">
       {/* Données structurées pour le crawl Google */}
@@ -101,10 +105,22 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
       {/* Enrichissement providers externes (client, progressif) */}
       <BandMediaSection bandId={band.id} />
 
-      {/* Discographie dépliable (albums -> tracklists) */}
+      {/* Discographie en cartes : rendue côté serveur, donc présente au
+          premier affichage — le tableau client précédent laissait un
+          espace vide le temps de sa requête. */}
       <section aria-label="Discographie" className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Discographie</h2>
-        <DiscographyTable bandId={band.id} bandName={band.name} />
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="metal-title text-lg">Discographie</h2>
+          <span className="text-muted-foreground text-sm">
+            {discography.length} {discography.length > 1 ? "sorties" : "sortie"}
+          </span>
+        </div>
+        <DiscographySections
+          albums={discography}
+          bandSlug={band.slug}
+          bandName={band.name}
+          bandImageUrl={band.imageUrl}
+        />
       </section>
     </article>
   );

@@ -105,6 +105,7 @@ export function AlbumsList() {
               album={album}
               bandSlug={album.band.slug}
               bandName={album.band.name}
+              bandImageUrl={album.band.imageUrl}
             />
           )}
           hasMore={infinite.hasNextPage}

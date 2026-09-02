@@ -27,6 +27,8 @@ type AlbumCardProps = {
   album: AlbumRow;
   /** Nom du groupe, affiché quand la carte sort du contexte d'une fiche. */
   bandName?: string;
+  /** Visuel du groupe : repli quand aucune pochette n'est archivée. */
+  bandImageUrl?: string | null;
   /**
    * Slug du groupe propriétaire.
    *
@@ -37,7 +39,12 @@ type AlbumCardProps = {
   bandSlug: string;
 };
 
-export function AlbumCard({ album, bandSlug, bandName }: AlbumCardProps) {
+export function AlbumCard({
+  album,
+  bandSlug,
+  bandName,
+  bandImageUrl,
+}: AlbumCardProps) {
   return (
     <Link
       href={`/bands/${bandSlug}/albums/${album.slug}`}
@@ -48,6 +55,8 @@ export function AlbumCard({ album, bandSlug, bandName }: AlbumCardProps) {
         <CoverImage
           src={album.coverUrl}
           title={album.title}
+          bandImageUrl={bandImageUrl}
+          bandName={bandName}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1536px) 200px, 160px"
         />
       </div>

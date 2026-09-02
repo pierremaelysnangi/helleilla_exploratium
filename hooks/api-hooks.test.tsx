@@ -195,6 +195,7 @@ describe("useGlobalSearch", () => {
             bandId: UUID,
             bandSlug: "emperor",
             bandName: "Emperor",
+            bandImageUrl: null,
             type: "album",
             releaseYear: 1997,
             releaseDate: null,

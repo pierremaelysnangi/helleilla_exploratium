@@ -110,6 +110,14 @@ export const bandSummarySchema = z.object({
   id: z.uuid(),
   name: z.string(),
   slug: z.string(),
+  /**
+   * Visuel du groupe — photo des musiciens ou logo officiel.
+   *
+   * Sert de REPLI aux pochettes absentes : une part des démos et des
+   * captations live n'a aucun visuel archivé, et le pictogramme neutre
+   * ne dit rien du groupe. Le visuel du groupe, lui, l'identifie.
+   */
+  imageUrl: z.string().nullish(),
 });
 
 /**

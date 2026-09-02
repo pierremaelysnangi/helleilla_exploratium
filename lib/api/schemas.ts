@@ -79,6 +79,8 @@ export const albumHitSchema = z.object({
   // résultat ne permet pas de construire l'URL band-scopée de l'album.
   bandSlug: z.string(),
   bandName: z.string(),
+  /** Repli de pochette quand aucune n'est archivée. */
+  bandImageUrl: z.string().nullable(),
   type: z.enum(ALBUM_TYPES),
   releaseYear: z.number().int().nullable(),
   releaseDate: z.string().nullable(),
@@ -94,6 +96,7 @@ export const trackHitSchema = z.object({
   albumTitle: z.string(),
   bandSlug: z.string(),
   bandName: z.string(),
+  bandImageUrl: z.string().nullable(),
   coverUrl: z.string().nullable(),
   trackNumber: z.number().int(),
   durationMs: z.number().int().nullable(),

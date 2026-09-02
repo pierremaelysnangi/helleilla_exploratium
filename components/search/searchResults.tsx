@@ -120,6 +120,8 @@ export function SearchResults({ q }: SearchResultsProps) {
                     <CoverImage
                       src={album.coverUrl}
                       title={album.title}
+                      bandImageUrl={album.bandImageUrl}
+                      bandName={album.bandName}
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                     />
                   </span>
@@ -162,6 +164,8 @@ export function SearchResults({ q }: SearchResultsProps) {
                     <CoverImage
                       src={track.coverUrl}
                       title={track.albumTitle}
+                      bandImageUrl={track.bandImageUrl}
+                      bandName={track.bandName}
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                     />
                   </span>

@@ -52,7 +52,12 @@ export const GET = route(
     return ok({
       ...album,
       // Projection publique minimale du groupe (fil d'Ariane + liens)
-      band: { id: band.id, name: band.name, slug: band.slug },
+      band: {
+        id: band.id,
+        name: band.name,
+        slug: band.slug,
+        imageUrl: band.imageUrl,
+      },
       tracks: tracklist,
     });
   },

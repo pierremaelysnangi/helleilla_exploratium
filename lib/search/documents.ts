@@ -21,7 +21,12 @@ import type { bands, albums, tracks } from "@/db/schema";
  * pas produire de lien valide — le composant en fabriquait un faux, qui
  * menait à une page inexistante.
  */
-export type BandContext = { slug: string; name: string };
+export type BandContext = {
+  slug: string;
+  name: string;
+  /** Visuel du groupe : repli des pochettes absentes dans les résultats. */
+  imageUrl: string | null;
+};
 
 /** Contexte de l'album joint aux documents piste. */
 export type AlbumContext = {
@@ -54,6 +59,7 @@ export function albumDocument(
     bandId: album.bandId,
     bandSlug: band.slug,
     bandName: band.name,
+    bandImageUrl: band.imageUrl,
     type: album.type,
     releaseYear: album.releaseYear,
     releaseDate: album.releaseDate,
@@ -75,6 +81,7 @@ export function trackDocument(
     albumTitle: album.title,
     bandSlug: band.slug,
     bandName: band.name,
+    bandImageUrl: band.imageUrl,
     coverUrl: album.coverUrl,
     trackNumber: track.trackNumber,
     durationMs: track.durationMs,

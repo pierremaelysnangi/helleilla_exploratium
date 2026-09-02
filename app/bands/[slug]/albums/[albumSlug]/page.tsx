@@ -164,7 +164,13 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             un 504, et une image brisée en tête de page est plus visible
             qu'ailleurs. */}
         <div className="border-border bg-muted relative h-56 w-56 shrink-0 overflow-hidden rounded-lg border">
-          <CoverImage src={album.coverUrl} title={album.title} sizes="224px" />
+          <CoverImage
+            src={album.coverUrl}
+            title={album.title}
+            bandImageUrl={album.band.imageUrl}
+            bandName={album.band.name}
+            sizes="224px"
+          />
         </div>
 
         <div className="min-w-0 flex-1">

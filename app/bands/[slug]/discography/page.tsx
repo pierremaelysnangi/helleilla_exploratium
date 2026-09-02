@@ -10,13 +10,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { z } from "zod";
 // Fetch serveur : groupe par slug, puis ses albums
 import { fetchBandBySlug } from "@/hooks/use-bands";
-import { apiFetch } from "@/lib/api/client";
-import { albumRowSchema, type AlbumRow } from "@/hooks/api/schemas";
-// Présentation
-import { AlbumCard } from "@/components/albums/albumCard";
+import { fetchDiscography } from "@/lib/api/discography";
+// Présentation — mêmes sections que la fiche du groupe
+import { DiscographySections } from "@/components/bands/discographySections";
 import { EmptyState } from "@/components/shared/emptyState";
 
 type DiscographyPageProps = {
@@ -25,38 +23,6 @@ type DiscographyPageProps = {
 
 /** URL de base absolue (cohérente avec le layout racine). */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
-/** Enveloppe paginée de GET /api/albums, réduite à ce qui est utilisé. */
-const albumsPageSchema = z.object({ data: z.array(albumRowSchema) });
-
-/** Ordre d'affichage des sections : sorties principales d'abord. */
-const TYPE_ORDER: AlbumRow["type"][] = [
-  "album",
-  "ep",
-  "single",
-  "live",
-  "compilation",
-  "demo",
-];
-
-/** Titres de section par type de sortie. */
-const TYPE_SECTIONS: Record<AlbumRow["type"], string> = {
-  album: "Albums studio",
-  ep: "EP",
-  single: "Singles",
-  live: "Live",
-  compilation: "Compilations",
-  demo: "Démos",
-};
-
-/** Charge la discographie complète d'un groupe, triée du plus ancien. */
-async function fetchDiscography(bandId: string): Promise<AlbumRow[]> {
-  const payload = await apiFetch("/api/albums", albumsPageSchema, {
-    query: { bandId, perPage: 100, sort: "year", order: "asc" },
-    revalidate: 60,
-  });
-  return payload.data;
-}
 
 export async function generateMetadata({
   params,
@@ -91,12 +57,6 @@ export default async function DiscographyPage({
 
   const albums = await fetchDiscography(band.id);
 
-  // Regroupement par type, dans l'ordre éditorial défini plus haut
-  const sections = TYPE_ORDER.map((type) => ({
-    type,
-    albums: albums.filter((album) => album.type === type),
-  })).filter((section) => section.albums.length > 0);
-
   return (
     <article className="flex flex-col gap-8">
       <nav aria-label="Fil d'Ariane" className="text-muted-foreground text-sm">
@@ -121,7 +81,7 @@ export default async function DiscographyPage({
         </p>
       </header>
 
-      {sections.length === 0 ? (
+      {albums.length === 0 ? (
         <EmptyState
           title="Aucune sortie référencée"
           description={`La discographie de ${band.name} n'a pas encore été documentée.`}
@@ -129,24 +89,12 @@ export default async function DiscographyPage({
           ctaLabel="Retour à la fiche du groupe"
         />
       ) : (
-        sections.map((section) => (
-          <section
-            key={section.type}
-            aria-label={TYPE_SECTIONS[section.type]}
-            className="flex flex-col gap-3"
-          >
-            <h2 className="metal-title text-lg">
-              {TYPE_SECTIONS[section.type]}
-            </h2>
-            <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-              {section.albums.map((album) => (
-                <li key={album.id}>
-                  <AlbumCard album={album} bandSlug={band.slug} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
+        <DiscographySections
+          albums={albums}
+          bandSlug={band.slug}
+          bandName={band.name}
+          bandImageUrl={band.imageUrl}
+        />
       )}
     </article>
   );

@@ -28,6 +28,12 @@ vi.mock("next/image", () => ({
   ),
 }));
 
+/** Visuel de groupe servant de repli dans les tests ci-dessous. */
+const BAND = {
+  bandImageUrl: "https://exemple.test/groupe.jpg",
+  bandName: "Paradise Lost",
+};
+
 const SIZES = "200px";
 
 describe("CoverImage", () => {
@@ -78,5 +84,48 @@ describe("CoverImage", () => {
     );
     expect(screen.queryByText("t")).toBeNull();
     expect(screen.queryByText("T")).toBeNull();
+  });
+
+  it("retombe sur le visuel du groupe quand aucune pochette n'existe", () => {
+    // Une part des démos et des captations live n'a pas de pochette
+    // archivée : le pictogramme neutre se répétait alors à l'écran sans
+    // rien dire du groupe.
+    render(<CoverImage src={null} title="Demo 1992" sizes={SIZES} {...BAND} />);
+
+    expect(
+      screen.getByAltText(
+        "Aucune pochette pour Demo 1992 — visuel de Paradise Lost",
+      ),
+    ).toBeDefined();
+  });
+
+  it("annonce que le visuel du groupe n'est PAS la pochette", () => {
+    // Une encyclopédie ne doit pas laisser croire qu'un visuel de groupe
+    // est la pochette de l'œuvre : le texte alternatif le dit.
+    render(<CoverImage src={null} title="Demo 1992" sizes={SIZES} {...BAND} />);
+
+    expect(screen.queryByAltText("Pochette de Demo 1992")).toBeNull();
+  });
+
+  it("enchaîne les deux replis si le visuel du groupe échoue aussi", () => {
+    render(
+      <CoverImage
+        src="https://exemple.test/a.jpg"
+        title="Gothic"
+        sizes={SIZES}
+        {...BAND}
+      />,
+    );
+
+    fireEvent.error(screen.getByAltText("Pochette de Gothic"));
+    const replacement = screen.getByAltText(
+      "Aucune pochette pour Gothic — visuel de Paradise Lost",
+    );
+
+    fireEvent.error(replacement);
+
+    expect(
+      screen.getByLabelText("Aucun visuel disponible pour Gothic"),
+    ).toBeDefined();
   });
 });

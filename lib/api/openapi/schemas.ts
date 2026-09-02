@@ -107,6 +107,8 @@ export const AlbumListItemSchema = AlbumSchema.extend({
     id: z.string().uuid(),
     name: z.string(),
     slug: z.string(),
+    /** Repli de pochette quand aucun visuel n'est archivé. */
+    imageUrl: z.string().nullable(),
   }),
 }).meta({ id: "AlbumListItem" });
 
