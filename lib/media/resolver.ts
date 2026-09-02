@@ -16,12 +16,37 @@ import { getBandById } from "@/db/queries/bands";
 import { getExternalRefs } from "@/db/queries/externalRefs";
 // Providers de données + registre de disponibilité
 import { dataProviders, isProviderAvailable } from "@/lib/providers";
-import { extractMembers, extractWikidataId } from "@/lib/providers/musicbrainz";
+import {
+  extractMemberships,
+  extractOfficialLinks,
+  extractWikidataId,
+} from "@/lib/providers/musicbrainz";
+// Aucun lien sortant ne doit transporter d'identifiant de campagne
+import { stripTracking } from "@/lib/url/tracking";
 // Cache Redis partagé
 import { redis } from "@/lib/redis";
 
 /** Durée de cache du DTO agrégé (24 h) ; invalidé par PUT refs. */
 const MEDIA_CACHE_TTL = 86_400;
+
+/**
+ * Libellés français des types de relation MusicBrainz retenus comme
+ * liens officiels. Une clé absente est affichée telle quelle.
+ */
+const OFFICIAL_LINK_LABELS: Record<string, string> = {
+  "official homepage": "Site officiel",
+  "social network": "Réseau social",
+  streaming: "Écoute en ligne",
+  "free streaming": "Écoute gratuite",
+  "purchase for download": "Achat / téléchargement",
+  bandcamp: "Bandcamp",
+  discogs: "Discogs",
+  allmusic: "AllMusic",
+  "last.fm": "Last.fm",
+  wikipedia: "Wikipédia",
+  youtube: "YouTube",
+  soundcloud: "SoundCloud",
+};
 
 /** Clé Redis du DTO média d'un groupe. */
 export function bandMediaCacheKey(bandId: string): string {
@@ -51,7 +76,21 @@ export const bandMediaSchema = z.object({
         ended: z.boolean().optional(),
       })
       .nullish(),
-    members: z.array(z.object({ id: z.string(), name: z.string() })),
+    /**
+     * Line-up du groupe : chaque passage porte ses dates et ses
+     * instruments, et `ended` distingue le line-up actuel des anciens
+     * membres — l'interface n'affiche par défaut que les actifs.
+     */
+    memberships: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        ended: z.boolean(),
+        beginYear: z.number().nullable(),
+        endYear: z.number().nullable(),
+        roles: z.array(z.string()),
+      }),
+    ),
     genres: z.array(z.string()),
     wikidata: z
       .object({
@@ -109,7 +148,13 @@ export async function resolveBandMedia(
   // 1. Cache
   if (!force) {
     const cached = await redis.get(key).catch(() => null);
-    if (cached) return bandMediaSchema.parse(JSON.parse(cached));
+    if (cached) {
+      // Un déploiement qui fait évoluer le DTO laisse en cache des
+      // entrées à l'ancien format pendant 24 h : elles doivent être
+      // ignorées et recalculées, jamais propagées en erreur 500.
+      const parsed = bandMediaSchema.safeParse(safeJson(cached));
+      if (parsed.success) return parsed.data;
+    }
   }
 
   const band = await getBandById(bandId);
@@ -187,6 +232,17 @@ export async function resolveBandMedia(
   if (wikidataImageUrl) {
     images.push({ provider: "wikidata", url: wikidataImageUrl });
   }
+  // Liens officiels déclarés dans MusicBrainz (site, réseaux, labels,
+  // plateformes) : la source la plus fiable, donc en tête de liste.
+  if (mbArtist) {
+    for (const link of extractOfficialLinks(mbArtist)) {
+      links.push({
+        provider: "musicbrainz",
+        label: OFFICIAL_LINK_LABELS[link.kind] ?? link.kind,
+        url: link.url,
+      });
+    }
+  }
   if (discogsArtist?.urls?.length && discogsRef) {
     for (const url of discogsArtist.urls.slice(0, 3)) {
       links.push({ provider: "discogs", label: "Site lié (Discogs)", url });
@@ -220,8 +276,8 @@ export async function resolveBandMedia(
             ended: mbArtist["life-span"].ended,
           }
         : null,
-      members: mbArtist ? extractMembers(mbArtist) : [],
-      genres: (mbArtist?.genres ?? []).map((g) => g.name),
+      memberships: mbArtist ? extractMemberships(mbArtist) : [],
+      genres: dedupeGenres((mbArtist?.genres ?? []).map((g) => g.name)),
       wikidata:
         wikidataId && wikidataSummary
           ? {
@@ -231,8 +287,11 @@ export async function resolveBandMedia(
             }
           : null,
     },
-    images,
-    links,
+    images: images.map((image) => ({
+      ...image,
+      url: stripTracking(image.url),
+    })),
+    links: dedupeLinks(links),
     previews: deezerTracks.map((t) => ({
       title: t.title,
       artistName: t.artist.name,
@@ -247,6 +306,50 @@ export async function resolveBandMedia(
     .set(key, JSON.stringify(payload), "EX", MEDIA_CACHE_TTL)
     .catch(() => undefined);
   return payload;
+}
+
+/** Analyse une entrée de cache, sans jamais lever sur du JSON abîmé. */
+function safeJson(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Déduplique les genres MusicBrainz.
+ *
+ * MusicBrainz mélange `genres` et `tags` votés : « black metal »,
+ * « Black Metal » et « black-metal » y coexistent pour un même groupe.
+ * On compare sur une forme normalisée mais on conserve le premier
+ * libellé rencontré, qui est le mieux orthographié.
+ */
+function dedupeGenres(names: readonly string[]): string[] {
+  const seen = new Map<string, string>();
+  for (const name of names) {
+    const key = name
+      .toLowerCase()
+      .replace(/[\s_-]+/g, " ")
+      .trim();
+    if (key && !seen.has(key)) seen.set(key, name);
+  }
+  return [...seen.values()];
+}
+
+/**
+ * Déduplique les liens sur leur URL nettoyée.
+ *
+ * Un même site officiel est souvent déclaré à la fois par MusicBrainz et
+ * par Discogs ; l'ordre d'insertion fait gagner la source la plus fiable.
+ */
+function dedupeLinks(links: BandMedia["links"]): BandMedia["links"] {
+  const seen = new Map<string, BandMedia["links"][number]>();
+  for (const link of links) {
+    const url = stripTracking(link.url);
+    if (!seen.has(url)) seen.set(url, { ...link, url });
+  }
+  return [...seen.values()];
 }
 
 /** Invalide le cache média d'un groupe (appelé par PUT refs). */

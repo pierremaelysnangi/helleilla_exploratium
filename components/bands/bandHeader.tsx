@@ -8,6 +8,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { BandDetail } from "@/hooks/api/schemas";
+import { ArtworkFallback } from "@/components/media/artworkFallback";
 
 type BandHeaderProps = {
   band: BandDetail;
@@ -16,7 +17,7 @@ type BandHeaderProps = {
 export function BandHeader({ band }: BandHeaderProps) {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start">
-      {/* Visuelle principale ou monogramme */}
+      {/* Visuel principal, ou repli neutre si aucune source n'en a fourni */}
       {band.imageUrl ? (
         <Image
           src={band.imageUrl}
@@ -27,9 +28,11 @@ export function BandHeader({ band }: BandHeaderProps) {
           className="border-border h-32 w-32 rounded-lg border object-cover"
         />
       ) : (
-        <span className="metal-title border-border bg-muted flex h-32 w-32 shrink-0 items-center justify-center rounded-lg border text-5xl">
-          {band.name.charAt(0)}
-        </span>
+        <ArtworkFallback
+          kind="band"
+          label={band.name}
+          className="h-32 w-32 shrink-0 rounded-lg"
+        />
       )}
 
       <div className="min-w-0 flex-1">

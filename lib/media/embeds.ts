@@ -5,14 +5,13 @@
  * - YouTube  : iframe youtube-nocookie + façade miniature (0 JS initial)
  * - Spotify  : widget open.spotify.com/embed
  * - Bandcamp : EmbeddedPlayer (exige l'ID numérique de l'album)
- * - Qobuz    : widget.qobuz.com (exige l'ID numérique de l'album)
  *
  * Logique pure (testée unitairement) ; le rendu React vit dans
  * `components/embeds/platformEmbed.tsx`.
  */
 
 /** Plateformes disposant d'un lecteur intégrable officiel. */
-export type EmbedPlatform = "youtube" | "spotify" | "bandcamp" | "qobuz";
+export type EmbedPlatform = "youtube" | "spotify" | "bandcamp";
 
 /** Résultat de résolution : URL d'iframe prête + métadonnées d'affichage. */
 export type ResolvedEmbed = {
@@ -83,18 +82,13 @@ export function parseEmbedUrl(rawUrl: string): ResolvedEmbed | null {
     return { platform: "bandcamp", embedUrl: rawUrl };
   }
 
-  // --- Qobuz (déjà au format widget) ---
-  if (host === "widget.qobuz.com") {
-    return { platform: "qobuz", embedUrl: rawUrl };
-  }
-
   return null;
 }
 
 /**
  * Construit un embed depuis une référence brute stockée en base
- * (`external_refs`) — nécessaire pour Bandcamp et Qobuz dont les
- * widgets exigent l'ID numérique plutôt qu'une URL publique.
+ * (`external_refs`) — nécessaire pour Bandcamp, dont le widget exige
+ * l'ID numérique plutôt qu'une URL publique.
  *
  * @returns La résolution, ou null si la plateforme exige un format
  *   d'identifiant non fourni.
@@ -122,13 +116,6 @@ export function buildEmbedFromRef(
       return {
         platform: "bandcamp",
         embedUrl: `https://bandcamp.com/EmbeddedPlayer/album=${externalId}/size=large/artwork=small/`,
-        nativeId: externalId,
-      };
-    case "qobuz":
-      if (!/^\d+$/.test(externalId)) return null;
-      return {
-        platform: "qobuz",
-        embedUrl: `https://widget.qobuz.com/?type=album&id=${externalId}`,
         nativeId: externalId,
       };
     default:

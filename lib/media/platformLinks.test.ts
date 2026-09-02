@@ -16,11 +16,10 @@ describe("trackSearchLinks", () => {
     expect(links.deezer.label).toBe("Deezer");
   });
 
-  it("couvre les cinq plateformes officielles", () => {
+  it("couvre les quatre plateformes officielles", () => {
     expect(Object.keys(links).sort()).toEqual([
       "bandcamp",
       "deezer",
-      "qobuz",
       "spotify",
       "youtube",
     ]);

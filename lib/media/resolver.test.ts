@@ -104,12 +104,27 @@ describe("resolveBandMedia", () => {
       country: "NO",
       area: { name: "Norway" },
       "life-span": { begin: "1991", end: "2001", ended: true },
-      genres: [{ name: "black metal" }],
+      // Doublon volontaire de casse : le resolver doit dédoublonner
+      genres: [{ name: "black metal" }, { name: "Black Metal" }],
       relations: [
         {
           type: "member of band",
           direction: "backward",
           artist: { id: "m1", name: "Ihsahn" },
+          begin: "1991",
+          attributes: ["vocal", "keyboard"],
+        },
+        {
+          type: "member of band",
+          direction: "backward",
+          artist: { id: "m2", name: "Samoth" },
+          begin: "1991",
+          end: "2001",
+          ended: true,
+        },
+        {
+          type: "official homepage",
+          url: { resource: "https://emperor.test/?utm_source=mb" },
         },
         {
           type: "wikidata",
@@ -149,7 +164,32 @@ describe("resolveBandMedia", () => {
       end: "2001",
       ended: true,
     });
-    expect(media.info.members).toEqual([{ id: "m1", name: "Ihsahn" }]);
+    expect(media.info.memberships).toEqual([
+      {
+        id: "m1",
+        name: "Ihsahn",
+        ended: false,
+        beginYear: 1991,
+        endYear: null,
+        roles: ["vocal", "keyboard"],
+      },
+      {
+        id: "m2",
+        name: "Samoth",
+        ended: true,
+        beginYear: 1991,
+        endYear: 2001,
+        roles: [],
+      },
+    ]);
+    // Les variantes de casse de MusicBrainz sont fusionnées
+    expect(media.info.genres).toEqual(["black metal"]);
+    // Le lien officiel est exposé, débarrassé de son paramètre de campagne
+    expect(media.links).toContainEqual({
+      provider: "musicbrainz",
+      label: "Site officiel",
+      url: "https://emperor.test/",
+    });
     expect(media.info.wikidata?.extract).toContain("norvégien");
     expect(media.images.some((i) => i.provider === "wikidata")).toBe(true);
     expect(media.images.map((i) => i.provider)).toEqual(["wikidata"]);
@@ -169,7 +209,7 @@ describe("resolveBandMedia", () => {
 
     const media = await resolveBandMedia("b1");
     expect(media.degraded).toBe(true);
-    expect(media.info.members).toEqual([]); // partiel mais valide
+    expect(media.info.memberships).toEqual([]); // partiel mais valide
   });
 
   it("sans aucune ref : résultat minimal avec previews Deezer seuls", async () => {
@@ -187,7 +227,7 @@ describe("resolveBandMedia", () => {
   it("sert depuis le cache Redis si présent (aucun provider appelé)", async () => {
     const cached = {
       band: { id: "b1", name: "Cached", slug: "cached" },
-      info: { members: [], genres: [] },
+      info: { memberships: [], genres: [] },
       images: [],
       links: [],
       previews: [],
@@ -199,6 +239,23 @@ describe("resolveBandMedia", () => {
     expect(media.band.name).toBe("Cached");
     expect(providersMock.mbGetArtist).not.toHaveBeenCalled();
     expect(providersMock.deezerSearch).not.toHaveBeenCalled();
+  });
+
+  it("ignore une entrée de cache au format obsolète et recalcule", async () => {
+    // Après une évolution du DTO, les entrées écrites par la version
+    // précédente restent 24 h en cache : les servir ferait échouer le
+    // parse et remonterait une 500 sur une page publique.
+    redisStore.store.set(
+      "media:band:b1",
+      JSON.stringify({ band: { id: "b1" }, info: {} }),
+    );
+    dbMock.getExternalRefs.mockResolvedValue([]);
+    providersMock.deezerSearch.mockResolvedValue([]);
+
+    const media = await resolveBandMedia("b1");
+
+    expect(media.band.name).toBe("Emperor");
+    expect(providersMock.deezerSearch).toHaveBeenCalled();
   });
 });
 

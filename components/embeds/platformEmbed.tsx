@@ -2,12 +2,12 @@
 
 /**
  * <PlatformEmbed> — lecteur officiel intégrable (YouTube, Spotify,
- * Bandcamp, Qobuz).
+ * Bandcamp).
  *
  * Performance & vie privée :
  * - YouTube : FAÇADE par défaut (miniature native, 0 JS de plateforme au
  *   chargement) ; l'iframe nocookie n'est injectée qu'au clic ;
- * - Spotify/Bandcamp/Qobuz : iframe `loading="lazy"` chargée au scroll.
+ * - Spotify/Bandcamp : iframe `loading="lazy"` chargée au scroll.
  * Aucun SDK tiers n'est importé — uniquement des iframes officielles.
  */
 

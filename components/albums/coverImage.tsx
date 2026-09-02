@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * <CoverImage> — pochette d'album avec repli sur monogramme.
+ * <CoverImage> — pochette d'album avec repli neutre.
  *
  * Les pochettes viennent de Cover Art Archive, qui redirige vers
  * l'Internet Archive : une lenteur ou une indisponibilité en amont fait
@@ -10,38 +10,35 @@
  * visuel du tout.
  *
  * Composant client uniquement pour cela : `onError` n'existe pas côté
- * serveur. Le repli est le même monogramme que pour un album sans
- * pochette référencée, donc l'incident passe inaperçu.
+ * serveur. Le repli est le même visuel que pour un album sans pochette
+ * référencée, donc l'incident passe inaperçu.
  */
 
 import Image from "next/image";
 import { useState } from "react";
+import { ArtworkFallback } from "@/components/media/artworkFallback";
 
 type CoverImageProps = {
   /** URL de la pochette, ou null si aucune n'est référencée. */
   src: string | null | undefined;
-  /** Titre de l'album : texte alternatif et lettre du monogramme. */
+  /** Titre de l'album : texte alternatif et libellé du repli. */
   title: string;
   /** Tailles candidates transmises à l'optimiseur. */
   sizes: string;
 };
 
-/** Monogramme : première lettre du titre sur fond acier. */
-function Monogram({ title }: { title: string }) {
-  return (
-    <span
-      aria-hidden
-      className="font-heading text-muted-foreground absolute inset-0 flex items-center justify-center text-4xl font-black uppercase"
-    >
-      {title.charAt(0)}
-    </span>
-  );
-}
-
 export function CoverImage({ src, title, sizes }: CoverImageProps) {
   const [failed, setFailed] = useState(false);
 
-  if (!src || failed) return <Monogram title={title} />;
+  if (!src || failed) {
+    return (
+      <ArtworkFallback
+        kind="album"
+        label={title}
+        className="absolute inset-0"
+      />
+    );
+  }
 
   return (
     <Image

@@ -14,7 +14,7 @@ import * as deezer from "./deezer";
 /**
  * Valeurs de l'enum `external_provider` disposant d'un provider de
  * données. Les plateformes restantes (spotify, youtube, bandcamp,
- * qobuz) sont des sources d'EMBED uniquement : on y stocke une
+ * bandcamp) sont des sources d'EMBED uniquement : on y stocke une
  * référence, mais aucune API de données n'est appelée.
  */
 export const dataProviders = {

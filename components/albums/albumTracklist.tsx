@@ -5,7 +5,7 @@
  * d'écoute par piste.
  *
  * Design validé : chaque ligne de piste porte un chevron `>` ouvrant un
- * panneau listant les plateformes officielles (Deezer, Spotify, Qobuz,
+ * panneau listant les plateformes officielles (Deezer, Spotify,
  * Bandcamp, YouTube). Un extrait Deezer 30 s est jouable inline si un
  * preview correspond au titre (données du resolver média) ; sinon les
  * liens mènent à la recherche officielle de la plateforme.

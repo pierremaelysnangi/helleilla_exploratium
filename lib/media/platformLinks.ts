@@ -6,14 +6,12 @@
  */
 
 /** Plateformes proposées dans le menu déroulant d'une piste. */
-export type TrackLinkPlatform =
-  "deezer" | "spotify" | "qobuz" | "bandcamp" | "youtube";
+export type TrackLinkPlatform = "deezer" | "spotify" | "bandcamp" | "youtube";
 
 /** Libellés français affichés dans le dropdown. */
 const LABELS: Record<TrackLinkPlatform, string> = {
   deezer: "Deezer",
   spotify: "Spotify",
-  qobuz: "Qobuz",
   bandcamp: "Bandcamp",
   youtube: "YouTube",
 };
@@ -48,10 +46,6 @@ export function trackSearchLinks(
     spotify: {
       label: LABELS.spotify,
       url: `https://open.spotify.com/search/${q}`,
-    },
-    qobuz: {
-      label: LABELS.qobuz,
-      url: `https://www.qobuz.com/fr-fr/search?q=${q}`,
     },
     bandcamp: {
       label: LABELS.bandcamp,

@@ -31,7 +31,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const { searchArtists, getArtist, extractMembers } =
+const { searchArtists, getArtist, extractMemberships } =
   await import("./musicbrainz");
 
 describe("musicbrainz", () => {
@@ -59,7 +59,16 @@ describe("musicbrainz", () => {
       ],
     });
     const artist = await getArtist("mb-1");
-    expect(extractMembers(artist)).toEqual([{ id: "m1", name: "Ihsahn" }]);
+    expect(extractMemberships(artist)).toEqual([
+      {
+        id: "m1",
+        name: "Ihsahn",
+        ended: false,
+        beginYear: null,
+        endYear: null,
+        roles: [],
+      },
+    ]);
   });
 
   it("extrait l'ID Wikidata depuis les relations URL", async () => {

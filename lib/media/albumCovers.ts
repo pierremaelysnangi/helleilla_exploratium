@@ -25,6 +25,8 @@ import {
   hasCoverArt,
   coverArtUrl,
 } from "@/lib/providers/coverart";
+// Repli quand Cover Art Archive n'archive aucun visuel
+import { findAlbumCover } from "@/lib/providers/deezer";
 
 /** Bilan d'une résolution, pour journalisation ou affichage. */
 export type CoverResolution = {
@@ -46,6 +48,7 @@ export type CoverResolution = {
 export async function resolveAlbumCoversForBand(
   bandId: string,
   artistMbid: string,
+  bandName: string,
 ): Promise<CoverResolution> {
   const [groups, bandAlbums] = await Promise.all([
     listReleaseGroups(artistMbid),
@@ -64,8 +67,20 @@ export async function resolveAlbumCoversForBand(
 
   for (const album of bandAlbums) {
     const group = matchReleaseGroup(groups, album);
+
     if (!group) {
-      result.skipped.push(album.title);
+      // Sans release-group, il reste la plateforme : une pochette vaut
+      // mieux qu'un monogramme, même sans référence encyclopédique.
+      const fallback = await findAlbumCover(bandName, album.title);
+      if (fallback) {
+        await db
+          .update(albums)
+          .set({ coverUrl: fallback, updatedAt: new Date() })
+          .where(eq(albums.id, album.id));
+        result.covered += 1;
+      } else {
+        result.skipped.push(album.title);
+      }
       continue;
     }
     result.matched += 1;
@@ -89,14 +104,20 @@ export async function resolveAlbumCoversForBand(
         set: { externalId: group.id, updatedAt: new Date() },
       });
 
-    if (!(await hasCoverArt(group.id))) {
+    // Cover Art Archive d'abord (visuel de l'édition de référence),
+    // Deezer ensuite pour ne laisser aucune sortie sans pochette.
+    const cover = (await hasCoverArt(group.id))
+      ? coverArtUrl(group.id)
+      : await findAlbumCover(bandName, album.title);
+
+    if (!cover) {
       result.skipped.push(album.title);
       continue;
     }
 
     await db
       .update(albums)
-      .set({ coverUrl: coverArtUrl(group.id), updatedAt: new Date() })
+      .set({ coverUrl: cover, updatedAt: new Date() })
       .where(eq(albums.id, album.id));
     result.covered += 1;
   }

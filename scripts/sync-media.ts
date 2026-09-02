@@ -88,7 +88,7 @@ async function main() {
     }
 
     try {
-      const covers = await resolveAlbumCoversForBand(band.id, mbid);
+      const covers = await resolveAlbumCoversForBand(band.id, mbid, band.name);
       covered += covers.covered;
       parts.push(`${covers.covered}/${covers.matched} pochettes`);
     } catch (err) {

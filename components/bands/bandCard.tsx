@@ -11,6 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 // Type de ligne validée côté client
 import type { BandRow } from "@/hooks/api/schemas";
+import { ArtworkFallback } from "@/components/media/artworkFallback";
 
 /** Props : la ligne de groupe à afficher. */
 type BandCardProps = {
@@ -40,10 +41,11 @@ export function BandCard({ band }: BandCardProps) {
             className="h-14 w-14 rounded-md object-cover"
           />
         ) : (
-          // Monogramme par défaut : initiale sur fond acier
-          <span className="border-border bg-muted font-heading text-muted-foreground flex h-14 w-14 shrink-0 items-center justify-center rounded-md border text-xl font-black uppercase">
-            {band.name.charAt(0)}
-          </span>
+          <ArtworkFallback
+            kind="band"
+            label={band.name}
+            className="h-14 w-14 shrink-0 rounded-md"
+          />
         )}
 
         <div className="min-w-0">

@@ -1,6 +1,6 @@
 /**
  * Tests du registre d'embeds (lib/media/embeds.ts).
- * Logique pure : formats d'URL YouTube/Spotify, widgets Bandcamp/Qobuz
+ * Logique pure : formats d'URL YouTube/Spotify, widget Bandcamp
  * depuis les références en base, rejets propres.
  */
 import { describe, it, expect } from "vitest";
@@ -29,13 +29,18 @@ describe("parseEmbedUrl", () => {
     expect(r?.embedUrl).toBe("https://open.spotify.com/embed/album/1A2b3C");
   });
 
-  it("passe tel quel un embed Bandcamp/Qobuz déjà formatté", () => {
+  it("passe tel quel un embed Bandcamp déjà formatté", () => {
     const bc = parseEmbedUrl(
       "https://bandcamp.com/EmbeddedPlayer/album=123/size=large/",
     );
     expect(bc?.platform).toBe("bandcamp");
-    const qz = parseEmbedUrl("https://widget.qobuz.com/?type=album&id=456");
-    expect(qz?.platform).toBe("qobuz");
+  });
+
+  it("ne résout plus les widgets Qobuz, retirés du registre", () => {
+    expect(
+      parseEmbedUrl("https://widget.qobuz.com/?type=album&id=456"),
+    ).toBeNull();
+    expect(buildEmbedFromRef("qobuz", "456")).toBeNull();
   });
 
   it("retourne null pour une URL non supportée ou malformée", () => {
@@ -52,11 +57,11 @@ describe("buildEmbedFromRef", () => {
     expect(r?.embedUrl).toContain("youtube-nocookie.com/embed/");
   });
 
-  it("exige un ID numérique pour Bandcamp et Qobuz", () => {
+  it("exige un ID numérique pour Bandcamp", () => {
     expect(buildEmbedFromRef("bandcamp", "1234567890")?.platform).toBe(
       "bandcamp",
     );
-    expect(buildEmbedFromRef("qobuz", "00abcd")).toBeNull(); // non numérique
+    expect(buildEmbedFromRef("bandcamp", "00abcd")).toBeNull(); // non numérique
   });
 
   it("retourne null pour un provider sans embed de données", () => {

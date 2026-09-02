@@ -320,7 +320,6 @@ export const ExternalRefSchema = z
       "spotify",
       "youtube",
       "bandcamp",
-      "qobuz",
       "deezer",
     ]),
     externalId: z.string(),
@@ -362,7 +361,21 @@ export const BandMediaSchema = z
           ended: z.boolean().optional(),
         })
         .nullish(),
-      members: z.array(z.object({ id: z.string(), name: z.string() })),
+      /**
+       * Line-up du groupe : chaque passage porte ses dates et ses
+       * instruments, et `ended` distingue le line-up actuel des anciens
+       * membres — l'interface n'affiche par défaut que les actifs.
+       */
+      memberships: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          ended: z.boolean(),
+          beginYear: z.number().nullable(),
+          endYear: z.number().nullable(),
+          roles: z.array(z.string()),
+        }),
+      ),
       genres: z.array(z.string()),
       wikidata: z
         .object({

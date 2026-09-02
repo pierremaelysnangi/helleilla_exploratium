@@ -24,7 +24,6 @@ const providerSchema = z.enum([
   "spotify",
   "youtube",
   "bandcamp",
-  "qobuz",
   "deezer",
 ]);
 

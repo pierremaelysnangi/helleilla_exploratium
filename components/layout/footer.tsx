@@ -15,7 +15,7 @@ export function Footer() {
         </p>
         <p className="text-xs">
           Médias © leurs plateformes officielles (Spotify, YouTube, Bandcamp,
-          Qobuz, Deezer) · Contenu sous licence AGPL-3.0
+          Deezer) · Contenu sous licence AGPL-3.0
         </p>
       </div>
     </footer>

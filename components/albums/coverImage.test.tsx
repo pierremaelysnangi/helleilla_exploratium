@@ -42,14 +42,16 @@ describe("CoverImage", () => {
     expect(screen.getByAltText("Pochette de Gothic")).toBeDefined();
   });
 
-  it("affiche le monogramme en l'absence d'URL", () => {
+  it("affiche le repli neutre en l'absence d'URL", () => {
     render(<CoverImage src={null} title="Gothic" sizes={SIZES} />);
 
     expect(screen.queryByAltText("Pochette de Gothic")).toBeNull();
-    expect(screen.getByText("G")).toBeDefined();
+    expect(
+      screen.getByLabelText("Aucun visuel disponible pour Gothic"),
+    ).toBeDefined();
   });
 
-  it("bascule sur le monogramme quand l'image échoue à charger", () => {
+  it("bascule sur le repli neutre quand l'image échoue à charger", () => {
     render(
       <CoverImage
         src="https://exemple.test/a.jpg"
@@ -63,15 +65,18 @@ describe("CoverImage", () => {
     // L'image brisée disparaît au profit du repli : l'incident amont ne
     // doit pas être visible côté lecteur.
     expect(screen.queryByAltText("Pochette de Gothic")).toBeNull();
-    expect(screen.getByText("G")).toBeDefined();
+    expect(
+      screen.getByLabelText("Aucun visuel disponible pour Gothic"),
+    ).toBeDefined();
   });
 
-  it("prend la première lettre du titre, en capitale", () => {
+  it("n'affiche jamais l'initiale du titre en guise de visuel", () => {
+    // Régression : le repli était un monogramme, répété à l'identique sur
+    // toutes les fiches sans pochette. Le catalogue paraissait vide.
     render(
       <CoverImage src={undefined} title="to Mega Therion" sizes={SIZES} />,
     );
-    // La capitalisation est portée par la CSS (`uppercase`) : le DOM garde
-    // la lettre d'origine, c'est bien elle qu'on vérifie.
-    expect(screen.getByText("t")).toBeDefined();
+    expect(screen.queryByText("t")).toBeNull();
+    expect(screen.queryByText("T")).toBeNull();
   });
 });

@@ -244,7 +244,16 @@ describe("useBandMedia", () => {
     info: {
       area: "Norway",
       lifeSpan: { begin: "1991", end: null, ended: false },
-      members: [{ id: "mb-1", name: "Ihsahn" }],
+      memberships: [
+        {
+          id: "mb-1",
+          name: "Ihsahn",
+          ended: false,
+          beginYear: 1991,
+          endYear: null,
+          roles: ["vocal"],
+        },
+      ],
       genres: ["black metal"],
       wikidata: null,
     },
@@ -266,9 +275,7 @@ describe("useBandMedia", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.band.name).toBe("Emperor");
-    expect(result.current.data?.info.members).toEqual([
-      { id: "mb-1", name: "Ihsahn" },
-    ]);
+    expect(result.current.data?.info.memberships[0]?.name).toBe("Ihsahn");
   });
 
   it("reste inactif tant qu'aucun identifiant n'est fourni", async () => {

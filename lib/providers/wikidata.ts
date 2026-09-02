@@ -54,21 +54,21 @@ export async function getSummary(
  * Contrat partiel de l'API EntityData : seule la propriété image (P18)
  * nous intéresse, le reste de l'entité est volumineux et inutile ici.
  */
+const claimSchema = z.object({
+  mainsnak: z.object({
+    datavalue: z.object({ value: z.string() }).nullish(),
+  }),
+});
+
 const entityImageSchema = z.object({
   entities: z.record(
     z.string(),
     z.object({
       claims: z
         .object({
-          P18: z
-            .array(
-              z.object({
-                mainsnak: z.object({
-                  datavalue: z.object({ value: z.string() }).nullish(),
-                }),
-              }),
-            )
-            .nullish(),
+          P18: z.array(claimSchema).nullish(),
+          /** P154 : logo officiel, repli quand aucune photo n'existe. */
+          P154: z.array(claimSchema).nullish(),
         })
         .nullish(),
     }),
@@ -91,9 +91,10 @@ const entityImageSchema = z.object({
  * @param width - Largeur souhaitée en pixels.
  * @returns L'URL de l'image, ou `null` si l'entité n'en déclare aucune.
  */
-export async function getEntityImageUrl(
+async function claimFileUrl(
   entityId: string,
-  width = 800,
+  property: "P18" | "P154",
+  width: number,
 ): Promise<string | null> {
   try {
     const data = await fetchJson(
@@ -101,7 +102,8 @@ export async function getEntityImageUrl(
       entityImageSchema,
     );
     const fileName =
-      data.entities[entityId]?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+      data.entities[entityId]?.claims?.[property]?.[0]?.mainsnak?.datavalue
+        ?.value;
     if (!fileName) return null;
     return (
       "https://commons.wikimedia.org/wiki/Special:FilePath/" +
@@ -111,4 +113,24 @@ export async function getEntityImageUrl(
     // Entité absente ou service indisponible : pas de visuel, pas d'erreur
     return null;
   }
+}
+
+export async function getEntityImageUrl(
+  entityId: string,
+  width = 800,
+): Promise<string | null> {
+  return claimFileUrl(entityId, "P18", width);
+}
+
+/**
+ * Logo officiel d'une entité (propriété P154).
+ *
+ * Repli de P18 : un groupe sans photo de ses membres a souvent un logo,
+ * et c'est le visuel qui l'identifie le mieux après une photo.
+ */
+export async function getEntityLogoUrl(
+  entityId: string,
+  width = 800,
+): Promise<string | null> {
+  return claimFileUrl(entityId, "P154", width);
 }

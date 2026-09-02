@@ -73,7 +73,7 @@ const securityHeaders = [
       // variable (dn710009.ca.archive.org…) : les DEUX hôtes sont requis,
       // sinon la pochette est bloquée après la redirection.
       "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://commons.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
-      "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com https://widget.qobuz.com",
+      "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com",
       // Sans media-src, l'audio retombait sur default-src 'self' : les
       // extraits Deezer et les fichiers MinIO étaient purement et
       // simplement bloqués par le navigateur.

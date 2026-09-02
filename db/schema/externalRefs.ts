@@ -2,7 +2,7 @@
  * @file Références externes vers les plateformes tierces.
  *
  * La base ne stocke AUCUN média : uniquement des identifiants externes
- * (MusicBrainz, Discogs, Wikidata, Spotify, YouTube, Bandcamp, Qobuz,
+ * (MusicBrainz, Discogs, Wikidata, Spotify, YouTube, Bandcamp,
  * Deezer). Les médias et informations sont résolus à la demande par les
  * providers (`lib/providers/`) via le resolver (`lib/media/resolver.ts`).
  *
@@ -39,7 +39,6 @@ export const externalProviderEnum = pgEnum("external_provider", [
   "spotify",
   "youtube",
   "bandcamp",
-  "qobuz",
   "deezer",
 ]);
 

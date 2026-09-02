@@ -3,7 +3,8 @@
 /**
  * <BandMediaSection> — enrichissement média du détail groupe.
  * Charge progressivement GET /api/bands/:id/media (providers externes) :
- * - encadré « infos » : zone, période MusicBrainz, membres, genres MB ;
+ * - encadré « infos » : pays, période d'activité, membres actifs (les
+ *   anciens repliés), genres dédoublonnés ;
  * - galerie d'images officielles (Discogs/Wikidata) ;
  * - liens externes officiels ;
  * - aperçus audio Deezer jouables inline (aucun média stocké).
@@ -40,6 +41,23 @@ function toPlayable(preview: {
   };
 }
 
+/**
+ * Formate la période d'activité.
+ *
+ * Un groupe toujours en activité s'affiche « 1991 – actif » plutôt que
+ * « 1991 – … », qui se lit comme une donnée manquante alors que c'est
+ * une information : le groupe n'a pas de date de fin.
+ */
+function formatActivity(lifeSpan: {
+  begin?: string | null;
+  end?: string | null;
+  ended?: boolean;
+}): string {
+  const begin = lifeSpan.begin?.slice(0, 4) ?? "?";
+  if (lifeSpan.end) return `${begin} – ${lifeSpan.end.slice(0, 4)}`;
+  return lifeSpan.ended ? `${begin} – séparé` : `${begin} – actif`;
+}
+
 export function BandMediaSection({ bandId }: BandMediaSectionProps) {
   const { data: media, isPending, isError } = useBandMedia(bandId);
   // Hooks avant tout retour anticipé : leur ordre doit être stable d'un
@@ -60,7 +78,13 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
   if (isError || !media) return null;
 
   const { info, images, links, previews, degraded } = media;
-  const hasInfo = info.area || info.lifeSpan || info.members.length > 0;
+  const activeMembers = info.memberships.filter((m) => !m.ended);
+  const pastMembers = info.memberships.filter((m) => m.ended);
+  const hasInfo =
+    info.area ||
+    info.lifeSpan ||
+    info.memberships.length > 0 ||
+    info.genres.length > 0;
 
   return (
     <section
@@ -82,29 +106,39 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
           <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             {info.area && (
               <>
-                <dt className="text-muted-foreground">Zone</dt>
+                <dt className="text-muted-foreground">Pays</dt>
                 <dd>{info.area}</dd>
               </>
             )}
             {info.lifeSpan?.begin && (
               <>
-                <dt className="text-muted-foreground">
-                  Activité (MusicBrainz)
-                </dt>
-                <dd>
-                  {info.lifeSpan.begin} – {info.lifeSpan.end ?? "…"}
-                </dd>
+                <dt className="text-muted-foreground">Activité</dt>
+                <dd>{formatActivity(info.lifeSpan)}</dd>
               </>
             )}
-            {info.members.length > 0 && (
+            {activeMembers.length > 0 && (
               <>
                 <dt className="text-muted-foreground">Membres</dt>
-                <dd>{info.members.map((m) => m.name).join(", ")}</dd>
+                <dd>
+                  {activeMembers.map((m) => m.name).join(", ")}
+                  {/* Anciens membres repliés : la fiche décrit le groupe
+                      tel qu'il existe, l'historique reste consultable. */}
+                  {pastMembers.length > 0 && (
+                    <details className="mt-1">
+                      <summary className="text-muted-foreground cursor-pointer text-xs">
+                        Anciens membres ({pastMembers.length})
+                      </summary>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        {pastMembers.map((m) => m.name).join(", ")}
+                      </p>
+                    </details>
+                  )}
+                </dd>
               </>
             )}
             {info.genres.length > 0 && (
               <>
-                <dt className="text-muted-foreground">Genres (MB)</dt>
+                <dt className="text-muted-foreground">Genres</dt>
                 <dd>{info.genres.slice(0, 6).join(", ")}</dd>
               </>
             )}
@@ -145,7 +179,7 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
           contrôles natifs débordaient du conteneur sur mobile. */}
       {previews.length > 0 && (
         <div>
-          <h2 className="metal-title text-sm">Aperçus audio</h2>
+          <h2 className="metal-title text-sm">Titres iconiques</h2>
           <ul className="divide-border border-border mt-3 flex flex-col divide-y rounded-lg border">
             {previews.map((preview, index) => (
               <li key={preview.previewUrl}>
