@@ -27,6 +27,8 @@ import {
 } from "@/lib/providers/coverart";
 // Repli quand Cover Art Archive n'archive aucun visuel
 import { findAlbumCover } from "@/lib/providers/deezer";
+// Écriture des références, partagée avec l'import de discographie
+import { linkAlbumToReleaseGroup } from "./refs";
 
 /** Bilan d'une résolution, pour journalisation ou affichage. */
 export type CoverResolution = {
@@ -89,23 +91,14 @@ export async function resolveAlbumCoversForBand(
     result.matched += 1;
 
     // Référence canonique : écrite même sans pochette disponible, elle
-    // reste utile (rééditions, ré-essai ultérieur, liens sortants).
-    await db
-      .insert(externalRefs)
-      .values({
-        entityType: "album",
-        entityId: album.id,
-        provider: "musicbrainz",
-        externalId: group.id,
-      })
-      .onConflictDoUpdate({
-        target: [
-          externalRefs.entityType,
-          externalRefs.entityId,
-          externalRefs.provider,
-        ],
-        set: { externalId: group.id, updatedAt: new Date() },
-      });
+    // reste utile (rééditions, ré-essai ultérieur, liens sortants). Un
+    // identifiant déjà rattaché à un autre album n'est pas déplacé —
+    // l'index unique `(provider, external_id)` l'interdit, et forcer
+    // faisait échouer toute la passe du groupe.
+    if (!(await linkAlbumToReleaseGroup(album.id, group.id))) {
+      result.skipped.push(`${album.title} (référence déjà attribuée)`);
+      continue;
+    }
 
     // Cover Art Archive d'abord (visuel de l'édition de référence),
     // Deezer ensuite pour ne laisser aucune sortie sans pochette.
