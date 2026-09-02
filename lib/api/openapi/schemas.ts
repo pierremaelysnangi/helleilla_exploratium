@@ -160,6 +160,24 @@ export const GenreDetailSchema = GenreSchema.extend({
   bands: z.array(BandSchema),
 }).meta({ id: "GenreDetail" });
 
+// Composant "AdminUser" : compte tel qu'exposé à l'administration.
+// Le seul schéma de l'API portant un email — d'où une route réservée aux
+// administrateurs (`user:read`).
+export const AdminUserSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+    emailVerified: z.boolean(),
+    role: z.enum(["user", "contributor", "moderator", "admin"]),
+    banned: z.boolean().nullable(),
+    banReason: z.string().nullable(),
+    banExpires: z.string().datetime().nullable(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "AdminUser" });
+
 // Corps du PUT /api/bands/{id}/genres : liste complète de genreIds
 export const SetBandGenresRequestSchema = z
   .object({ genreIds: z.array(z.string().uuid()).max(20) })

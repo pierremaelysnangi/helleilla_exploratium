@@ -15,7 +15,7 @@ Règle stricte : zéro média généré par IA.
 | Prettier          | ✅ passe                                 |
 | Lint              | ✅ passe                                 |
 | Typecheck         | ✅ passe                                 |
-| Tests unitaires   | 393/393 ✅ (49 fichiers)                 |
+| Tests unitaires   | 416/416 ✅ (50 fichiers)                 |
 | Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
 | OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
 | Build             | ✅ passe                                 |
@@ -89,14 +89,32 @@ client et serveur rendent le même verdict.
 
 ---
 
-## Phase D — Espace admin
+## Phase D — Espace admin ✅ TERMINÉE
 
-| Tâche                                                       | État                                                                       |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Backend RBAC                                                | ✅ Matrice complète (4 rôles × 6 ressources × 5 actions) + `seed-admin.ts` |
-| Route `GET/PATCH/DELETE /api/users`                         | 🔴 Inexistante (la matrice prévoit `user: read/update/delete/moderate`)    |
-| `components/admin/`                                         | 🔴 Dossier inexistant                                                      |
-| Pages admin (gestion utilisateurs/rôles, stats, modération) | 🔴 Aucune page                                                             |
+**Contrainte structurante** : les comptes vivent dans la base IDENTITÉ
+(`authDb`), pas dans la base contenu. `profiles` n'en est qu'une projection
+publique (nom + rôle), insuffisante pour administrer — l'email, la
+vérification et le bannissement n'existent que côté identité. `/api/users`
+est donc la seule famille de routes qui lit la base identité hors Better
+Auth, et la seule qui expose des emails : d'où `user:read`, permission que
+la matrice n'accorde qu'aux admins.
+
+| Tâche                              | État      | Détail                                                                                                                                                      |
+| ---------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/users`                   | ✅ Créée  | Liste paginée, recherche nom/email, filtre par rôle. Colonnes projetées explicitement pour qu'aucun champ sensible futur ne fuite par effet de bord.        |
+| `GET/PATCH/DELETE /api/users/{id}` | ✅ Créées | Changement de rôle, bannissement, suppression                                                                                                               |
+| Garde-fou auto-protection          | ✅        | Un admin ne peut ni se rétrograder, ni se bannir, ni se supprimer — la façon la plus simple de se verrouiller hors de l'administration                      |
+| Garde-fou dernier admin            | ✅        | Le dernier administrateur est intouchable (409). Sans cela, l'espace admin devenait inaccessible à tous, sans recours autre que `pnpm seed:admin`.          |
+| Synchronisation des deux bases     | ✅        | Un écrit Drizzle direct ne déclenche pas les hooks Better Auth : `updateUserAsAdmin` met à jour `authDb.user` ET `profiles`, comme le fait `seed-admin.ts`. |
+| `components/admin/`                | ✅ Créé   | `usersTable` (rôle, bannissement, suppression confirmée par saisie du nom), `roleBadge`                                                                     |
+| `/admin`                           | ✅ Écrite | Tableau de bord : compteurs catalogue et communauté, accès rapide relecture et doc API                                                                      |
+| `/admin/utilisateurs`              | ✅ Écrite | Gestion des comptes                                                                                                                                         |
+
+**Suppression d'un compte** : l'identité et le profil public sont effacés
+(sessions et `account` en cascade), mais les contributions déjà soumises
+sont CONSERVÉES. Leur `submittedBy` ne renvoie alors plus à aucune
+identité : la trace devient anonyme tout en préservant l'historique de
+modération, ce qui est l'effet recherché.
 
 ---
 
@@ -137,8 +155,8 @@ client et serveur rendent le même verdict.
 ~~Phase A (stabilisation)~~ ✅ terminée — la CI est verte
 ~~Phase B (pages détail)~~ ✅ terminée
 ~~Phase C (parcours contributeur)~~ ✅ terminée
-└→ **Phase D (espace admin : route /api/users + UI)** ← prochaine étape
-└→ Phase E (audio + profil)
+~~Phase D (espace admin)~~ ✅ terminée
+└→ **Phase E (audio + profil)** ← prochaine étape
 └→ Phase F (enrichissement)
 
 ---

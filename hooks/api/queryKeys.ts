@@ -55,6 +55,9 @@ export const contributionKeys = {
     ["contributions", "review", status ?? "open"] as const,
 };
 
+/** Clés de l'administration des comptes (liste paginée + détail). */
+export const userKeys = entityKeys("users");
+
 /** Clé de la recherche globale (terme + limite). */
 export const searchKeys = {
   all: ["search"] as const,

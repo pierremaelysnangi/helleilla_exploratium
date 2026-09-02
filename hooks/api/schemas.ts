@@ -186,6 +186,28 @@ export type ContributionStatus = z.infer<typeof contributionStatusSchema>;
 export type EvidenceRow = z.infer<typeof evidenceRowSchema>;
 export type ContributionRow = z.infer<typeof contributionRowSchema>;
 
+/**
+ * Compte tel qu'exposé par l'administration (GET /api/users).
+ *
+ * Seule ligne de l'API portant un email : elle ne transite que vers
+ * l'espace admin, derrière la permission `user:read`.
+ */
+export const adminUserRowSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string(),
+  emailVerified: z.boolean(),
+  role: z.enum(["user", "contributor", "moderator", "admin"]),
+  banned: z.boolean().nullish(),
+  banReason: z.string().nullish(),
+  banExpires: z.string().nullish(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type AdminUserRow = z.infer<typeof adminUserRowSchema>;
+export type UserRole = AdminUserRow["role"];
+
 /** DTO du resolver média (miroir de lib/media/resolver.ts). */
 export const bandMediaSchema = z.object({
   band: z.object({

@@ -45,6 +45,7 @@ export function UserMenu() {
   // Rôle porté par la session Better Auth ; repli au plus faible
   const role = session.user.role ?? "user";
   const canModerate = role === "moderator" || role === "admin";
+  const isAdmin = role === "admin";
 
   return (
     <div className="flex items-center gap-3">
@@ -57,6 +58,11 @@ export function UserMenu() {
       {canModerate && (
         <Link href="/contributions/relecture" className="metal-nav-link">
           Relecture
+        </Link>
+      )}
+      {isAdmin && (
+        <Link href="/admin" className="metal-nav-link">
+          Admin
         </Link>
       )}
       <span className="text-muted-foreground text-sm">{session.user.name}</span>

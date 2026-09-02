@@ -24,6 +24,7 @@ import {
   GlobalSearchQuerySchema,
   GlobalSearchResponseSchema,
   BandDetailSchema,
+  AdminUserSchema,
   AlbumDetailSchema,
   GenreDetailSchema,
   SetBandGenresRequestSchema,
@@ -41,6 +42,8 @@ import {
   createGenreSchema,
   updateGenreBodySchema,
 } from "@/lib/validations/genre";
+// Contrat d'administration des comptes (source unique avec la route)
+import { updateUserSchema } from "@/lib/validations/user";
 // Schémas médias & contributions
 import {
   BandMediaSchema,
@@ -283,6 +286,65 @@ registerPath("/api/genres/by-slug/{slug}", "get", {
   responses: {
     200: jsonOk(GenreDetailSchema),
     ...pick(404, 422, 429, 500),
+  },
+});
+
+// Administration des comptes. Réservée aux admins : c'est la seule
+// famille de routes qui expose des emails, et la seule voie de changement
+// de rôle (Better Auth interdit au client de se l'attribuer).
+registerPath("/api/users", "get", {
+  tags: ["users"],
+  summary: "Liste les comptes (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+      role: z.enum(["user", "contributor", "moderator", "admin"]).optional(),
+    }),
+  },
+  responses: {
+    200: jsonOk(listSchema(AdminUserSchema)),
+    ...pick(401, 403, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "get", {
+  tags: ["users"],
+  summary: "Récupère un compte (admin)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(AdminUserSchema),
+    ...pick(401, 403, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "patch", {
+  tags: ["users"],
+  summary: "Change le rôle ou le bannissement d'un compte (admin)",
+  description:
+    "409 si l'opération retirerait ses droits au dernier administrateur ; 403 si l'administrateur se vise lui-même.",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  requestBody: json(updateUserSchema),
+  responses: {
+    200: jsonOk(AdminUserSchema),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/users/{id}", "delete", {
+  tags: ["users"],
+  summary: "Supprime un compte (admin)",
+  description:
+    "Les contributions déjà soumises sont conservées et deviennent anonymes.",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: z.object({ id: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(z.object({ deleted: z.boolean(), id: z.string() })),
+    ...pick(401, 403, 404, 409, 422, 429, 500),
   },
 });
 
