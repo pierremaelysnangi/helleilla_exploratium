@@ -12,6 +12,7 @@ import type { MetadataRoute } from "next";
 import { listBandSlugs } from "@/db/queries/bands";
 import { listAlbumSlugs } from "@/db/queries/albums";
 import { listGenreSlugs } from "@/db/queries/genres";
+import { listMemberSlugs } from "@/db/queries/members";
 
 /** URL de base absolue. */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -37,10 +38,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Ne figurent ici que des pages réellement rendues. /bands/[slug]/members
     // reste exclue : son contenu vient de MusicBrainz, n'est pas persisté et
     // la page est déclarée noindex.
-    const [bands, albums, genres] = await Promise.all([
+    const [bands, albums, genres, members] = await Promise.all([
       listBandSlugs(),
       listAlbumSlugs(),
       listGenreSlugs(),
+      listMemberSlugs(),
     ]);
 
     const bandRoutes: MetadataRoute.Sitemap = bands.flatMap((band) => [
@@ -72,7 +74,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     }));
 
-    return [...staticRoutes, ...bandRoutes, ...albumRoutes, ...genreRoutes];
+    // Les fiches membres ne sont déclarées que depuis qu'une table les
+    // porte : auparavant la route n'avait aucun contenu réel derrière.
+    const memberRoutes: MetadataRoute.Sitemap = members.map((member) => ({
+      url: `${BASE_URL}/members/${member.slug}`,
+      lastModified: member.updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    }));
+
+    return [
+      ...staticRoutes,
+      ...bandRoutes,
+      ...albumRoutes,
+      ...genreRoutes,
+      ...memberRoutes,
+    ];
   } catch (err) {
     console.error("[sitemap] Base indisponible :", err);
     return staticRoutes;

@@ -5,6 +5,16 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+// Lectures directes : l'accueil est un Server Component, repasser par
+// l'API n'ajouterait qu'un aller-retour pour des données publiques.
+import {
+  listRecentAlbums,
+  listRecentBands,
+  listTopRatedAlbums,
+} from "@/db/queries/widgets";
+import { RecentAlbums } from "@/components/widgets/recentAlbums";
+import { RecentBands } from "@/components/widgets/recentBands";
+import { TopRatedAlbums } from "@/components/widgets/topRatedAlbums";
 
 export const metadata: Metadata = {
   title: "Accueil",
@@ -32,7 +42,30 @@ const SECTIONS = [
   },
 ] as const;
 
-export default function HomePage() {
+/** Rafraîchit les widgets sans redéploiement, sans requêter à chaque vue. */
+export const revalidate = 300;
+
+/**
+ * Charge les widgets en tolérant une panne de base : l'accueil doit rester
+ * servable même dégradé, comme le fait déjà le sitemap.
+ */
+async function loadWidgets() {
+  try {
+    const [recentBands, recentAlbums, topRated] = await Promise.all([
+      listRecentBands(4),
+      listRecentAlbums(8),
+      listTopRatedAlbums(5),
+    ]);
+    return { recentBands, recentAlbums, topRated };
+  } catch (err) {
+    console.error("[accueil] Widgets indisponibles :", err);
+    return { recentBands: [], recentAlbums: [], topRated: [] };
+  }
+}
+
+export default async function HomePage() {
+  const { recentBands, recentAlbums, topRated } = await loadWidgets();
+
   return (
     <div className="flex flex-col gap-10">
       {/* Héro */}
@@ -72,6 +105,12 @@ export default function HomePage() {
           </Link>
         ))}
       </section>
+
+      {/* Widgets : chacun disparaît si le catalogue n'a rien à montrer,
+          plutôt que d'afficher une section vide. */}
+      <RecentAlbums albums={recentAlbums} />
+      <TopRatedAlbums albums={topRated} />
+      <RecentBands bands={recentBands} />
     </div>
   );
 }

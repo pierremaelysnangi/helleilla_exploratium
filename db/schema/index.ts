@@ -25,3 +25,9 @@ export * from "./relations";
 export * from "./auth";
 // Profils publics répliqués depuis la base identité
 export * from "./profiles";
+// Labels (maisons de disques) référencés par les albums
+export * from "./labels";
+// Membres, appartenances aux groupes et formations par album
+export * from "./members";
+// Notes et listes personnelles des utilisateurs
+export * from "./collections";

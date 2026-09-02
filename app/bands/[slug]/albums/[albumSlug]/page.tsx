@@ -19,6 +19,8 @@ import Image from "next/image";
 import { fetchAlbumBySlug } from "@/hooks/use-albums";
 // Type du détail validé
 import type { AlbumDetail } from "@/hooks/api/schemas";
+// Note personnelle et liste de l'utilisateur (client)
+import { AlbumActions } from "@/components/collections/albumActions";
 
 type AlbumPageProps = {
   params: Promise<{ slug: string; albumSlug: string }>;
@@ -184,6 +186,8 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
           </p>
         </div>
       </header>
+
+      <AlbumActions albumId={album.id} />
 
       <section aria-label="Tracklist" className="flex flex-col gap-3">
         <h2 className="metal-title text-lg">Tracklist</h2>

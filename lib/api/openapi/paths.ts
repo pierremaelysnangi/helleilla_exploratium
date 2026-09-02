@@ -26,6 +26,11 @@ import {
   BandDetailSchema,
   AdminUserSchema,
   ProfileSchema,
+  LabelSchema,
+  MemberSchema,
+  BandMembershipSchema,
+  RatingSummarySchema,
+  CollectionEntrySchema,
   AlbumDetailSchema,
   GenreDetailSchema,
   SetBandGenresRequestSchema,
@@ -46,6 +51,14 @@ import {
 // Contrat d'administration des comptes (source unique avec la route)
 import { updateUserSchema } from "@/lib/validations/user";
 import { updateProfileSchema } from "@/lib/validations/profile";
+import {
+  createMemberSchema,
+  setBandMembersSchema,
+} from "@/lib/validations/member";
+import {
+  setRatingSchema,
+  setCollectionSchema,
+} from "@/lib/validations/collection";
 // Schémas médias & contributions
 import {
   BandMediaSchema,
@@ -372,6 +385,161 @@ registerPath("/api/profile", "patch", {
   responses: {
     200: jsonOk(ProfileSchema),
     ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+// --- Phase F : membres, labels, appréciations, collections ---
+
+registerPath("/api/members", "get", {
+  tags: ["members"],
+  summary: "Annuaire paginé des membres",
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+    }),
+  },
+  responses: { 200: jsonOk(listSchema(MemberSchema)), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/members", "post", {
+  tags: ["members"],
+  summary: "Crée une fiche membre (contributor+)",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(createMemberSchema),
+  responses: {
+    201: jsonOk(MemberSchema, "Créé"),
+    ...pick(401, 403, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/members/by-slug/{slug}", "get", {
+  tags: ["members"],
+  summary: "Fiche d'un membre (groupes et albums)",
+  requestParams: { path: z.object({ slug: z.string().min(1).max(200) }) },
+  responses: {
+    200: jsonOk(
+      MemberSchema.extend({
+        bands: z.array(z.any()),
+        albums: z.array(z.any()),
+      }),
+    ),
+    ...pick(404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/bands/{id}/members", "get", {
+  tags: ["bands"],
+  summary: "Formation d'un groupe",
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(z.array(BandMembershipSchema)),
+    ...pick(422, 429, 500),
+  },
+});
+
+registerPath("/api/bands/{id}/members", "put", {
+  tags: ["bands"],
+  summary: "Remplace la formation d'un groupe (sync complète)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(setBandMembersSchema),
+  responses: {
+    200: jsonOk(z.array(BandMembershipSchema)),
+    ...pick(401, 403, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/labels", "get", {
+  tags: ["labels"],
+  summary: "Annuaire paginé des labels",
+  requestParams: {
+    query: z.object({
+      page: z.coerce.number().int().min(1).optional(),
+      perPage: z.coerce.number().int().min(1).max(100).optional(),
+      q: z.string().max(200).optional(),
+    }),
+  },
+  responses: { 200: jsonOk(listSchema(LabelSchema)), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/labels", "post", {
+  tags: ["labels"],
+  summary: "Crée un label (moderator+)",
+  security: [{ sessionCookie: [] }],
+  responses: {
+    201: jsonOk(LabelSchema, "Créé"),
+    ...pick(401, 403, 409, 422, 429, 500),
+  },
+});
+
+registerPath("/api/albums/{id}/ratings", "get", {
+  tags: ["albums"],
+  summary: "Moyenne des notes d'un album",
+  description:
+    "Agrégat public uniquement ; `mine` n'est renseigné que pour un appelant connecté, et ne contient jamais la note d'autrui.",
+  requestParams: { path: UuidParamSchema },
+  responses: { 200: jsonOk(RatingSummarySchema), ...pick(422, 429, 500) },
+});
+
+registerPath("/api/albums/{id}/ratings", "put", {
+  tags: ["albums"],
+  summary: "Enregistre sa note (1 à 5)",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  requestBody: json(setRatingSchema),
+  responses: {
+    200: jsonOk(RatingSummarySchema),
+    ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/albums/{id}/ratings", "delete", {
+  tags: ["albums"],
+  summary: "Retire sa note",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(RatingSummarySchema),
+    ...pick(401, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "get", {
+  tags: ["collection"],
+  summary: "Collection et liste d'envies de l'appelant",
+  description:
+    "Toujours cadrée sur la session : aucun identifiant d'utilisateur n'est accepté en entrée.",
+  security: [{ sessionCookie: [] }],
+  requestParams: {
+    query: z.object({ status: z.enum(["owned", "wanted"]).optional() }),
+  },
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "put", {
+  tags: ["collection"],
+  summary: "Ajoute un album ou change son statut",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(setCollectionSchema),
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/me/collection", "delete", {
+  tags: ["collection"],
+  summary: "Retire un album de sa liste",
+  security: [{ sessionCookie: [] }],
+  requestParams: { query: z.object({ albumId: z.string().uuid() }) },
+  responses: {
+    200: jsonOk(z.array(CollectionEntrySchema)),
+    ...pick(401, 422, 429, 500),
   },
 });
 

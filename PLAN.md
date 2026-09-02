@@ -15,7 +15,7 @@ Règle stricte : zéro média généré par IA.
 | Prettier          | ✅ passe                                 |
 | Lint              | ✅ passe                                 |
 | Typecheck         | ✅ passe                                 |
-| Tests unitaires   | 433/433 ✅ (52 fichiers)                 |
+| Tests unitaires   | 454/454 ✅ (54 fichiers)                 |
 | Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
 | OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
 | Build             | ✅ passe                                 |
@@ -145,18 +145,36 @@ alimente le lecteur global, avec la suite de la tracklist en file d'attente.
 
 ---
 
-## Phase F — Enrichissement encyclopédique
+## Phase F — Enrichissement ✅ TERMINÉE
 
-| Tâche                                                      | État                                           |
-| ---------------------------------------------------------- | ---------------------------------------------- |
-| `components/widgets/`                                      | 🔴 Dossier inexistant                          |
-| Widgets accueil (derniers ajouts, tops, stats, carrousels) | 🔴 Rien                                        |
-| Membres persistés en DB (table `band_members`)             | 🔴 Aucune table, données éphémères MusicBrainz |
-| Labels (maisons de disques)                                | 🔴 Aucun schéma/route                          |
-| Lineups (formations par album)                             | 🔴 Aucun schéma/route                          |
-| Ratings / notes                                            | 🔴 Aucun schéma/route                          |
-| Listes utilisateur (collection / wishlist)                 | 🔴 Aucun schéma/route                          |
-| `hooks/use-media-query.ts`                                 | 🔴 Stub doc-only                               |
+Migration `0005_clever_peter_parker` : **purement additive**, aucun `DROP`.
+Six tables et une colonne, appliquées et validées contre un PostgreSQL réel.
+
+| Tâche                      | État         | Détail                                                                                                                                                         |
+| -------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `members` + `band_members` | ✅ Créées    | Modèle en trois tables : la PERSONNE, son appartenance à un groupe (période, rôle), sa participation à un album. `musicbrainzId` garde le lien vers la source. |
+| `album_lineups`            | ✅ Créée     | Distincte de l'appartenance : un musicien de session figure sur un album sans être membre                                                                      |
+| `labels`                   | ✅ Créée     | + `albums.label_id` en `set null` — perdre un label ne doit pas effacer les albums                                                                             |
+| `ratings`                  | ✅ Créée     | Note 1-5, clé primaire `(user_id, album_id)` : une seule note par personne. Borne **aussi** en base par un `CHECK` — vérifié.                                  |
+| `user_albums`              | ✅ Créée     | Collection / liste d'envies, un statut par couple                                                                                                              |
+| Routes                     | ✅ Créées    | `/api/members`, `/api/members/by-slug/{slug}`, `/api/bands/{id}/members` (sync complète), `/api/labels`, `/api/albums/{id}/ratings`, `/api/me/collection`      |
+| `/members/[slug]`          | ✅ Restaurée | Supprimée en phase B faute de modèle de données ; elle revient maintenant qu'une table la porte réellement                                                     |
+| `/bands/[slug]/members`    | ✅ Revue     | Privilégie la formation persistée, retombe sur MusicBrainz sinon. `noindex` seulement dans ce second cas.                                                      |
+| `components/widgets/`      | ✅ Créé      | Dernières sorties, mieux notés, derniers groupes — sur l'accueil, avec repli si la base est indisponible                                                       |
+| `hooks/use-media-query`    | ✅ Écrit     | (livré en phase E)                                                                                                                                             |
+
+**Décisions de conception notables :**
+
+- Le classement « mieux notés » exige un **minimum de 3 votes**. Sans ce
+  seuil, un album noté 5 par une seule personne coifferait un classique
+  noté 4,6 par cinquante — un classement statistiquement mensonger. Le
+  nombre de votes est toujours affiché à côté de la moyenne.
+- `GET /api/albums/{id}/ratings` ne renvoie qu'un **agrégat** : exposer qui
+  a noté quoi révélerait les goûts d'une personne identifiable. `mine` ne
+  contient que la note de l'appelant.
+- `/api/me/collection` est cadrée sur la session ; aucun `userId` n'est
+  accepté en entrée, sans quoi n'importe qui lirait les goûts d'autrui en
+  changeant un chiffre d'URL.
 
 ---
 
@@ -166,8 +184,11 @@ alimente le lecteur global, avec la suite de la tracklist en file d'attente.
 ~~Phase B (pages détail)~~ ✅ terminée
 ~~Phase C (parcours contributeur)~~ ✅ terminée
 ~~Phase D (espace admin)~~ ✅ terminée
-└→ **Phase E (audio + profil)** ← prochaine étape
-└→ Phase F (enrichissement)
+~~Phase E (audio + profil)~~ ✅ terminée
+~~Phase F (enrichissement)~~ ✅ terminée
+
+**Les six phases du plan sont livrées.** Reste la dette signalée ci-dessous,
+qui demande des arbitrages plutôt que du code.
 
 ---
 
