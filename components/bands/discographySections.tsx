@@ -53,8 +53,15 @@ type DiscographySectionsProps = {
   headingLevel?: "h2" | "h3";
 };
 
-/** Nombre de cartes chargées sans attendre le défilement. */
-const EAGER_CARDS = 6;
+/**
+ * Nombre de cartes chargées sans attendre le défilement.
+ *
+ * Douze, soit deux rangées pleines à la largeur la plus dense (six
+ * colonnes) : les sections sont courtes et se succèdent, si bien que le
+ * Largest Contentful Paint tombe souvent dans la DEUXIÈME. Six ne
+ * suffisait pas, et le navigateur le signalait encore.
+ */
+const EAGER_CARDS = 12;
 
 export function DiscographySections({
   albums,
