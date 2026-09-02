@@ -34,9 +34,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Pas de `version:` ici : `packageManager` dans package.json fait foi.
+      # Déclarer les deux fait échouer l'action ("Multiple versions of pnpm
+      # specified"), et un pnpm 10 lisant un lockfile produit par pnpm 11
+      # casserait de toute façon `--frozen-lockfile`.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -75,9 +77,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Pas de `version:` ici : `packageManager` dans package.json fait foi.
+      # Déclarer les deux fait échouer l'action ("Multiple versions of pnpm
+      # specified"), et un pnpm 10 lisant un lockfile produit par pnpm 11
+      # casserait de toute façon `--frozen-lockfile`.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -132,9 +136,11 @@ jobs:
     needs: quality
     steps:
       - uses: actions/checkout@v4
+      # Pas de `version:` ici : `packageManager` dans package.json fait foi.
+      # Déclarer les deux fait échouer l'action ("Multiple versions of pnpm
+      # specified"), et un pnpm 10 lisant un lockfile produit par pnpm 11
+      # casserait de toute façon `--frozen-lockfile`.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 22
