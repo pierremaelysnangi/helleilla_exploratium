@@ -74,3 +74,73 @@ export async function fetchGenreBySlug(
     { signal: init?.signal },
   );
 }
+
+// Taxonomie complète, partagée par les filtres du catalogue
+import { useQuery } from "@tanstack/react-query";
+import { apiJsonEnvelope } from "./api/client";
+import { z } from "zod";
+import type { GenreRow } from "./api/schemas";
+
+/** Taille de page maximale acceptée par l'API (`paginationSchema`). */
+const MAX_PER_PAGE = 100;
+
+const genrePageSchema = z.object({
+  data: z.array(genreRowSchema),
+  meta: z.object({ totalPages: z.number() }).loose(),
+});
+
+/**
+ * Récupère la taxonomie ENTIÈRE, en enchaînant les pages.
+ *
+ * L'API plafonne `perPage` à 100 : demander davantage renvoie une 400,
+ * et se contenter de la première page tronquerait silencieusement les
+ * filtres dès que la taxonomie dépasse cent entrées.
+ */
+async function fetchAllGenres(signal?: AbortSignal): Promise<GenreRow[]> {
+  const all: GenreRow[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const payload = await apiJsonEnvelope("/api/genres", {
+      signal,
+      query: { page, perPage: MAX_PER_PAGE, order: "asc" },
+    });
+    const parsed = genrePageSchema.parse(payload);
+    all.push(...parsed.data);
+    totalPages = parsed.meta.totalPages;
+    page += 1;
+  } while (page <= totalPages);
+
+  return all;
+}
+
+/** Un genre racine et ses sous-genres, prêts pour un affichage groupé. */
+export type GenreFamily = {
+  root: GenreRow;
+  children: GenreRow[];
+};
+
+/**
+ * Taxonomie complète, organisée en familles.
+ *
+ * La donnée bouge rarement : un `staleTime` d'une heure évite de la
+ * recharger à chaque ouverture d'un filtre.
+ */
+export function useGenreTaxonomy() {
+  const query = useQuery({
+    queryKey: ["genres", "taxonomy"],
+    queryFn: ({ signal }) => fetchAllGenres(signal),
+    staleTime: 3_600_000,
+  });
+
+  const genres = query.data ?? [];
+  const families: GenreFamily[] = genres
+    .filter((g) => !g.parentId)
+    .map((root) => ({
+      root,
+      children: genres.filter((g) => g.parentId === root.id),
+    }));
+
+  return { ...query, genres, families };
+}

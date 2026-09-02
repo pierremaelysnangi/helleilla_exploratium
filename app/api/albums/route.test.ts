@@ -65,7 +65,13 @@ describe("GET /api/albums", () => {
   it("200 + pagination", async () => {
     dbMock.select
       .mockReturnValueOnce(
-        chain([{ id: ALBUM_ID, title: "Transilvanian Hunger" }]),
+        chain([
+          {
+            id: ALBUM_ID,
+            title: "Transilvanian Hunger",
+            band: { id: BAND_ID, name: "Darkthrone", slug: "darkthrone" },
+          },
+        ]),
       )
       .mockReturnValueOnce(chain([{ count: 1 }]));
     const res = await GET(mkReq("http://localhost/api/albums"), ctx());
@@ -73,6 +79,9 @@ describe("GET /api/albums", () => {
     const json = await res.json();
     expect(json.data).toHaveLength(1);
     expect(json.meta.total).toBe(1);
+    // Le groupe est joint à la ligne : sans lui, l'URL canonique d'un
+    // album (band-scopée) n'est pas constructible côté client.
+    expect(json.data[0].band.slug).toBe("darkthrone");
   });
 
   it("422 si perPage invalide", async () => {

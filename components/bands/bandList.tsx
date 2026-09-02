@@ -3,7 +3,7 @@
 /**
  * <BandList> — catalogue des groupes virtualisé avec chargement progressif.
  * Combine :
- * - filtres d'URL synchronisés (nuqs) : q, sort, order ;
+ * - filtres d'URL synchronisés (nuqs) : q, genre, sort, order ;
  * - `useInfiniteQuery` (TanStack Query) sur GET /api/bands paginé ;
  * - `<VirtualInfiniteList>` : seules les lignes visibles sont rendues,
  *   hauteurs dynamiques mesurées (bios longues ou absentes).
@@ -24,6 +24,8 @@ import {
 import { VirtualInfiniteList } from "@/components/shared/virtualInfiniteList";
 // Carte de groupe
 import { BandCard } from "./bandCard";
+// Filtre par genre partagé (inclusif des sous-genres)
+import { GenreSelect } from "@/components/genres/genreSelect";
 import { z } from "zod";
 
 /** Schéma du payload paginé renvoyé par l'API (validation runtime). */
@@ -40,6 +42,8 @@ const pageSchema = z.object({
 /** Filtres synchronisés à l'URL (?q=&sort=&order=). */
 export const bandFilters = {
   q: parseAsString.withDefault(""),
+  /** Slug de genre ; vide = toute la taxonomie. */
+  genre: parseAsString.withDefault(""),
   sort: parseAsStringEnum(["name", "createdAt", "year"]).withDefault(
     "createdAt",
   ),
@@ -66,6 +70,7 @@ export function BandList() {
           page: pageParam,
           perPage: PER_PAGE,
           q: filters.q || undefined,
+          genre: filters.genre || undefined,
           sort: filters.sort,
           order: filters.order,
         },
@@ -94,6 +99,11 @@ export function BandList() {
           onChange={(e) => setFilters({ q: e.target.value || null })}
           className="border-border bg-card focus:border-primary/50 w-full max-w-xs rounded-md border px-3 py-2 text-sm outline-none"
           aria-label="Rechercher un groupe"
+        />
+        <GenreSelect
+          value={filters.genre}
+          onChange={(genre) => setFilters({ genre: genre || null })}
+          label="Filtrer les groupes par genre"
         />
         <select
           value={filters.sort}

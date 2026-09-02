@@ -39,15 +39,18 @@ export function okSchema<T extends z.ZodType>(data: T) {
 // Query de pagination : recherche + limite/décalage avec coercion
 export const PaginationQuerySchema = z.object({
   q: z.string().optional().meta({ description: "Recherche plein-texte" }),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-  offset: z.coerce.number().int().min(0).default(0),
+  page: z.coerce.number().int().min(1).default(1),
+  perPage: z.coerce.number().int().min(1).max(100).default(20),
+  sort: z.enum(["name", "createdAt", "year"]).default("createdAt"),
+  order: z.enum(["asc", "desc"]).default("desc"),
 });
 
 // Métadonnées jointes aux listes paginées
 export const PaginatedMetaSchema = z.object({
   total: z.number().int(),
-  limit: z.number().int(),
-  offset: z.number().int(),
+  page: z.number().int(),
+  perPage: z.number().int(),
+  totalPages: z.number().int(),
 });
 
 // Paramètre de chemin `{ id }` : UUID avec exemple
@@ -79,12 +82,27 @@ export const AlbumSchema = z
     bandId: z.string().uuid(),
     title: z.string().meta({ example: "Frozen Depths" }),
     slug: z.string(),
+    type: z.enum(["album", "ep", "single", "compilation", "live", "demo"]),
     releaseYear: z.number().int().nullable(),
+    releaseDate: z.string().nullable(),
     coverUrl: z.string().nullable(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
   })
   .meta({ id: "Album" });
+
+/**
+ * Album tel que renvoyé par la LISTE : la ligne, plus le groupe qui
+ * signe la sortie. Sans lui, un client ne peut pas construire l'URL
+ * canonique de l'album, qui est band-scopée.
+ */
+export const AlbumListItemSchema = AlbumSchema.extend({
+  band: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    slug: z.string(),
+  }),
+}).meta({ id: "AlbumListItem" });
 
 // Composant "Track" : piste rattachée à un album
 export const TrackSchema = z

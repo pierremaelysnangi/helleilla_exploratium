@@ -114,6 +114,17 @@ export const bandSummarySchema = z.object({
  * Détail public d'un album : ligne + groupe + tracklist ordonnée
  * (GET /api/albums/by-slug/:bandSlug/:albumSlug).
  */
+/**
+ * Ligne d'album telle que renvoyée par GET /api/albums : la ligne, plus
+ * le groupe qui signe la sortie. Sans lui, l'URL canonique d'un album
+ * (band-scopée) ne peut pas être construite côté client.
+ */
+export const albumListItemSchema = albumRowSchema.extend({
+  band: bandSummarySchema,
+});
+
+export type AlbumListItem = z.infer<typeof albumListItemSchema>;
+
 export const albumDetailSchema = albumRowSchema.extend({
   band: bandSummarySchema,
   tracks: z.array(trackRowSchema),

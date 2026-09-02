@@ -4,10 +4,8 @@
  * <Nav> — navigation principale du site.
  * Lien actif surligné selon la route courante (usePathname).
  *
- * Sur mobile les liens PASSENT À LA LIGNE plutôt que de défiler
- * horizontalement : le défilement tronquait le dernier lien (« Recherche »
- * apparaissait comme un « R » isolé), sans rien indiquer qu'il fallait
- * faire glisser. Cinq entrées tiennent sur deux lignes.
+ * Rendu uniquement à partir de `lg` : en dessous, la navigation passe
+ * par <MobileNav> et son bouton burger.
  */
 
 // Détection de la route active

@@ -69,10 +69,14 @@ const securityHeaders = [
       // les scripts inline de nonce complet nécessitent un middleware dédié.
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline'",
-      // Cover Art Archive redirige vers un nœud Internet Archive au nom
-      // variable (dn710009.ca.archive.org…) : les DEUX hôtes sont requis,
-      // sinon la pochette est bloquée après la redirection.
-      "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://commons.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
+      // Deux redirections imposent d'autoriser les hôtes d'ARRIVÉE et pas
+      // seulement ceux qu'on écrit :
+      // - Cover Art Archive renvoie vers un nœud Internet Archive au nom
+      //   variable (dn710009.ca.archive.org…) ;
+      // - `commons.wikimedia.org/wiki/Special:FilePath/…` renvoie vers
+      //   `thumb.wikimedia.org`, d'où le joker sur wikimedia.org. Sans lui,
+      //   la photo de groupe était silencieusement bloquée.
+      "img-src 'self' data: blob: https://i.ytimg.com https://*.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
       "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com",
       // Sans media-src, l'audio retombait sur default-src 'self' : les
       // extraits Deezer et les fichiers MinIO étaient purement et
@@ -102,7 +106,8 @@ const nextConfig: NextConfig = {
      * Domaines externes autorisés pour <Image> (médias officiels,
      * jamais copiés localement) :
      * - i.ytimg.com        : miniatures YouTube (façades d'embed)
-     * - upload.wikimedia.org : images Wikidata/Wikipédia
+     * - **.wikimedia.org : images Wikidata/Wikipédia — `commons` pour
+     *   l'URL écrite, `upload`/`thumb` pour les cibles de redirection
      * - api.discogs.com + imgutils.discogs.com : pochettes/photos Discogs
      * - *.dzcdn.net : pochettes et extraits Deezer (les sous-domaines
      *   varient : cdns-preview, cdnt-preview, e-cdns-images…)
@@ -111,9 +116,7 @@ const nextConfig: NextConfig = {
      */
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },
-      { protocol: "https", hostname: "upload.wikimedia.org" },
-      // Special:FilePath, qui redirige vers upload.wikimedia.org
-      { protocol: "https", hostname: "commons.wikimedia.org" },
+      { protocol: "https", hostname: "**.wikimedia.org" },
       { protocol: "https", hostname: "api.discogs.com" },
       { protocol: "https", hostname: "imgutils.discogs.com" },
       { protocol: "https", hostname: "**.dzcdn.net" },

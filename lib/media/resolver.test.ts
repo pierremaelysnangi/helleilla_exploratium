@@ -37,6 +37,7 @@ vi.mock("@/db/queries/externalRefs", () => ({
 // Providers factices pilotables par test.
 const providersMock = vi.hoisted(() => ({
   wdImage: vi.fn(),
+  wdLogo: vi.fn(),
   mbGetArtist: vi.fn(),
   mbSearch: vi.fn(),
   wdSummary: vi.fn(),
@@ -54,6 +55,7 @@ vi.mock("@/lib/providers", () => ({
     wikidata: {
       getSummary: providersMock.wdSummary,
       getEntityImageUrl: providersMock.wdImage,
+      getEntityLogoUrl: providersMock.wdLogo,
     },
     discogs: {
       getArtist: providersMock.discogsGetArtist,
@@ -142,6 +144,10 @@ describe("resolveBandMedia", () => {
     providersMock.wdImage.mockResolvedValue(
       "https://commons.wikimedia.org/wiki/Special:FilePath/e.jpg?width=800",
     );
+    // Logo officiel (P154) : second visuel de la galerie
+    providersMock.wdLogo.mockResolvedValue(
+      "https://commons.wikimedia.org/wiki/Special:FilePath/logo.svg?width=800",
+    );
     providersMock.deezerSearch.mockResolvedValue([
       {
         id: 1,
@@ -184,15 +190,22 @@ describe("resolveBandMedia", () => {
     ]);
     // Les variantes de casse de MusicBrainz sont fusionnées
     expect(media.info.genres).toEqual(["black metal"]);
-    // Le lien officiel est exposé, débarrassé de son paramètre de campagne
+    // Le lien officiel est exposé, débarrassé de son paramètre de
+    // campagne, et nommé par sa destination plutôt que par le type de
+    // relation MusicBrainz.
     expect(media.links).toContainEqual({
       provider: "musicbrainz",
-      label: "Site officiel",
+      label: "emperor.test",
       url: "https://emperor.test/",
     });
     expect(media.info.wikidata?.extract).toContain("norvégien");
-    expect(media.images.some((i) => i.provider === "wikidata")).toBe(true);
-    expect(media.images.map((i) => i.provider)).toEqual(["wikidata"]);
+    // Galerie : photo puis logo Wikidata, puis la pochette rapportée
+    // par Deezer — la fiche ne se contente plus d'un seul visuel.
+    expect(media.images.map((i) => i.provider)).toEqual([
+      "wikidata",
+      "wikidata",
+      "deezer",
+    ]);
     expect(media.previews).toHaveLength(1);
     expect(media.degraded).toBe(false);
 

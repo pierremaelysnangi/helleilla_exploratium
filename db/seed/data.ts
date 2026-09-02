@@ -26,14 +26,92 @@ export type SeedGenre = {
 };
 
 /**
- * Taxonomie de départ : quatre familles racines et leurs ramifications
- * les plus établies.
+ * Taxonomie metal complète : familles racines et sous-genres établis.
+ *
+ * Sert de vocabulaire commun à tout le catalogue — filtres, recherche à
+ * facettes et rattachement des groupes. Une taxonomie trop courte force
+ * les contributeurs à ranger un groupe dans une famille approximative,
+ * et rend le filtre par genre inutile.
+ *
+ * Les libellés suivent l'usage anglophone consacré (le nom des genres
+ * n'est pas traduit : « Black Metal » n'a pas d'équivalent français
+ * établi), et la hiérarchie reste à deux niveaux, comme le modèle de
+ * données (`genres.parent_id`).
  */
 export const GENRES: SeedGenre[] = [
-  { name: "Black Metal", slug: "black-metal" },
-  { name: "Death Metal", slug: "death-metal" },
-  { name: "Doom Metal", slug: "doom-metal" },
+  { name: "Heavy Metal", slug: "heavy-metal" },
   { name: "Thrash Metal", slug: "thrash-metal" },
+  { name: "Death Metal", slug: "death-metal" },
+  { name: "Black Metal", slug: "black-metal" },
+  { name: "Doom Metal", slug: "doom-metal" },
+  { name: "Gothic Metal", slug: "gothic-metal" },
+  { name: "Progressive Metal", slug: "progressive-metal" },
+  { name: "Folk Metal", slug: "folk-metal" },
+  { name: "Grindcore", slug: "grindcore" },
+  { name: "Metalcore", slug: "metalcore" },
+  { name: "Industrial Metal", slug: "industrial-metal" },
+  { name: "Post-Metal", slug: "post-metal" },
+  { name: "NWOBHM", slug: "nwobhm", parent: "heavy-metal" },
+  { name: "Speed Metal", slug: "speed-metal", parent: "heavy-metal" },
+  { name: "Power Metal", slug: "power-metal", parent: "heavy-metal" },
+  {
+    name: "Symphonic Power Metal",
+    slug: "symphonic-power-metal",
+    parent: "heavy-metal",
+  },
+  { name: "Epic Metal", slug: "epic-metal", parent: "heavy-metal" },
+  { name: "Traditional Doom", slug: "traditional-doom", parent: "heavy-metal" },
+  { name: "Bay Area Thrash", slug: "bay-area-thrash", parent: "thrash-metal" },
+  { name: "Teutonic Thrash", slug: "teutonic-thrash", parent: "thrash-metal" },
+  {
+    name: "Crossover Thrash",
+    slug: "crossover-thrash",
+    parent: "thrash-metal",
+  },
+  {
+    name: "Technical Thrash",
+    slug: "technical-thrash",
+    parent: "thrash-metal",
+  },
+  {
+    name: "Blackened Thrash",
+    slug: "blackened-thrash",
+    parent: "thrash-metal",
+  },
+  { name: "Groove Metal", slug: "groove-metal", parent: "thrash-metal" },
+  {
+    name: "Melodic Death Metal",
+    slug: "melodic-death-metal",
+    parent: "death-metal",
+  },
+  {
+    name: "Technical Death Metal",
+    slug: "technical-death-metal",
+    parent: "death-metal",
+  },
+  {
+    name: "Brutal Death Metal",
+    slug: "brutal-death-metal",
+    parent: "death-metal",
+  },
+  {
+    name: "Old School Death Metal",
+    slug: "old-school-death-metal",
+    parent: "death-metal",
+  },
+  {
+    name: "Blackened Death Metal",
+    slug: "blackened-death-metal",
+    parent: "death-metal",
+  },
+  {
+    name: "Dissonant Death Metal",
+    slug: "dissonant-death-metal",
+    parent: "death-metal",
+  },
+  { name: "Death 'n' Roll", slug: "death-n-roll", parent: "death-metal" },
+  { name: "Slam Death Metal", slug: "slam-death-metal", parent: "death-metal" },
+  { name: "Deathgrind", slug: "deathgrind", parent: "death-metal" },
   {
     name: "Symphonic Black Metal",
     slug: "symphonic-black-metal",
@@ -45,14 +123,75 @@ export const GENRES: SeedGenre[] = [
     parent: "black-metal",
   },
   {
-    name: "Melodic Death Metal",
-    slug: "melodic-death-metal",
-    parent: "death-metal",
+    name: "Depressive Black Metal",
+    slug: "depressive-black-metal",
+    parent: "black-metal",
   },
+  { name: "Raw Black Metal", slug: "raw-black-metal", parent: "black-metal" },
+  {
+    name: "Melodic Black Metal",
+    slug: "melodic-black-metal",
+    parent: "black-metal",
+  },
+  { name: "Post-Black Metal", slug: "post-black-metal", parent: "black-metal" },
+  { name: "Blackgaze", slug: "blackgaze", parent: "black-metal" },
+  { name: "War Metal", slug: "war-metal", parent: "black-metal" },
+  {
+    name: "Pagan Black Metal",
+    slug: "pagan-black-metal",
+    parent: "black-metal",
+  },
+  { name: "Viking Metal", slug: "viking-metal", parent: "black-metal" },
   { name: "Death-Doom", slug: "death-doom", parent: "doom-metal" },
   { name: "Funeral Doom", slug: "funeral-doom", parent: "doom-metal" },
+  { name: "Stoner Doom", slug: "stoner-doom", parent: "doom-metal" },
+  { name: "Sludge Metal", slug: "sludge-metal", parent: "doom-metal" },
+  { name: "Drone Metal", slug: "drone-metal", parent: "doom-metal" },
+  { name: "Gothic Doom", slug: "gothic-doom", parent: "doom-metal" },
+  { name: "Epic Doom", slug: "epic-doom", parent: "doom-metal" },
+  {
+    name: "Symphonic Gothic Metal",
+    slug: "symphonic-gothic-metal",
+    parent: "gothic-metal",
+  },
+  { name: "Gothic Rock", slug: "gothic-rock", parent: "gothic-metal" },
+  {
+    name: "Technical Progressive Metal",
+    slug: "technical-progressive-metal",
+    parent: "progressive-metal",
+  },
+  {
+    name: "Avant-garde Metal",
+    slug: "avant-garde-metal",
+    parent: "progressive-metal",
+  },
+  { name: "Djent", slug: "djent", parent: "progressive-metal" },
+  {
+    name: "Atmospheric Sludge",
+    slug: "atmospheric-sludge",
+    parent: "progressive-metal",
+  },
+  { name: "Celtic Metal", slug: "celtic-metal", parent: "folk-metal" },
+  { name: "Medieval Metal", slug: "medieval-metal", parent: "folk-metal" },
+  { name: "Oriental Metal", slug: "oriental-metal", parent: "folk-metal" },
+  { name: "Goregrind", slug: "goregrind", parent: "grindcore" },
+  { name: "Cybergrind", slug: "cybergrind", parent: "grindcore" },
+  { name: "Powerviolence", slug: "powerviolence", parent: "grindcore" },
+  { name: "Melodic Metalcore", slug: "melodic-metalcore", parent: "metalcore" },
+  { name: "Mathcore", slug: "mathcore", parent: "metalcore" },
+  { name: "Deathcore", slug: "deathcore", parent: "metalcore" },
+  {
+    name: "Industrial Black Metal",
+    slug: "industrial-black-metal",
+    parent: "industrial-metal",
+  },
+  { name: "Cyber Metal", slug: "cyber-metal", parent: "industrial-metal" },
+  {
+    name: "Atmospheric Post-Metal",
+    slug: "atmospheric-post-metal",
+    parent: "post-metal",
+  },
 ];
-
 /** Label réel, avec son pays et son année de fondation. */
 export type SeedLabel = {
   name: string;

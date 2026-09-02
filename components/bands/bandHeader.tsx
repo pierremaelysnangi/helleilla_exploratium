@@ -46,9 +46,11 @@ export function BandHeader({ band }: BandHeaderProps) {
               {band.countryCode}
             </span>
           )}
+          {/* « actif » plutôt qu'une ellipse : l'absence de date de fin
+              est une information, pas une donnée manquante. */}
           <span>
-            {band.formedYear ?? "?"} – {band.dissolvedYear ?? "…"}
-            {band.dissolvedYear ? " (séparé)" : ""}
+            {band.formedYear ?? "?"} –{" "}
+            {band.dissolvedYear ? `${band.dissolvedYear} (séparé)` : "actif"}
           </span>
         </p>
 

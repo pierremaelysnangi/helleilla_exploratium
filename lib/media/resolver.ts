@@ -23,6 +23,8 @@ import {
 } from "@/lib/providers/musicbrainz";
 // Aucun lien sortant ne doit transporter d'identifiant de campagne
 import { stripTracking } from "@/lib/url/tracking";
+// Nommage des liens par destination plutôt que par type de relation
+import { officialLinkLabel } from "@/lib/media/linkLabels";
 // Cache Redis partagé
 import { redis } from "@/lib/redis";
 
@@ -47,6 +49,14 @@ const OFFICIAL_LINK_LABELS: Record<string, string> = {
   youtube: "YouTube",
   soundcloud: "SoundCloud",
 };
+
+/**
+ * Domaines écartés des liens officiels.
+ *
+ * Qobuz a été retiré du projet : le laisser remonter par les relations
+ * MusicBrainz le réintroduirait par une porte dérobée.
+ */
+const EXCLUDED_LINK_HOSTS = ["qobuz.com"];
 
 /** Clé Redis du DTO média d'un groupe. */
 export function bandMediaCacheKey(bandId: string): string {
@@ -192,14 +202,17 @@ export async function resolveBandMedia(
   // pas le sujet. Elle est portée par la déclaration P18 de l'entité,
   // d'où deux appels distincts.
   let wikidataImageUrl: string | null = null;
+  let wikidataLogoUrl: string | null = null;
   if (wikidataId && isProviderAvailable("wikidata")) {
-    const [wd, img] = await Promise.allSettled([
+    const [wd, img, logo] = await Promise.allSettled([
       dataProviders.wikidata.getSummary(wikidataId),
       dataProviders.wikidata.getEntityImageUrl(wikidataId),
+      dataProviders.wikidata.getEntityLogoUrl(wikidataId),
     ]);
     if (wd.status === "fulfilled") wikidataSummary = wd.value;
     else degraded = true;
     if (img.status === "fulfilled") wikidataImageUrl = img.value;
+    if (logo.status === "fulfilled") wikidataLogoUrl = logo.value;
   }
 
   // Meilleur match Discogs : détail connu, sinon recherche par nom
@@ -229,8 +242,19 @@ export async function resolveBandMedia(
       url: bestDiscogsMatch.cover_image ?? bestDiscogsMatch.thumb!,
     });
   }
+  // Ordre de la galerie : photo du groupe, puis logo, puis pochettes
+  // rapportées par les plateformes — du plus au moins représentatif.
   if (wikidataImageUrl) {
     images.push({ provider: "wikidata", url: wikidataImageUrl });
+  }
+  if (wikidataLogoUrl) {
+    images.push({ provider: "wikidata", url: wikidataLogoUrl });
+  }
+  // Les visuels d'album rapportés par Deezer complètent une galerie que
+  // les sources encyclopédiques laissent souvent à une seule image.
+  for (const track of deezerTracks) {
+    const cover = track.album.cover_big ?? track.album.cover_medium;
+    if (cover) images.push({ provider: "deezer", url: cover });
   }
   // Liens officiels déclarés dans MusicBrainz (site, réseaux, labels,
   // plateformes) : la source la plus fiable, donc en tête de liste.
@@ -238,7 +262,10 @@ export async function resolveBandMedia(
     for (const link of extractOfficialLinks(mbArtist)) {
       links.push({
         provider: "musicbrainz",
-        label: OFFICIAL_LINK_LABELS[link.kind] ?? link.kind,
+        label: officialLinkLabel(
+          link.url,
+          OFFICIAL_LINK_LABELS[link.kind] ?? link.kind,
+        ),
         url: link.url,
       });
     }
@@ -287,10 +314,7 @@ export async function resolveBandMedia(
             }
           : null,
     },
-    images: images.map((image) => ({
-      ...image,
-      url: stripTracking(image.url),
-    })),
+    images: dedupeImages(images),
     links: dedupeLinks(links),
     previews: deezerTracks.map((t) => ({
       title: t.title,
@@ -308,6 +332,21 @@ export async function resolveBandMedia(
   return payload;
 }
 
+/**
+ * Déduplique la galerie sur l'URL nettoyée.
+ *
+ * Deezer renvoie la même pochette pour toutes les pistes d'un album :
+ * sans cela, la galerie afficherait dix fois le même visuel.
+ */
+function dedupeImages(images: BandMedia["images"]): BandMedia["images"] {
+  const seen = new Map<string, BandMedia["images"][number]>();
+  for (const image of images) {
+    const url = stripTracking(image.url);
+    if (!seen.has(url)) seen.set(url, { ...image, url });
+  }
+  return [...seen.values()];
+}
+
 /** Analyse une entrée de cache, sans jamais lever sur du JSON abîmé. */
 function safeJson(raw: string): unknown {
   try {
@@ -321,9 +360,10 @@ function safeJson(raw: string): unknown {
  * Déduplique les genres MusicBrainz.
  *
  * MusicBrainz mélange `genres` et `tags` votés : « black metal »,
- * « Black Metal » et « black-metal » y coexistent pour un même groupe.
- * On compare sur une forme normalisée mais on conserve le premier
- * libellé rencontré, qui est le mieux orthographié.
+ * « Black Metal » et « black-metal » y coexistent pour un même groupe,
+ * souvent accompagnés du genre parent (« metal »). On compare sur une
+ * forme normalisée, on conserve le premier libellé rencontré — le mieux
+ * orthographié — et on écarte les genres englobants.
  */
 function dedupeGenres(names: readonly string[]): string[] {
   const seen = new Map<string, string>();
@@ -334,11 +374,24 @@ function dedupeGenres(names: readonly string[]): string[] {
       .trim();
     if (key && !seen.has(key)) seen.set(key, name);
   }
-  return [...seen.values()];
+
+  const keys = [...seen.keys()];
+  // Seul le genre GÉNÉRIQUE d'un seul mot est écarté quand un genre plus
+  // précis le contient : « metal » n'apprend rien à côté de « black
+  // metal ». La règle s'arrête là — écarter tout genre englobant ferait
+  // disparaître « black metal » derrière « symphonic black metal », or
+  // les deux qualifient réellement le groupe.
+  const kept = keys.filter(
+    (key) =>
+      key.includes(" ") ||
+      !keys.some((other) => other !== key && other.endsWith(` ${key}`)),
+  );
+
+  return kept.map((key) => seen.get(key)!);
 }
 
 /**
- * Déduplique les liens sur leur URL nettoyée.
+ * Déduplique les liens et écarte les plateformes exclues du projet.
  *
  * Un même site officiel est souvent déclaré à la fois par MusicBrainz et
  * par Discogs ; l'ordre d'insertion fait gagner la source la plus fiable.
@@ -347,7 +400,11 @@ function dedupeLinks(links: BandMedia["links"]): BandMedia["links"] {
   const seen = new Map<string, BandMedia["links"][number]>();
   for (const link of links) {
     const url = stripTracking(link.url);
-    if (!seen.has(url)) seen.set(url, { ...link, url });
+    if (EXCLUDED_LINK_HOSTS.some((host) => url.includes(host))) continue;
+    // La clé est le LIBELLÉ, pas l'URL : MusicBrainz déclare souvent deux
+    // adresses Spotify pour un même groupe, et deux boutons identiques
+    // n'aident personne à choisir.
+    if (!seen.has(link.label)) seen.set(link.label, { ...link, url });
   }
   return [...seen.values()];
 }

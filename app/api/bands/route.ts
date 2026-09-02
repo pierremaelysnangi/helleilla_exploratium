@@ -17,7 +17,10 @@ import { listQuerySchema } from "@/lib/api/schemas";
 import { createBandSchema } from "@/lib/validations/band";
 import { db } from "@/db";
 import { bands } from "@/db/schema";
-import { desc, asc, ilike, sql, type SQL } from "drizzle-orm";
+import { and, desc, asc, ilike, sql, type SQL } from "drizzle-orm";
+// Filtre par genre, inclusif de ses sous-genres
+import { bandIdsByGenreSlug, restrictTo } from "@/db/queries/genreFilter";
+import { z } from "zod";
 import { bandIndexQueue } from "@/lib/queue/client";
 // Génération d'embedding sémantique (non bloquante)
 import {
@@ -36,20 +39,36 @@ const SORT_COLUMNS = {
 } as const;
 
 /**
- * GET /api/bands — liste paginée de groupes avec recherche et tri.
+ * Query params de la liste : ceux de `listQuerySchema`, plus un filtre
+ * facultatif par slug de genre.
+ */
+const bandListQuerySchema = listQuerySchema.extend({
+  genre: z.string().trim().min(1).max(200).optional(),
+});
+
+/**
+ * GET /api/bands — liste paginée de groupes avec recherche, tri et
+ * filtre facultatif par genre.
  *
  * @param query - Query params validés : pagination, filtre texte `q`,
- *   colonne de tri `sort` et sens `order`.
+ *   colonne de tri `sort`, sens `order` et slug de `genre`.
  * @returns 200 avec la page de groupes et les métadonnées de pagination.
  * Exécute en parallèle la requête de données et celle de comptage total.
  * Limité à 60 requêtes par minute.
  */
 export const GET = route(
-  { query: listQuerySchema, rateLimit: { limit: 60, window: 60 } },
+  { query: bandListQuerySchema, rateLimit: { limit: 60, window: 60 } },
   async ({ query }) => {
-    const { page, perPage, q, sort, order } = query;
+    const { page, perPage, q, sort, order, genre } = query;
     const offset = (page - 1) * perPage;
-    const where: SQL | undefined = q ? ilike(bands.name, `%${q}%`) : undefined;
+    // Le filtre par genre est résolu en amont : il traverse deux tables
+    // de jointure, et l'exprimer en sous-requête rendrait le comptage
+    // paginé difficile à lire pour un gain nul à cette volumétrie.
+    const genreIds = genre ? await bandIdsByGenreSlug(genre) : null;
+    const where: SQL | undefined = and(
+      q ? ilike(bands.name, `%${q}%`) : undefined,
+      genreIds ? restrictTo(bands.id, genreIds) : undefined,
+    );
     const dir = order === "asc" ? asc : desc;
     const column =
       SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? bands.createdAt;

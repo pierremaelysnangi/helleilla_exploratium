@@ -24,6 +24,8 @@ const trackSchema = z.object({
     id: z.number(),
     title: z.string(),
     cover_medium: z.string().url().nullish(),
+    /** Format 500 px : galerie de la fiche groupe. */
+    cover_big: z.string().url().nullish(),
   }),
 });
 

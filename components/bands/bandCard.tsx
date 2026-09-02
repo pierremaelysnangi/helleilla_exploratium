@@ -18,10 +18,15 @@ type BandCardProps = {
   band: BandRow;
 };
 
-/** Libellé humain de la période d'activité ("1991 – 2001" ou "1991 – …"). */
+/**
+ * Libellé de la période d'activité : « 1991 – 2001 » ou « 1991 – actif ».
+ *
+ * L'absence de date de fin signifie que le groupe existe encore ; une
+ * ellipse laissait croire à une donnée manquante.
+ */
 function activityPeriod(band: BandRow): string {
   const begin = band.formedYear ?? "?";
-  return `${begin} – ${band.dissolvedYear ?? "…"}`;
+  return `${begin} – ${band.dissolvedYear ?? "actif"}`;
 }
 
 export function BandCard({ band }: BandCardProps) {

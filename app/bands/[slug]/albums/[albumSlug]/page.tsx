@@ -21,6 +21,8 @@ import { fetchAlbumBySlug } from "@/hooks/use-albums";
 import type { AlbumDetail } from "@/hooks/api/schemas";
 // Note personnelle et liste de l'utilisateur (client)
 import { AlbumActions } from "@/components/collections/albumActions";
+// Tracklist interactive : menu déroulant par piste (écoute + paroles)
+import { AlbumTracklist } from "@/components/albums/albumTracklist";
 
 type AlbumPageProps = {
   params: Promise<{ slug: string; albumSlug: string }>;
@@ -39,11 +41,22 @@ const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
   demo: "Démo",
 };
 
-/** Formate une durée en minutes:secondes. */
-function formatDuration(ms?: number | null): string {
-  if (ms === null || ms === undefined) return "—";
-  const total = Math.round(ms / 1000);
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+/**
+ * Durée cumulée d'une tracklist, en `1 h 12 min` ou `47 min`.
+ *
+ * Affichée en tête de fiche : c'est l'information qu'on cherche avant
+ * d'ouvrir la tracklist, et elle situe une sortie (EP ou double album)
+ * mieux que le nombre de pistes seul.
+ */
+function formatTotalDuration(tracks: AlbumDetail["tracks"]): string | null {
+  const total = tracks.reduce((sum, t) => sum + (t.durationMs ?? 0), 0);
+  if (total === 0) return null;
+  const minutes = Math.round(total / 60000);
+  if (minutes < 60) return `${minutes} min`;
+  const rest = minutes % 60;
+  return rest === 0
+    ? `${Math.floor(minutes / 60)} h`
+    : `${Math.floor(minutes / 60)} h ${String(rest).padStart(2, "0")} min`;
 }
 
 /** Durée cumulée de la tracklist, au format ISO 8601 pour schema.org. */
@@ -119,6 +132,8 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
 
   if (!album) notFound();
 
+  const totalDuration = formatTotalDuration(album.tracks);
+
   return (
     <article className="flex flex-col gap-8">
       <script
@@ -175,6 +190,9 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
                 {album.tracks.length > 1 ? "pistes" : "piste"}
               </span>
             )}
+            {totalDuration && (
+              <span className="text-foreground font-mono">{totalDuration}</span>
+            )}
           </p>
         </div>
       </header>
@@ -182,31 +200,21 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       <AlbumActions albumId={album.id} />
 
       <section aria-label="Tracklist" className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Tracklist</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="metal-title text-lg">Tracklist</h2>
+          {totalDuration && (
+            <span className="text-muted-foreground font-mono text-sm">
+              Durée totale : {totalDuration}
+            </span>
+          )}
+        </div>
 
         {album.tracks.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             Aucune piste référencée pour cette sortie.
           </p>
         ) : (
-          <ol className="divide-border border-border divide-y rounded-lg border">
-            {album.tracks.map((track) => (
-              <li
-                key={track.id}
-                className="bg-card flex items-center gap-3 px-4 py-2.5"
-              >
-                <span className="text-muted-foreground w-8 shrink-0 text-right font-mono text-sm">
-                  {track.trackNumber}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  {track.title}
-                </span>
-                <span className="text-muted-foreground shrink-0 font-mono text-xs">
-                  {formatDuration(track.durationMs)}
-                </span>
-              </li>
-            ))}
-          </ol>
+          <AlbumTracklist tracks={album.tracks} artistName={album.band.name} />
         )}
       </section>
 

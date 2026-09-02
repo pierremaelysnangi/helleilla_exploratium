@@ -15,6 +15,7 @@ import { jsonOk, pick, errorResponses } from "./responses";
 // Schémas d'entités et de pagination propres à la spec
 import {
   AlbumSchema,
+  AlbumListItemSchema,
   BandSchema,
   GenreSchema,
   PaginatedMetaSchema,
@@ -72,13 +73,22 @@ import {
 
 /** Enveloppe de liste paginée `{ items, meta }` pour un type d'entité. */
 function listSchema<T extends z.ZodType>(item: T) {
-  return z.object({ items: z.array(item), meta: PaginatedMetaSchema });
+  return z.object({ data: z.array(item), meta: PaginatedMetaSchema });
 }
 
 /** Descripteur de contenu `application/json` à partir d'un schéma. */
 function json<T extends z.ZodType>(schema: T) {
   return { content: { "application/json": { schema } } };
 }
+
+/**
+ * Filtre par genre commun aux listes : un slug, inclusif des
+ * sous-genres du genre demandé.
+ */
+const GenreFilterQuery = z.string().optional().meta({
+  description: "Slug de genre ; inclut ses sous-genres",
+  example: "black-metal",
+});
 
 /** Description générique d'une ressource exposée en CRUD. */
 type Resource = {
@@ -88,6 +98,10 @@ type Resource = {
   entity: z.ZodType;
   create: z.ZodType;
   update: z.ZodType;
+  /** Forme des éléments de la LISTE si elle diffère de l'entité. */
+  listEntity?: z.ZodType;
+  /** Query params supplémentaires acceptés par la liste. */
+  listQuery?: z.ZodObject;
 };
 
 // Table des ressources générant automatiquement les 5 opérations CRUD
@@ -99,6 +113,7 @@ const resources: Resource[] = [
     entity: BandSchema,
     create: createBandSchema,
     update: updateBandSchema,
+    listQuery: z.object({ genre: GenreFilterQuery }),
   },
   {
     name: "album",
@@ -107,6 +122,11 @@ const resources: Resource[] = [
     entity: AlbumSchema,
     create: createAlbumSchema,
     update: updateAlbumSchema,
+    listEntity: AlbumListItemSchema,
+    listQuery: z.object({
+      bandId: z.string().uuid().optional(),
+      genre: GenreFilterQuery,
+    }),
   },
   {
     name: "track",
@@ -124,9 +144,13 @@ for (const r of resources) {
   registerPath(r.path, "get", {
     tags: [r.tag],
     summary: `Liste les ${r.tag}`,
-    requestParams: { query: PaginationQuerySchema },
+    requestParams: {
+      query: r.listQuery
+        ? PaginationQuerySchema.extend(r.listQuery.shape)
+        : PaginationQuerySchema,
+    },
     responses: {
-      200: jsonOk(listSchema(r.entity)),
+      200: jsonOk(listSchema(r.listEntity ?? r.entity)),
       ...pick(422, 429, 500),
     },
   });

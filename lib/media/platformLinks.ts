@@ -1,8 +1,8 @@
 /**
- * Liens d'écoute officiels pour une piste donnée.
+ * Liens d'écoute et de paroles officiels pour une piste donnée.
  * Construit des URLs de RECHERCHE profondes vers les plateformes
- * officielles (aucun média généré ni hébergé : on renvoie l'utilisateur
- * vers la source légitime).
+ * officielles (aucun média généré ni hébergé, aucune parole reproduite :
+ * on renvoie l'utilisateur vers la source légitime).
  */
 
 /** Plateformes proposées dans le menu déroulant d'une piste. */
@@ -54,6 +54,50 @@ export function trackSearchLinks(
     youtube: {
       label: LABELS.youtube,
       url: `https://www.youtube.com/results?search_query=${q}`,
+    },
+  };
+}
+
+/** Sites de paroles proposés pour une piste. */
+export type LyricsSource = "metal-archives" | "genius";
+
+/** Libellés affichés dans le panneau d'une piste. */
+const LYRICS_LABELS: Record<LyricsSource, string> = {
+  "metal-archives": "Metal Archives",
+  genius: "Genius",
+};
+
+/**
+ * Liens vers les paroles d'une piste.
+ *
+ * Aucune parole n'est reproduite ici : elles sont protégées par le droit
+ * d'auteur et appartiennent aux auteurs et à leurs éditeurs. On renvoie
+ * vers les bases qui les publient avec l'autorisation nécessaire —
+ * Metal Archives pour le metal, Genius en couverture générale.
+ *
+ * Ce sont des URLs de RECHERCHE : les identifiants internes de ces sites
+ * ne sont pas connus du projet, et une recherche reste juste même si la
+ * cible change de côté.
+ *
+ * @param artistName - Nom du groupe interprète.
+ * @param trackTitle - Titre de la piste.
+ */
+export function trackLyricsLinks(
+  artistName: string,
+  trackTitle: string,
+): Record<LyricsSource, { label: string; url: string }> {
+  const q = searchQuery(artistName, trackTitle);
+  return {
+    "metal-archives": {
+      label: LYRICS_LABELS["metal-archives"],
+      url:
+        "https://www.metal-archives.com/search/advanced/searching/songs" +
+        `?bandName=${encodeURIComponent(artistName)}` +
+        `&songTitle=${encodeURIComponent(trackTitle)}`,
+    },
+    genius: {
+      label: LYRICS_LABELS.genius,
+      url: `https://genius.com/search?q=${q}`,
     },
   };
 }

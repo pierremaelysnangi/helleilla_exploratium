@@ -79,6 +79,8 @@ export function chain(result: unknown) {
     set: vi.fn(() => c),
     returning: vi.fn(async () => result),
     from: vi.fn(() => c),
+    innerJoin: vi.fn(() => c),
+    leftJoin: vi.fn(() => c),
     then: (resolve: (v: unknown) => void) => resolve(result),
   };
   return c;

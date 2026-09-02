@@ -3,8 +3,11 @@
 /**
  * <BandMediaSection> — enrichissement média du détail groupe.
  * Charge progressivement GET /api/bands/:id/media (providers externes) :
- * - encadré « infos » : pays, période d'activité, membres actifs (les
- *   anciens repliés), genres dédoublonnés ;
+ * - encadré « infos » : pays, membres actifs (les anciens repliés) et
+ *   genres dédoublonnés. La période d'activité n'y figure PAS : elle est
+ *   déjà portée par l'en-tête de fiche, à partir des données locales, et
+ *   l'afficher deux fois exposait deux périodes contradictoires quand
+ *   MusicBrainz et l'encyclopédie divergent ;
  * - galerie d'images officielles (Discogs/Wikidata) ;
  * - liens externes officiels ;
  * - aperçus audio Deezer jouables inline (aucun média stocké).
@@ -41,23 +44,6 @@ function toPlayable(preview: {
   };
 }
 
-/**
- * Formate la période d'activité.
- *
- * Un groupe toujours en activité s'affiche « 1991 – actif » plutôt que
- * « 1991 – … », qui se lit comme une donnée manquante alors que c'est
- * une information : le groupe n'a pas de date de fin.
- */
-function formatActivity(lifeSpan: {
-  begin?: string | null;
-  end?: string | null;
-  ended?: boolean;
-}): string {
-  const begin = lifeSpan.begin?.slice(0, 4) ?? "?";
-  if (lifeSpan.end) return `${begin} – ${lifeSpan.end.slice(0, 4)}`;
-  return lifeSpan.ended ? `${begin} – séparé` : `${begin} – actif`;
-}
-
 export function BandMediaSection({ bandId }: BandMediaSectionProps) {
   const { data: media, isPending, isError } = useBandMedia(bandId);
   // Hooks avant tout retour anticipé : leur ordre doit être stable d'un
@@ -81,10 +67,7 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
   const activeMembers = info.memberships.filter((m) => !m.ended);
   const pastMembers = info.memberships.filter((m) => m.ended);
   const hasInfo =
-    info.area ||
-    info.lifeSpan ||
-    info.memberships.length > 0 ||
-    info.genres.length > 0;
+    info.area || info.memberships.length > 0 || info.genres.length > 0;
 
   return (
     <section
@@ -108,12 +91,6 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
               <>
                 <dt className="text-muted-foreground">Pays</dt>
                 <dd>{info.area}</dd>
-              </>
-            )}
-            {info.lifeSpan?.begin && (
-              <>
-                <dt className="text-muted-foreground">Activité</dt>
-                <dd>{formatActivity(info.lifeSpan)}</dd>
               </>
             )}
             {activeMembers.length > 0 && (

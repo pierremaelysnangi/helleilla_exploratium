@@ -15,9 +15,10 @@ import { ok, okPaginated } from "@/lib/api/response";
 import { listQuerySchema } from "@/lib/api/schemas";
 import { createAlbumSchema } from "@/lib/validations/album";
 import { db } from "@/db";
-import { albums } from "@/db/schema";
+import { albums, bands } from "@/db/schema";
 import { desc, asc, ilike, sql, and, eq, type SQL } from "drizzle-orm";
 import { z } from "zod";
+import { bandIdsByGenreSlug, restrictTo } from "@/db/queries/genreFilter";
 import { albumIndexQueue } from "@/lib/queue/client";
 
 /**
@@ -32,10 +33,13 @@ const SORT_COLUMNS = {
 
 /**
  * Query de liste albums : pagination standard + filtre par groupe
- * (`bandId`, UUID) pour la discographie d'une page détail.
+ * (`bandId`, UUID) pour la discographie d'une page détail, et filtre
+ * par `genre` (slug), hérité du groupe.
  */
 const albumListQuerySchema = listQuerySchema.extend({
   bandId: z.string().uuid().optional(),
+  /** Slug de genre : filtre sur le genre du groupe qui signe la sortie. */
+  genre: z.string().trim().min(1).max(200).optional(),
 });
 
 /**
@@ -51,20 +55,43 @@ const albumListQuerySchema = listQuerySchema.extend({
 export const GET = route(
   { query: albumListQuerySchema, rateLimit: { limit: 60, window: 60 } },
   async ({ query }) => {
-    const { page, perPage, q, sort, order, bandId } = query;
+    const { page, perPage, q, sort, order, bandId, genre } = query;
     const offset = (page - 1) * perPage;
+    // Un album n'a pas de genre propre : il hérite de celui de son
+    // groupe, comme partout ailleurs dans le catalogue.
+    const genreIds = genre ? await bandIdsByGenreSlug(genre) : null;
     const where: SQL | undefined = and(
       q ? ilike(albums.title, `%${q}%`) : undefined,
       bandId ? eq(albums.bandId, bandId) : undefined,
+      genreIds ? restrictTo(albums.bandId, genreIds) : undefined,
     );
     const dir = order === "asc" ? asc : desc;
     const column =
       SORT_COLUMNS[sort as keyof typeof SORT_COLUMNS] ?? albums.createdAt;
 
     const [items, counts] = await Promise.all([
+      // Le groupe est joint à la ligne : l'URL canonique d'un album est
+      // band-scopée, un client ne peut donc pas la construire sans lui.
       db
-        .select()
+        .select({
+          id: albums.id,
+          bandId: albums.bandId,
+          title: albums.title,
+          slug: albums.slug,
+          type: albums.type,
+          releaseYear: albums.releaseYear,
+          releaseDate: albums.releaseDate,
+          coverUrl: albums.coverUrl,
+          createdAt: albums.createdAt,
+          updatedAt: albums.updatedAt,
+          band: {
+            id: bands.id,
+            name: bands.name,
+            slug: bands.slug,
+          },
+        })
         .from(albums)
+        .innerJoin(bands, eq(bands.id, albums.bandId))
         .where(where)
         .orderBy(dir(column))
         .limit(perPage)

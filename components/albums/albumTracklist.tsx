@@ -6,9 +6,11 @@
  *
  * Design validé : chaque ligne de piste porte un chevron `>` ouvrant un
  * panneau listant les plateformes officielles (Deezer, Spotify,
- * Bandcamp, YouTube). Un extrait Deezer 30 s est jouable inline si un
- * preview correspond au titre (données du resolver média) ; sinon les
- * liens mènent à la recherche officielle de la plateforme.
+ * Bandcamp, YouTube) et les sites de paroles (Metal Archives, Genius).
+ * Un extrait Deezer 30 s est jouable inline si un preview correspond au
+ * titre (données du resolver média) ; sinon les liens mènent à la
+ * recherche officielle de la plateforme. Aucune parole n'est reproduite
+ * dans l'application : seulement référencée.
  */
 
 // État local : quelle piste a son panneau ouvert
@@ -21,7 +23,7 @@ import {
 // Types validés côté client
 import type { TrackRow } from "@/hooks/api/schemas";
 // Liens officiels par plateforme
-import { trackSearchLinks } from "@/lib/media/platformLinks";
+import { trackSearchLinks, trackLyricsLinks } from "@/lib/media/platformLinks";
 // Extrait Deezer optionnel associé à une piste
 export type TrackPreview = {
   title: string;
@@ -97,6 +99,7 @@ export function AlbumTracklist({
       {tracks.map((track, index) => {
         const isOpen = openIndex === index;
         const links = trackSearchLinks(artistName, track.title);
+        const lyrics = trackLyricsLinks(artistName, track.title);
         const preview = findPreview(previews, track.title);
 
         return (
@@ -154,6 +157,9 @@ export function AlbumTracklist({
                   </div>
                 )}
                 {/* Liens d'écoute officiels */}
+                <p className="text-muted-foreground mb-1.5 text-[11px] tracking-wide uppercase">
+                  Écouter
+                </p>
                 <ul className="flex flex-wrap gap-2">
                   {Object.entries(links).map(([platform, link]) => (
                     <li key={platform}>
@@ -164,6 +170,25 @@ export function AlbumTracklist({
                         className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase transition-colors"
                       >
                         {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Paroles : jamais reproduites ici, seulement référencées */}
+                <p className="text-muted-foreground mt-3 mb-1.5 text-[11px] tracking-wide uppercase">
+                  Paroles
+                </p>
+                <ul className="flex flex-wrap gap-2">
+                  {Object.entries(lyrics).map(([source, link]) => (
+                    <li key={source}>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase transition-colors"
+                      >
+                        {link.label} ↗
                       </a>
                     </li>
                   ))}
