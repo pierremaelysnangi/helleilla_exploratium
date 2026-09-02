@@ -133,6 +133,59 @@ export type BandSummary = z.infer<typeof bandSummarySchema>;
 export type AlbumDetail = z.infer<typeof albumDetailSchema>;
 export type GenreDetail = z.infer<typeof genreDetailSchema>;
 
+/** Statuts du workflow de médiation (enum PostgreSQL `contribution_status`). */
+export const contributionStatusSchema = z.enum([
+  "pending",
+  "evidence_requested",
+  "approved",
+  "expired",
+  "rejected",
+]);
+
+/** Une preuve telle que stockée dans le dossier. */
+export const evidenceRowSchema = z.object({
+  kind: z.enum([
+    "official-site",
+    "label",
+    "press",
+    "musicbrainz",
+    "discogs",
+    "other",
+  ]),
+  url: z.string(),
+  note: z.string().nullish(),
+});
+
+/**
+ * Ligne « contribution » sérialisée (GET /api/contributions).
+ *
+ * `payload` reste volontairement permissif : sa forme est contractualisée
+ * à l'écriture par `contributionPayloadSchema`, et le front n'en lit que
+ * quelques champs d'affichage.
+ */
+export const contributionRowSchema = z.object({
+  id: z.uuid(),
+  type: z.enum(["band_create", "band_update"]),
+  status: contributionStatusSchema,
+  payload: z.object({
+    name: z.string().optional(),
+    slug: z.string().optional(),
+    targetBandId: z.string().nullish(),
+  }),
+  evidence: z.array(evidenceRowSchema),
+  reviewNotes: z.string().nullish(),
+  submittedBy: z.string(),
+  reviewedBy: z.string().nullish(),
+  reminderCount: z.number().int(),
+  deadlineAt: z.string().nullish(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type ContributionStatus = z.infer<typeof contributionStatusSchema>;
+export type EvidenceRow = z.infer<typeof evidenceRowSchema>;
+export type ContributionRow = z.infer<typeof contributionRowSchema>;
+
 /** DTO du resolver média (miroir de lib/media/resolver.ts). */
 export const bandMediaSchema = z.object({
   band: z.object({

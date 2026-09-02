@@ -15,7 +15,7 @@ Règle stricte : zéro média généré par IA.
 | Prettier          | ✅ passe                                 |
 | Lint              | ✅ passe                                 |
 | Typecheck         | ✅ passe                                 |
-| Tests unitaires   | 358/358 ✅ (46 fichiers)                 |
+| Tests unitaires   | 393/393 ✅ (49 fichiers)                 |
 | Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
 | OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
 | Build             | ✅ passe                                 |
@@ -64,17 +64,28 @@ section média du groupe était donc **toujours** en erreur.
 
 ---
 
-## Phase C — Parcours contributeur
+## Phase C — Parcours contributeur ✅ TERMINÉE
 
-| Tâche                                         | État                                                                                                                                                           |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend workflow                              | ⚠️ Routes complètes et testées (soumission + preuves anti-IA + médiation 2 relances/30j) mais **l'approbation ne crée aucun groupe** — voir « Dette signalée » |
-| Hook `use-contributions`                      | 🔴 Inexistant                                                                                                                                                  |
-| Server Actions `lib/actions/contribution*.ts` | 🔴 Inexistant                                                                                                                                                  |
-| `components/contributions/`                   | 🔴 Dossier inexistant                                                                                                                                          |
-| Page `/contributions` (formulaire soumission) | 🔴 Aucune page                                                                                                                                                 |
-| Page `/contributions/mes-dossiers`            | 🔴 Aucune page                                                                                                                                                 |
-| File de relecture modérateur                  | 🔴 Aucune page                                                                                                                                                 |
+**Préalable traité d'abord** : l'approbation ne produisait aucune donnée
+(cf. commit `454ed4b`). Construire l'interface par-dessus aurait donné une
+façade — un contributeur aurait vu « approuvé » sans qu'aucune fiche
+n'existe.
+
+| Tâche                           | État        | Détail                                                                                                                                                     |
+| ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Matérialisation à l'approbation | ✅ Corrigée | `lib/contributions/approve.ts` : groupe créé/enrichi, `payload.refs` écrites, médias promus, visuel rattaché, réindexation. Rejouable après panne MinIO.   |
+| Hook `use-contributions`        | ✅ Créé     | Écrit à la main : la ressource n'est pas un CRUD paginé (deux vues selon le rôle, transitions métier). `createEntityHooks` ne s'y applique pas.            |
+| Server Actions `contribution*`  | ❌ Écartées | Les routes API portent déjà le contrat, sont documentées et testées. Les doubler en Server Actions aurait créé deux sources pour la même règle.            |
+| `components/contributions/`     | ✅ Créé     | `contributionForm`, `evidenceFields`, `myContributions`, `reviewQueue`, `contributionStatusBadge`, `accessNotice`                                          |
+| `/contributions`                | ✅ Écrite   | Formulaire verrouillé tant que la règle n'est pas satisfaite — la soumission est plafonnée à 5/h, laisser partir un dossier voué au refus serait hostile   |
+| `/contributions/mes-dossiers`   | ✅ Écrite   | Suivi + réponse inline aux demandes de preuves, échéance et compteur de relances affichés                                                                  |
+| `/contributions/relecture`      | ✅ Écrite   | File modérateur : preuves cliquables, demande de preuves en action par défaut, rejet terminal visible aux seuls admins                                     |
+| Garde RBAC de page              | ✅ Créée    | `lib/rbac/page.ts` : anonyme → redirection ; connecté sans droit → message explicatif, pas de renvoi vers une connexion sans effet. Resservira en phase D. |
+
+`OFFICIAL_EVIDENCE_KINDS` / `MIN_EVIDENCE_COUNT` sont désormais exportés
+depuis `lib/validations/contribution.ts` : le verrou du formulaire et le
+refine serveur lisent la même règle. Un test vérifie explicitement que
+client et serveur rendent le même verdict.
 
 ---
 
@@ -124,9 +135,9 @@ section média du groupe était donc **toujours** en erreur.
 ## Ordre d'exécution recommandé
 
 ~~Phase A (stabilisation)~~ ✅ terminée — la CI est verte
-└→ **Phase B (pages détail, 6 pages + 3 cartes)** ← prochaine étape
-└→ Phase C (parcours contributeur, UI pour backend existant)
-└→ Phase D (espace admin, route users + UI)
+~~Phase B (pages détail)~~ ✅ terminée
+~~Phase C (parcours contributeur)~~ ✅ terminée
+└→ **Phase D (espace admin : route /api/users + UI)** ← prochaine étape
 └→ Phase E (audio + profil)
 └→ Phase F (enrichissement)
 
@@ -134,7 +145,7 @@ section média du groupe était donc **toujours** en erreur.
 
 ## Dette signalée, non traitée (décisions à prendre)
 
-Constats relevés pendant la phase A, volontairement laissés de côté car ils
+Constats relevés au fil des phases, volontairement laissés de côté car ils
 demandent un arbitrage plutôt qu'un correctif mécanique.
 
 | Sujet                                | Détail                                                                                                                                                                                                                                                                          |

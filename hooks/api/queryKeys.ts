@@ -39,6 +39,22 @@ export const trackKeys = entityKeys("tracks");
 /** Clés des requêtes liées aux genres. */
 export const genreKeys = entityKeys("genres");
 
+/**
+ * Clés des contributions.
+ *
+ * Hors de `entityKeys` : la route ne renvoie pas de liste paginée mais
+ * deux vues distinctes selon le rôle — « mes dossiers » et la file de
+ * relecture — qui doivent s'invalider séparément.
+ */
+export const contributionKeys = {
+  all: ["contributions"] as const,
+  /** Dossiers de l'utilisateur courant. */
+  mine: () => ["contributions", "mine"] as const,
+  /** File de modération, éventuellement filtrée par statut. */
+  review: (status?: string) =>
+    ["contributions", "review", status ?? "open"] as const,
+};
+
 /** Clé de la recherche globale (terme + limite). */
 export const searchKeys = {
   all: ["search"] as const,

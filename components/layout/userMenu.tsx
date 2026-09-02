@@ -4,8 +4,13 @@
  * <UserMenu> — zone authentifiée du header.
  * Utilise la session Better Auth côté client (useSession) :
  * - non connecté -> liens Connexion / Inscription ;
- * - connecté     -> nom affiché + bouton Déconnexion (Server Action
- *   signOutAction, qui révoque la session serveur puis redirige).
+ * - connecté     -> accès aux contributions, nom affiché et bouton
+ *   Déconnexion (Server Action signOutAction, qui révoque la session
+ *   serveur puis redirige).
+ *
+ * Les liens de contribution vivent ici et non dans <Nav> : celle-ci est la
+ * navigation publique du catalogue, alors que ces pages exigent une session.
+ * L'affichage suit le rôle par confort ; l'autorisation reste serveur.
  */
 
 // Session Better Auth + action serveur de déconnexion
@@ -37,8 +42,23 @@ export function UserMenu() {
     );
   }
 
+  // Rôle porté par la session Better Auth ; repli au plus faible
+  const role = session.user.role ?? "user";
+  const canModerate = role === "moderator" || role === "admin";
+
   return (
     <div className="flex items-center gap-3">
+      <Link href="/contributions" className="metal-nav-link">
+        Contribuer
+      </Link>
+      <Link href="/contributions/mes-dossiers" className="metal-nav-link">
+        Mes dossiers
+      </Link>
+      {canModerate && (
+        <Link href="/contributions/relecture" className="metal-nav-link">
+          Relecture
+        </Link>
+      )}
       <span className="text-muted-foreground text-sm">{session.user.name}</span>
       {/* Server Action : révocation serveur + purge du cookie de session */}
       <form action={signOutAction}>
