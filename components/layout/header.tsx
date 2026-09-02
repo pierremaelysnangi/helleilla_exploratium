@@ -2,8 +2,8 @@
  * <Header> — en-tête global du site (Server Component).
  *
  * Deux dispositions selon la largeur :
- * - à partir de `lg`, le titre à gauche, la navigation au centre, la
- *   session et le thème à droite ;
+ * - à partir de `lg`, le titre à gauche, la navigation au centre et la
+ *   session à droite ;
  * - en dessous (smartphone et tablette), le titre à gauche et un bouton
  *   burger à droite, qui déplie liens et actions en liste.
  *
@@ -14,8 +14,7 @@
 import { Nav } from "./nav";
 // Navigation repliée pour smartphone et tablette
 import { MobileNav } from "./mobileNav";
-// Bascule clair/sombre + zone authentifiée (clients)
-import { ThemeToggle } from "./themeToggle";
+// Zone authentifiée (client)
 import { UserMenu } from "./userMenu";
 import Link from "next/link";
 
@@ -33,17 +32,15 @@ export function Header() {
           <Nav />
         </div>
 
-        {/* Zone droite : session + thème (grand écran) */}
+        {/* Zone droite : session (grand écran) */}
         <div className="hidden items-center gap-3 lg:flex">
           <UserMenu />
-          <ThemeToggle />
         </div>
 
         {/* Burger : le panneau déplié occupe toute la largeur grâce à
             `basis-full`, sous la ligne du titre. */}
         <MobileNav>
           <UserMenu />
-          <ThemeToggle />
         </MobileNav>
       </div>
     </header>

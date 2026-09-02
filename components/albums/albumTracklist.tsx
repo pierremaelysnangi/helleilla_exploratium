@@ -106,23 +106,26 @@ export function AlbumTracklist({
           <li key={track.id} className="bg-card">
             {/* Ligne piste : numéro, titre, durée, chevron */}
             <div className="flex items-center gap-3 px-4 py-2">
-              <span className="text-muted-foreground w-6 text-right font-mono text-xs">
+              <span className="text-muted-foreground w-6 shrink-0 text-right font-mono text-xs tabular-nums">
                 {track.trackNumber}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm">
                 {track.title}
               </span>
-              <span className="text-muted-foreground font-mono text-xs">
+              <span className="text-muted-foreground shrink-0 font-mono text-xs tabular-nums">
                 {formatDuration(track.durationMs)}
               </span>
+              {/* Carré de 28 px, contenu centré : le chevron était calé
+                  sur la ligne de base du texte, ce qui décalait le bouton
+                  d'une ligne à l'autre selon la hauteur du titre. */}
               <button
                 type="button"
                 aria-expanded={isOpen}
                 aria-label={`Options d'écoute pour ${track.title}`}
                 onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="border-border hover:border-primary/50 rounded-md border px-2 py-0.5 text-xs transition-colors"
+                className="border-border hover:border-primary/50 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-xs leading-none transition-colors"
               >
-                {isOpen ? "▾" : "▸"}
+                <span aria-hidden>{isOpen ? "▾" : "▸"}</span>
               </button>
             </div>
 

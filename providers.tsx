@@ -2,8 +2,6 @@
 
 // Client + Provider de TanStack Query (cache et gestion des requêtes serveur)
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// Fournisseur de thème (clair/sombre) basé sur next-themes
-import { ThemeProvider } from "next-themes";
 // Adaptateur nuqs requis pour les query params typés en App Router
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 // useState pour créer le QueryClient une seule fois par montage client
@@ -11,8 +9,13 @@ import { useState } from "react";
 
 /**
  * Composant englobant tous les providers côté client de l'application.
- * Doit être placé au plus haut niveau du layout pour que tous les composants
- * clients bénéficient du thème et du cache de requêtes.
+ * Doit être placé au plus haut niveau du layout.
+ *
+ * Plus de fournisseur de thème : l'application n'a qu'une seule
+ * apparence, sombre, appliquée directement sur `<html>`. Un mode clair
+ * n'a pas de sens ici — toute la direction artistique repose sur des
+ * contrastes de noir, et il était par ailleurs la source d'un décalage
+ * d'hydratation sur chaque page.
  *
  * @param children - L'arbre React (pages/layouts) à envelopper.
  * @returns Les providers imbriqués autour des enfants.
@@ -33,13 +36,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    // Thème géré via la classe HTML, sombre par défaut, système respecté
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <NuqsAdapter>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </NuqsAdapter>
-    </ThemeProvider>
+    <NuqsAdapter>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </NuqsAdapter>
   );
 }

@@ -30,7 +30,7 @@ const LINKS = [
 ] as const;
 
 type MobileNavProps = {
-  /** Zone de session et de thème, listée sous les liens une fois ouvert. */
+  /** Zone de session, listée sous les liens une fois le menu ouvert. */
   children: React.ReactNode;
 };
 
@@ -105,7 +105,7 @@ export function MobileNav({ children }: MobileNavProps) {
           </ul>
         </nav>
 
-        {/* Session et thème : mêmes actions que sur grand écran */}
+        {/* Session : mêmes actions que sur grand écran */}
         <div className="border-border/60 flex items-center gap-3 border-t py-3">
           {children}
         </div>

@@ -36,3 +36,5 @@ export * from "./labels";
 export * from "./members";
 // Notes et listes personnelles des utilisateurs
 export * from "./collections";
+// Critiques de presse rattachées aux albums (lien vers la source, jamais le texte)
+export * from "./pressReviews";

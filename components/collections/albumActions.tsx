@@ -1,7 +1,8 @@
 "use client";
 
 /**
- * <AlbumActions> — note personnelle et liste de l'utilisateur pour un album.
+ * <AlbumActions> — critiques des auditeurs : note personnelle, moyenne
+ * de la communauté et liste de l'utilisateur pour un album.
  *
  * Les deux gestes cohabitent parce qu'ils répondent à la même question sur
  * la page d'un album : « qu'est-ce que j'en pense, et est-ce que je l'ai ? »
@@ -104,11 +105,11 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
 
   return (
     <section
-      aria-label="Appréciation et collection"
+      aria-label="Critiques et collection"
       className="metal-card flex flex-col gap-4 p-4"
     >
       <div className="flex flex-wrap items-baseline gap-3">
-        <h2 className="metal-title text-base">Appréciation</h2>
+        <h3 className="metal-title text-base">Auditeurs</h3>
         {summary && (
           <p className="text-muted-foreground text-sm">
             {summary.count === 0 ? (

@@ -52,9 +52,12 @@ export function AudioPlayer() {
           type="button"
           onClick={toggle}
           aria-label={isPlaying ? "Mettre en pause" : "Reprendre la lecture"}
-          className="bg-primary text-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm"
+          className="bg-primary text-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm leading-none"
         >
-          {isPlaying ? "❚❚" : "▶"}
+          {/* `leading-none` et le glyphe isolé : les caractères ❚❚ et ▶
+              n'ont pas la même hauteur d'œil, et le bouton paraissait
+              décalé selon l'état de lecture. */}
+          <span aria-hidden>{isPlaying ? "❚❚" : "▶"}</span>
         </button>
 
         <div className="min-w-0 flex-1">

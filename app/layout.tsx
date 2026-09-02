@@ -54,13 +54,13 @@ export const metadata: Metadata = {
  * @param children - Les pages rendues dans ce layout.
  */
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  // suppressHydrationWarning : évite les avertissements d'hydratation
-  // causés par l'injection du thème (mode sombre) côté client.
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
+      // `dark` en dur : l'application n'a qu'une apparence. Le thème
+      // n'étant plus résolu côté client, `suppressHydrationWarning`
+      // devient inutile — et masquait de vrais écarts.
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <Providers>

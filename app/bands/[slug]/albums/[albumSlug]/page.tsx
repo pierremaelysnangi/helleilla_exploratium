@@ -23,6 +23,8 @@ import type { AlbumDetail } from "@/hooks/api/schemas";
 import { AlbumActions } from "@/components/collections/albumActions";
 // Tracklist interactive : menu déroulant par piste (écoute + paroles)
 import { AlbumTracklist } from "@/components/albums/albumTracklist";
+// Critiques de presse : pendant professionnel des notes d'auditeurs
+import { PressReviews } from "@/components/albums/pressReviews";
 
 type AlbumPageProps = {
   params: Promise<{ slug: string; albumSlug: string }>;
@@ -203,26 +205,41 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
         </div>
       </header>
 
-      <AlbumActions albumId={album.id} />
+      {/* Tracklist et critiques côte à côte à partir de `lg` : la
+          tracklist se lit en colonne étroite, et reléguer les critiques
+          tout en bas les rendait invisibles. En dessous, empilement. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <section aria-label="Tracklist" className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="metal-title text-lg">Tracklist</h2>
+            {totalDuration && (
+              <span className="text-muted-foreground font-mono text-sm">
+                Durée totale : {totalDuration}
+              </span>
+            )}
+          </div>
 
-      <section aria-label="Tracklist" className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="metal-title text-lg">Tracklist</h2>
-          {totalDuration && (
-            <span className="text-muted-foreground font-mono text-sm">
-              Durée totale : {totalDuration}
-            </span>
+          {album.tracks.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              Aucune piste référencée pour cette sortie.
+            </p>
+          ) : (
+            <AlbumTracklist
+              tracks={album.tracks}
+              artistName={album.band.name}
+            />
           )}
-        </div>
+        </section>
 
-        {album.tracks.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            Aucune piste référencée pour cette sortie.
-          </p>
-        ) : (
-          <AlbumTracklist tracks={album.tracks} artistName={album.band.name} />
-        )}
-      </section>
+        <section aria-label="Critiques" className="flex flex-col gap-3">
+          <h2 className="metal-title text-lg">Critiques</h2>
+          {/* Presse et auditeurs séparés : ce sont deux jugements
+              différents, et les fondre en une note unique effacerait
+              l'écart qui fait justement l'intérêt de la comparaison. */}
+          <PressReviews albumId={album.id} />
+          <AlbumActions albumId={album.id} />
+        </section>
+      </div>
 
       <p className="text-muted-foreground text-xs">
         Les écoutes et visuels proviennent exclusivement des plateformes

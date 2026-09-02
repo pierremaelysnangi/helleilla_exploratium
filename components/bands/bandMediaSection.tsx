@@ -173,7 +173,7 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
                 >
                   <span
                     aria-hidden
-                    className="border-border text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px]"
+                    className="border-border text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px] leading-none"
                   >
                     {currentId === preview.previewUrl ? "❚❚" : "▶"}
                   </span>

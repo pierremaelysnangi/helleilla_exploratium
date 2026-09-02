@@ -15,6 +15,8 @@ import type { Metadata } from "next";
 import { fetchBandBySlug } from "@/hooks/use-bands";
 // Présentation
 import { BandHeader } from "@/components/bands/bandHeader";
+// Visuel du groupe en fond de fiche
+import { BandBackdrop } from "@/components/bands/bandBackdrop";
 import { BandMediaSection } from "@/components/bands/bandMediaSection";
 import { DiscographySections } from "@/components/bands/discographySections";
 // Chargement serveur de la discographie complète
@@ -100,6 +102,8 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
           __html: JSON.stringify(buildMusicGroupJsonLd(band)),
         }}
       />
+
+      <BandBackdrop imageUrl={band.imageUrl} />
 
       <BandHeader band={band} />
       {/* Enrichissement providers externes (client, progressif) */}

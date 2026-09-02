@@ -68,6 +68,18 @@
  * couleurs de composants shadcn/ui (card, popover, sidebar…) et graphiques (chart-*).
  */
 :root {
+  /*
+   * L'application n'a QU'UNE apparence, sombre : la classe `.dark` est
+   * posée en dur sur <html> (app/layout.tsx), et le mode clair a été
+   * retiré. Les valeurs ci-dessous restent la base shadcn/ui, conservée
+   * comme socle des variantes `dark:` encore utilisées par les
+   * composants — elles ne sont jamais rendues telles quelles.
+   *
+   * `color-scheme` aligne les éléments dessinés par le navigateur
+   * (barres de défilement, contrôles de formulaire) sur le fond sombre ;
+   * sans lui ils restaient clairs, en contraste violent avec la page.
+   */
+  color-scheme: dark;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -108,9 +120,9 @@
 }
 
 /*
- * Palette de couleurs en mode sombre (activée par la classe .dark sur <html>).
- * Mêmes variables que :root mais avec des valeurs adaptées au thème sombre
- * (fonds sombres, textes clairs, bordures translucides).
+ * Palette effective de l'application. La classe `.dark` est présente en
+ * permanence sur <html> : ce bloc est celui qui rend, `:root` n'étant
+ * qu'un socle.
  */
 .dark {
   --background: oklch(0.145 0 0);

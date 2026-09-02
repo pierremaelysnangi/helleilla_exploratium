@@ -71,6 +71,13 @@
       "when": 1788376366641,
       "tag": "0009_confused_thaddeus_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788388943461,
+      "tag": "0010_pretty_tigra",
+      "breakpoints": true
     }
   ]
 }

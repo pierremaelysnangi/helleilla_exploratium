@@ -3,68 +3,56 @@
 /**
  * <GenresView> — taxonomie des genres, groupée par famille.
  *
- * La liste était auparavant demandée en une seule page de 200 entrées,
- * ce que l'API refuse (`perPage` plafonné à 100) ; la pagination est
- * désormais gérée par `useGenreTaxonomy`, qui enchaîne les pages.
+ * Plus de champ de filtre : la recherche globale (Ctrl+K, ou /search)
+ * couvre déjà ce besoin, et un second champ propre à cette page en
+ * doublonnait la fonction tout en repoussant la taxonomie sous la ligne
+ * de flottaison.
  *
- * L'affichage est groupé par famille racine : à plusieurs dizaines de
- * genres, une grille à plat ne se parcourt plus.
+ * La pagination est gérée par `useGenreTaxonomy` : l'API plafonne
+ * `perPage` à 100, et cette vue en demandait 200 — elle recevait donc
+ * une erreur de validation au lieu des genres.
  */
 
-import { useState } from "react";
 import { useGenreTaxonomy } from "@/hooks/use-genres";
-// Présentation extraite : champ de filtre et carte de genre
-import { GenreFilter } from "./genreFilter";
 import { GenreCard } from "./genreCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function GenresView() {
-  const [filter, setFilter] = useState("");
-  const { families, genres, isPending, isError } = useGenreTaxonomy();
+  const { families, isPending, isError } = useGenreTaxonomy();
 
-  const needle = filter.trim().toLowerCase();
-  const matches = (name: string) => name.toLowerCase().includes(needle);
+  if (isPending) {
+    return (
+      <div className="flex flex-col gap-6">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-32" />
+        ))}
+      </div>
+    );
+  }
 
-  // Une famille reste affichée si elle correspond elle-même — ses
-  // sous-genres sont alors tous pertinents — ou si l'un d'eux correspond.
-  const visible = families
-    .map((family) => ({
-      root: family.root,
-      children: matches(family.root.name)
-        ? family.children
-        : family.children.filter((c) => matches(c.name)),
-      self: matches(family.root.name),
-    }))
-    .filter((family) => family.self || family.children.length > 0);
-
-  const visibleCount = visible.reduce(
-    (sum, f) => sum + (f.self ? 1 : 0) + f.children.length,
-    0,
-  );
+  if (isError) {
+    return (
+      <p role="alert" className="text-destructive text-sm">
+        Impossible de charger les genres.
+      </p>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-6">
-      <GenreFilter
-        value={filter}
-        onChange={setFilter}
-        resultCount={isPending ? undefined : visibleCount}
-      />
-
-      {isPending && (
-        <p className="text-muted-foreground">Chargement des genres…</p>
-      )}
-      {isError && (
-        <p role="alert" className="text-destructive text-sm">
-          Impossible de charger les genres.
-        </p>
-      )}
-
-      {visible.map((family) => (
+    <div className="flex flex-col gap-8">
+      {families.map((family) => (
         <section key={family.root.id} className="flex flex-col gap-3">
-          <h2 className="metal-title text-base">
+          <h2 className="metal-title flex items-baseline gap-2 text-base">
             <a href={`/genres/${family.root.slug}`} className="hover:underline">
               {family.root.name}
             </a>
+            {family.children.length > 0 && (
+              <span className="text-muted-foreground font-mono text-xs">
+                {family.children.length}
+              </span>
+            )}
           </h2>
+
           {family.children.length > 0 && (
             <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
               {family.children.map((genre) => (
@@ -76,10 +64,6 @@ export function GenresView() {
           )}
         </section>
       ))}
-
-      {!isPending && genres.length > 0 && visibleCount === 0 && (
-        <p className="text-muted-foreground">Aucun genre ne correspond.</p>
-      )}
     </div>
   );
 }
