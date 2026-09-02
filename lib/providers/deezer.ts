@@ -37,20 +37,43 @@ const searchResponseSchema = z.object({
   total: z.number().default(0),
 });
 
+/** Forme comparable d'un nom : lettres et chiffres uniquement. */
+export function normalizeName(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 /**
  * Recherche de pistes par requête libre ("artiste titre").
  *
  * @param query - Terme de recherche (ex : "Emperor I am the black wizards").
+ * @param artistName - Si fourni, ne conserve que les pistes de CET
+ *   artiste. Indispensable pour un nom courant : chercher « Emperor »
+ *   remonte sinon des morceaux d'homonymes, qui finissaient présentés
+ *   comme des titres du groupe et dont les pochettes polluaient sa
+ *   galerie.
  * @returns Jusqu'à 5 pistes avec leur preview MP3 30 s.
  */
-export async function searchTracks(query: string): Promise<DeezerTrack[]> {
+export async function searchTracks(
+  query: string,
+  artistName?: string,
+): Promise<DeezerTrack[]> {
   const result = await fetchJson(
-    `${BASE}/search?q=${encodeURIComponent(query)}&limit=5`,
+    // La limite est relevée quand on filtre : les morceaux d'homonymes
+    // occupent sinon toutes les places avant le filtrage.
+    `${BASE}/search?q=${encodeURIComponent(query)}&limit=${artistName ? 25 : 5}`,
     searchResponseSchema,
     { minIntervalMs: 300 },
   );
+
   // Seules les pistes ayant réellement un extrait sont exploitables
-  return result.data.filter((t) => Boolean(t.preview));
+  let tracks = result.data.filter((t) => Boolean(t.preview));
+
+  if (artistName) {
+    const wanted = normalizeName(artistName);
+    tracks = tracks.filter((t) => normalizeName(t.artist.name) === wanted);
+  }
+
+  return tracks.slice(0, 5);
 }
 
 /** Artiste Deezer : seuls le nom et les visuels nous intéressent. */
@@ -121,9 +144,8 @@ export async function findAlbumCover(
       albumSearchSchema,
       { minIntervalMs: 300 },
     );
-    const normalize = (t: string) => t.toLowerCase().replace(/[^a-z0-9]/g, "");
     const exact = result.data.find(
-      (a) => normalize(a.title) === normalize(title),
+      (a) => normalizeName(a.title) === normalizeName(title),
     );
     return exact?.cover_xl ?? exact?.cover_big ?? null;
   } catch {

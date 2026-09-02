@@ -162,4 +162,33 @@ describe("deezer", () => {
     expect(tracks).toHaveLength(1);
     expect(tracks[0].preview).toContain("cdns-preview");
   });
+
+  it("écarte les homonymes quand un artiste est imposé", async () => {
+    // « Emperor » est un nom courant : sans filtre, la recherche remonte
+    // des morceaux d'autres artistes, présentés ensuite comme des titres
+    // du groupe et dont les pochettes polluaient sa galerie.
+    stubFetch(200, {
+      data: [
+        {
+          id: 1,
+          title: "Emperor (Maceo Plex Last Disco Remix)",
+          preview: "https://cdns-preview.dzcdn.net/x.mp3",
+          artist: { id: 77, name: "Maceo Plex" },
+          album: { id: 4, title: "Solar" },
+        },
+        {
+          id: 2,
+          title: "I Am the Black Wizards",
+          preview: "https://cdns-preview.dzcdn.net/a.mp3",
+          artist: { id: 9, name: "Emperor" },
+          album: { id: 3, title: "Anthems" },
+        },
+      ],
+    });
+
+    const tracks = await searchTracks("Emperor", "Emperor");
+
+    expect(tracks).toHaveLength(1);
+    expect(tracks[0].artist.name).toBe("Emperor");
+  });
 });

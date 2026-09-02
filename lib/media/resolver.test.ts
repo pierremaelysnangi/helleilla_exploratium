@@ -233,8 +233,13 @@ describe("resolveBandMedia", () => {
     expect(media.info.area).toBeNull();
     expect(media.images).toEqual([]);
     expect(media.degraded).toBe(false);
-    // Deezer est interrogé même sans ref (provider public)
-    expect(providersMock.deezerSearch).toHaveBeenCalledWith("Emperor");
+    // Deezer est interrogé même sans ref (provider public), et le nom du
+    // groupe sert aussi de filtre d'artiste : sans lui, un homonyme
+    // fournirait des « titres iconiques » qui ne sont pas de lui.
+    expect(providersMock.deezerSearch).toHaveBeenCalledWith(
+      "Emperor",
+      "Emperor",
+    );
   });
 
   it("sert depuis le cache Redis si présent (aucun provider appelé)", async () => {

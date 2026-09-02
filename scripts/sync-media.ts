@@ -65,6 +65,7 @@ async function main() {
   let images = 0;
   let filledAlbums = 0;
   let newTracks = 0;
+  let filledDurations = 0;
 
   for (const band of targets) {
     const mbid = await getBandMusicbrainzId(band.id);
@@ -101,8 +102,12 @@ async function main() {
       const lists = await fillMissingTracklists(band.id);
       filledAlbums += lists.filled;
       newTracks += lists.tracks;
+      filledDurations += lists.durations;
       if (lists.filled > 0) {
         parts.push(`${lists.tracks} pistes sur ${lists.filled} album(s)`);
+      }
+      if (lists.durations > 0) {
+        parts.push(`${lists.durations} durée(s) complétée(s)`);
       }
     } catch {
       parts.push("tracklists en échec");
@@ -113,7 +118,8 @@ async function main() {
 
   console.log(
     `\n${images} visuel(s) de groupe · ${covered} pochette(s) · ` +
-      `${newTracks} piste(s) sur ${filledAlbums} album(s).\n` +
+      `${newTracks} piste(s) sur ${filledAlbums} album(s) · ` +
+      `${filledDurations} durée(s) complétée(s).\n` +
       "Pensez à `pnpm search:reindex` pour répercuter dans la recherche.",
   );
   process.exit(0);

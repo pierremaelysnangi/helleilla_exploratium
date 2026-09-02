@@ -182,7 +182,10 @@ export async function resolveBandMedia(
     discogsRef && isProviderAvailable("discogs")
       ? dataProviders.discogs.getArtist(Number(discogsRef.externalId))
       : Promise.resolve(null),
-    dataProviders.deezer.searchTracks(band.name),
+    // Le nom du groupe sert AUSSI de filtre : sans lui, un homonyme
+    // fournissait des « titres iconiques » qui ne sont pas de lui, et
+    // ses pochettes se retrouvaient dans la galerie du groupe.
+    dataProviders.deezer.searchTracks(band.name, band.name),
   ]);
 
   let degraded = false;
