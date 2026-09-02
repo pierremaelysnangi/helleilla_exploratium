@@ -65,7 +65,12 @@ export function UserMenu() {
           Admin
         </Link>
       )}
-      <span className="text-muted-foreground text-sm">{session.user.name}</span>
+      <Link
+        href="/profile"
+        className="text-muted-foreground text-sm hover:underline"
+      >
+        {session.user.name}
+      </Link>
       {/* Server Action : révocation serveur + purge du cookie de session */}
       <form action={signOutAction}>
         <button

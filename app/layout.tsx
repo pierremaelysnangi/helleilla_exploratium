@@ -10,6 +10,8 @@ import { Providers } from "@/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CommandPalette } from "@/components/search/commandPalette";
+// Lecteur audio global : élément <audio> unique de l'application
+import { MiniPlayer } from "@/components/audio/miniPlayer";
 import { ErrorBoundary } from "@/components/shared/errorBoundary";
 
 // Police sans-serif principale, exposée via la variable CSS --font-geist-sans
@@ -70,6 +72,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* Capture les erreurs de rendu des composants clients */}
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
+          {/* Barre de lecture persistante, au-dessus du pied de page */}
+          <MiniPlayer />
           <Footer />
         </Providers>
       </body>

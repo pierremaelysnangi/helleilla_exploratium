@@ -13,6 +13,11 @@
 
 // État local : quelle piste a son panneau ouvert
 import { useState } from "react";
+// Lecteur global : une seule piste joue à la fois dans toute l'application
+import {
+  useAudioPlayerStore,
+  type PlayableTrack,
+} from "@/stores/audioPlayer.store";
 // Types validés côté client
 import type { TrackRow } from "@/hooks/api/schemas";
 // Liens officiels par plateforme
@@ -60,6 +65,32 @@ export function AlbumTracklist({
 }: AlbumTracklistProps) {
   // Une seule piste dépliée à la fois (index dans la liste)
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const play = useAudioPlayerStore((s) => s.play);
+  const currentId = useAudioPlayerStore((s) => s.current?.id ?? null);
+
+  /**
+   * Construit la file de lecture à partir des pistes qui disposent
+   * réellement d'un média : l'extrait Deezer correspondant, ou le fichier
+   * hébergé. Les autres sont simplement absentes de la file.
+   */
+  function buildQueue(fromIndex: number): PlayableTrack[] {
+    return tracks
+      .slice(fromIndex + 1)
+      .map((t) => {
+        const src = findPreview(previews, t.title)?.previewUrl ?? t.audioUrl;
+        if (!src) return null;
+        return {
+          id: t.id,
+          title: t.title,
+          artist: artistName,
+          src,
+          source: (findPreview(previews, t.title)
+            ? "deezer"
+            : "hosted") as PlayableTrack["source"],
+        };
+      })
+      .filter((t): t is PlayableTrack => t !== null);
+  }
 
   return (
     <ol className="divide-border border-border divide-y rounded-lg border">
@@ -95,17 +126,30 @@ export function AlbumTracklist({
             {/* Panneau plateformes (déplié) */}
             {isOpen && (
               <div className="border-border/60 bg-background/40 border-t px-4 py-3">
-                {/* Extrait jouable inline si disponible */}
-                {preview && (
+                {/* Lecture déléguée au lecteur global : un <audio> par
+                    ligne permettait deux lectures simultanées. */}
+                {(preview || track.audioUrl) && (
                   <div className="mb-3 flex items-center gap-3">
-                    <audio
-                      controls
-                      preload="none"
-                      src={preview.previewUrl}
-                      className="h-8 max-w-[260px]"
-                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        play(
+                          {
+                            id: track.id,
+                            title: track.title,
+                            artist: artistName,
+                            src: preview?.previewUrl ?? track.audioUrl!,
+                            source: preview ? "deezer" : "hosted",
+                          },
+                          buildQueue(index),
+                        )
+                      }
+                      className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-xs font-semibold tracking-wide uppercase hover:opacity-90"
+                    >
+                      {currentId === track.id ? "En lecture" : "Écouter"}
+                    </button>
                     <span className="text-muted-foreground text-xs">
-                      Extrait 30 s — Deezer
+                      {preview ? "Extrait 30 s — Deezer" : "Fichier hébergé"}
                     </span>
                   </div>
                 )}

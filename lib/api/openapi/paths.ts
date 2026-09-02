@@ -25,6 +25,7 @@ import {
   GlobalSearchResponseSchema,
   BandDetailSchema,
   AdminUserSchema,
+  ProfileSchema,
   AlbumDetailSchema,
   GenreDetailSchema,
   SetBandGenresRequestSchema,
@@ -44,6 +45,7 @@ import {
 } from "@/lib/validations/genre";
 // Contrat d'administration des comptes (source unique avec la route)
 import { updateUserSchema } from "@/lib/validations/user";
+import { updateProfileSchema } from "@/lib/validations/profile";
 // Schémas médias & contributions
 import {
   BandMediaSchema,
@@ -345,6 +347,31 @@ registerPath("/api/users/{id}", "delete", {
   responses: {
     200: jsonOk(z.object({ deleted: z.boolean(), id: z.string() })),
     ...pick(401, 403, 404, 409, 422, 429, 500),
+  },
+});
+
+// Profil de l'utilisateur connecté : lit la projection publique, pas la
+// base identité — le nom affiché suffit, l'email n'a pas à circuler ici.
+registerPath("/api/profile", "get", {
+  tags: ["profile"],
+  summary: "Profil public de l'utilisateur connecté",
+  security: [{ sessionCookie: [] }],
+  responses: {
+    200: jsonOk(ProfileSchema),
+    ...pick(401, 404, 429, 500),
+  },
+});
+
+registerPath("/api/profile", "patch", {
+  tags: ["profile"],
+  summary: "Met à jour son nom affiché",
+  description:
+    "Passe par Better Auth : ses hooks répliquent le nom vers la projection publique.",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(updateProfileSchema),
+  responses: {
+    200: jsonOk(ProfileSchema),
+    ...pick(401, 404, 422, 429, 500),
   },
 });
 

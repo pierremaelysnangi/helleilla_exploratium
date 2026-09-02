@@ -10,6 +10,31 @@ import type { NextConfig } from "next";
  *   frame — self, Next.js inline (styles/hydration) et Cloudflare
  *   Turnstile (CAPTCHA inscription). Aucun autre tiers autorisé.
  */
+/**
+ * Origine du stockage objet (MinIO/S3), d'où proviennent les fichiers
+ * audio téléversés. Lue au build : la CSP est statique, mais l'endpoint
+ * varie selon l'environnement. Une valeur absente ou invalide ne doit pas
+ * casser le build — elle produit simplement une directive plus stricte.
+ */
+function storageOrigin(): string | null {
+  const raw = process.env.MINIO_ENDPOINT;
+  if (!raw) return null;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return null;
+  }
+}
+
+/** Sources autorisées pour les médias audio (extraits et fichiers hébergés). */
+const mediaSources = [
+  "'self'",
+  "blob:",
+  // Extraits 30 s Deezer, résolus par lib/providers/deezer.ts
+  "https://cdns-preview.dzcdn.net",
+  storageOrigin(),
+].filter(Boolean) as string[];
+
 const securityHeaders = [
   {
     key: "Strict-Transport-Security",
@@ -32,7 +57,15 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://cdns-preview.dzcdn.net https://e-cdns-images.dzcdn.net",
       "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com https://widget.qobuz.com",
-      "connect-src 'self' https://challenges.cloudflare.com",
+      // Sans media-src, l'audio retombait sur default-src 'self' : les
+      // extraits Deezer et les fichiers MinIO étaient purement et
+      // simplement bloqués par le navigateur.
+      `media-src ${mediaSources.join(" ")}`,
+      // Même liste pour connect-src : le décodage d'une forme d'onde
+      // télécharge le fichier via fetch avant de l'analyser.
+      `connect-src 'self' https://challenges.cloudflare.com ${mediaSources
+        .filter((s) => s !== "'self'" && s !== "blob:")
+        .join(" ")}`,
       "font-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",

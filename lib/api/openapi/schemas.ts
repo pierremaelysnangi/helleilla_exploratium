@@ -178,6 +178,16 @@ export const AdminUserSchema = z
   })
   .meta({ id: "AdminUser" });
 
+// Composant "Profile" : projection publique d'un compte (base contenu)
+export const ProfileSchema = z
+  .object({
+    userId: z.string(),
+    displayName: z.string(),
+    role: z.string(),
+    updatedAt: z.string().datetime(),
+  })
+  .meta({ id: "Profile" });
+
 // Corps du PUT /api/bands/{id}/genres : liste complète de genreIds
 export const SetBandGenresRequestSchema = z
   .object({ genreIds: z.array(z.string().uuid()).max(20) })

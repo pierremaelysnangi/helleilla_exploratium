@@ -15,7 +15,7 @@ Règle stricte : zéro média généré par IA.
 | Prettier          | ✅ passe                                 |
 | Lint              | ✅ passe                                 |
 | Typecheck         | ✅ passe                                 |
-| Tests unitaires   | 416/416 ✅ (50 fichiers)                 |
+| Tests unitaires   | 433/433 ✅ (52 fichiers)                 |
 | Coverage branches | 100 % ✅ (seuil relevé à 90 %)           |
 | OpenAPI lint      | ✅ valide, aligné sur les routes réelles |
 | Build             | ✅ passe                                 |
@@ -118,20 +118,30 @@ modération, ce qui est l'effet recherché.
 
 ---
 
-## Phase E — Audio & profil
+## Phase E — Audio & profil ✅ TERMINÉE
 
-| Tâche                                | État                                        |
-| ------------------------------------ | ------------------------------------------- |
-| Upload audio MinIO                   | ✅ `POST /api/tracks/{id}/audio` (présigné) |
-| Aperçus Deezer 30s                   | ✅ Via resolver + `albumTracklist`          |
-| `components/audio/audioPlayer.tsx`   | 🔴 À écrire (fichier vide supprimé)         |
-| `components/audio/miniPlayer.tsx`    | 🔴 À écrire (fichier vide supprimé)         |
-| `components/audio/waveform.tsx`      | 🔴 À écrire (fichier vide supprimé)         |
-| `hooks/use-player-audio.ts`          | 🔴 Stub doc-only                            |
-| `stores/audioPlayer.store.ts`        | 🔴 Stub doc-only                            |
-| `stores/preference.store.ts`         | 🔴 Stub doc-only                            |
-| Page profil/préférences (`/profile`) | 🔴 Aucune page                              |
-| Table `profiles` exposée             | 🔴 Non exposée                              |
+**Bug bloquant trouvé d'entrée** : la CSP n'avait pas de directive
+`media-src`, elle retombait donc sur `default-src 'self'`. Les extraits
+Deezer déjà branchés dans la tracklist étaient **purement et simplement
+bloqués par le navigateur** — la fonctionnalité audio ne marchait pas.
+`next.config.ts` déclare désormais `media-src` (et `connect-src`, requis
+pour décoder une forme d'onde), avec l'origine du stockage lue à la volée
+depuis `MINIO_ENDPOINT`.
+
+| Tâche                          | État      | Détail                                                                                                                                        |
+| ------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stores/audioPlayer.store.ts`  | ✅ Écrit  | Décrit une intention de lecture ; garantit qu'une seule piste joue dans toute l'application. File d'attente, progression, déplacement.        |
+| `stores/preference.store.ts`   | ✅ Écrit  | Volume et sourdine persistés (`zustand/persist`). Le thème reste à `next-themes` — le dupliquer créerait deux sources pour un même réglage.   |
+| `hooks/use-player-audio.ts`    | ✅ Écrit  | Traduit l'intention du store en appels impératifs sur l'élément, et remonte la progression réelle                                             |
+| `components/audio/audioPlayer` | ✅ Écrit  | Contrôles : lecture, déplacement, volume, piste suivante. La provenance du média est toujours affichée.                                       |
+| `components/audio/miniPlayer`  | ✅ Écrit  | Barre persistante montée dans le layout — **seul** composant à posséder un `<audio>`, d'où l'impossibilité de superposer deux lectures        |
+| `components/audio/waveform`    | ✅ Écrit  | Forme d'onde **réelle**, décodée via Web Audio API. Aucune donnée inventée : si le décodage échoue (CORS, format), le composant ne rend rien. |
+| `hooks/use-media-query.ts`     | ✅ Écrit  | `useSyncExternalStore` avec snapshot serveur explicite, pour éviter l'écart d'hydratation                                                     |
+| `GET/PATCH /api/profile`       | ✅ Créées | Lit la projection publique ; l'écriture passe par Better Auth pour que ses hooks répliquent le nom vers `profiles`                            |
+| `/profile`                     | ✅ Écrite | Nom affiché (serveur) et préférences de lecture (locales) — la distinction est dite à l'utilisateur                                           |
+
+`albumTracklist` ne rend plus un `<audio>` par ligne : chaque piste
+alimente le lecteur global, avec la suite de la tracklist en file d'attente.
 
 ---
 
