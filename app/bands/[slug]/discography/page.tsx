@@ -138,7 +138,7 @@ export default async function DiscographyPage({
             <h2 className="metal-title text-lg">
               {TYPE_SECTIONS[section.type]}
             </h2>
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
               {section.albums.map((album) => (
                 <li key={album.id}>
                   <AlbumCard album={album} bandSlug={band.slug} />

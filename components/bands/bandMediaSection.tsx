@@ -12,13 +12,40 @@
 // Hook média + composants UI de base
 import { useBandMedia } from "@/hooks/use-band-media";
 import { Skeleton } from "@/components/ui/skeleton";
+// Lecteur global : une seule piste joue à la fois dans toute l'application
+import {
+  useAudioPlayerStore,
+  type PlayableTrack,
+} from "@/stores/audioPlayer.store";
 
 type BandMediaSectionProps = {
   bandId: string;
 };
 
+/**
+ * Convertit un extrait du resolver en piste jouable.
+ * L'URL sert d'identifiant : ces extraits n'ont pas d'id applicatif.
+ */
+function toPlayable(preview: {
+  title: string;
+  artistName: string;
+  previewUrl: string;
+}): PlayableTrack {
+  return {
+    id: preview.previewUrl,
+    title: preview.title,
+    artist: preview.artistName,
+    src: preview.previewUrl,
+    source: "deezer",
+  };
+}
+
 export function BandMediaSection({ bandId }: BandMediaSectionProps) {
   const { data: media, isPending, isError } = useBandMedia(bandId);
+  // Hooks avant tout retour anticipé : leur ordre doit être stable d'un
+  // rendu à l'autre, quel que soit l'état de la requête.
+  const play = useAudioPlayerStore((s) => s.play);
+  const currentId = useAudioPlayerStore((s) => s.current?.id ?? null);
 
   if (isPending) {
     return (
@@ -112,25 +139,40 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
         </div>
       )}
 
-      {/* Aperçus audio Deezer (extraits 30 s hébergés par la plateforme) */}
+      {/* Aperçus audio Deezer (extraits 30 s hébergés par la plateforme).
+          La lecture passe par le lecteur global : un <audio controls> par
+          ligne permettait de superposer plusieurs extraits, et ses
+          contrôles natifs débordaient du conteneur sur mobile. */}
       {previews.length > 0 && (
         <div>
           <h2 className="metal-title text-sm">Aperçus audio</h2>
           <ul className="divide-border border-border mt-3 flex flex-col divide-y rounded-lg border">
-            {previews.map((preview) => (
-              <li
-                key={preview.previewUrl}
-                className="flex items-center gap-3 px-4 py-2"
-              >
-                <audio
-                  controls
-                  preload="none"
-                  src={preview.previewUrl}
-                  className="h-8 max-w-[240px]"
-                />
-                <span className="min-w-0 truncate text-sm">
-                  {preview.title}
-                </span>
+            {previews.map((preview, index) => (
+              <li key={preview.previewUrl}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    play(
+                      toPlayable(preview),
+                      previews.slice(index + 1).map(toPlayable),
+                    )
+                  }
+                  aria-label={`Écouter un extrait de ${preview.title}`}
+                  className="hover:bg-accent/30 flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors"
+                >
+                  <span
+                    aria-hidden
+                    className="border-border text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[10px]"
+                  >
+                    {currentId === preview.previewUrl ? "❚❚" : "▶"}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm">
+                    {preview.title}
+                  </span>
+                  <span className="text-muted-foreground shrink-0 text-xs">
+                    30 s
+                  </span>
+                </button>
               </li>
             ))}
           </ul>

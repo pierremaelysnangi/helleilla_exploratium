@@ -69,10 +69,10 @@ export async function searchGenresByName(query: string) {
  * Liste plate des slugs de genres (sitemap SEO).
  */
 export async function listGenreSlugs(): Promise<
-  { slug: string; createdAt: Date }[]
+  { slug: string; updatedAt: Date }[]
 > {
   return db
-    .select({ slug: genres.slug, createdAt: genres.createdAt })
+    .select({ slug: genres.slug, updatedAt: genres.updatedAt })
     .from(genres)
     .limit(5_000);
 }

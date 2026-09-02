@@ -34,7 +34,9 @@ export async function updateGenre(
 ) {
   const [genre] = await db
     .update(genres)
-    .set(data)
+    // `updatedAt` rafraîchi ici comme pour les autres entités : sans cela
+    // la colonne resterait figée à la date de création.
+    .set({ ...data, updatedAt: new Date() })
     .where(eq(genres.id, id))
     .returning();
   return genre;

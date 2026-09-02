@@ -70,6 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const genreRoutes: MetadataRoute.Sitemap = genres.map((genre) => ({
       url: `${BASE_URL}/genres/${genre.slug}`,
+      lastModified: genre.updatedAt,
       changeFrequency: "monthly",
       priority: 0.5,
     }));

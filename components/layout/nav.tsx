@@ -2,8 +2,12 @@
 
 /**
  * <Nav> — navigation principale du site.
- * Lien actif surligné selon la route courante (usePathname) ; se replie
- * en défilement horizontal sur mobile (pas de burger : 5 liens max).
+ * Lien actif surligné selon la route courante (usePathname).
+ *
+ * Sur mobile les liens PASSENT À LA LIGNE plutôt que de défiler
+ * horizontalement : le défilement tronquait le dernier lien (« Recherche »
+ * apparaissait comme un « R » isolé), sans rien indiquer qu'il fallait
+ * faire glisser. Cinq entrées tiennent sur deux lignes.
  */
 
 // Détection de la route active
@@ -23,8 +27,8 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Navigation principale" className="overflow-x-auto">
-      <ul className="flex items-center gap-4 sm:gap-6">
+    <nav aria-label="Navigation principale">
+      <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
         {LINKS.map(({ href, label }) => {
           // Actif si route exacte (accueil) ou sous-route (/bands/...)
           const active =

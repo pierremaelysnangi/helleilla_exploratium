@@ -26,14 +26,28 @@ function storageOrigin(): string | null {
   }
 }
 
-/** Sources autorisées pour les médias audio (extraits et fichiers hébergés). */
+/**
+ * Sources autorisées pour les médias audio (extraits et fichiers hébergés).
+ *
+ * Deezer répartit ses extraits sur plusieurs sous-domaines de `dzcdn.net`
+ * (`cdns-preview`, `cdnt-preview`…) et en change sans préavis : lister un
+ * hôte précis bloquait la lecture dès que l'API renvoyait l'autre. Le
+ * joker reste borné au domaine de la plateforme.
+ */
 const mediaSources = [
   "'self'",
   "blob:",
-  // Extraits 30 s Deezer, résolus par lib/providers/deezer.ts
-  "https://cdns-preview.dzcdn.net",
+  "https://*.dzcdn.net",
   storageOrigin(),
 ].filter(Boolean) as string[];
+
+/**
+ * Le serveur de développement ouvre une WebSocket de rechargement à chaud
+ * sur un port local aléatoire ; sans cette autorisation, la CSP la bloque
+ * et le HMR cesse de fonctionner. Jamais ajoutée en production.
+ */
+const devConnectSources =
+  process.env.NODE_ENV === "development" ? ["ws:", "http://localhost:*"] : [];
 
 const securityHeaders = [
   {
@@ -55,7 +69,7 @@ const securityHeaders = [
       // les scripts inline de nonce complet nécessitent un middleware dédié.
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://cdns-preview.dzcdn.net https://e-cdns-images.dzcdn.net",
+      "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net",
       "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com https://widget.qobuz.com",
       // Sans media-src, l'audio retombait sur default-src 'self' : les
       // extraits Deezer et les fichiers MinIO étaient purement et
@@ -63,9 +77,10 @@ const securityHeaders = [
       `media-src ${mediaSources.join(" ")}`,
       // Même liste pour connect-src : le décodage d'une forme d'onde
       // télécharge le fichier via fetch avant de l'analyser.
-      `connect-src 'self' https://challenges.cloudflare.com ${mediaSources
-        .filter((s) => s !== "'self'" && s !== "blob:")
-        .join(" ")}`,
+      `connect-src 'self' https://challenges.cloudflare.com ${[
+        ...mediaSources.filter((s) => s !== "'self'" && s !== "blob:"),
+        ...devConnectSources,
+      ].join(" ")}`,
       "font-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
@@ -86,15 +101,15 @@ const nextConfig: NextConfig = {
      * - i.ytimg.com        : miniatures YouTube (façades d'embed)
      * - upload.wikimedia.org : images Wikidata/Wikipédia
      * - api.discogs.com + imgutils.discogs.com : pochettes/photos Discogs
-     * - cdns-preview.dzcdn.net / e-cdns-images.dzcdn.net : covers Deezer
+     * - *.dzcdn.net : pochettes et extraits Deezer (les sous-domaines
+     *   varient : cdns-preview, cdnt-preview, e-cdns-images…)
      */
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "api.discogs.com" },
       { protocol: "https", hostname: "imgutils.discogs.com" },
-      { protocol: "https", hostname: "cdns-preview.dzcdn.net" },
-      { protocol: "https", hostname: "e-cdns-images.dzcdn.net" },
+      { protocol: "https", hostname: "**.dzcdn.net" },
     ],
   },
 };

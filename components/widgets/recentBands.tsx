@@ -17,7 +17,7 @@ export function RecentBands({ bands }: { bands: BandRow[] }) {
       <h2 id="derniers-groupes" className="metal-title text-lg">
         Derniers groupes ajoutés
       </h2>
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul className="3xl:grid-cols-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {bands.map((band) => (
           <li key={band.id}>
             <BandCard band={band} />

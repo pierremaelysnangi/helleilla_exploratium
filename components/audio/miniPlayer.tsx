@@ -25,7 +25,7 @@ export function MiniPlayer() {
       aria-label="Lecteur audio"
       className="border-border bg-card/95 sticky bottom-0 z-40 border-t backdrop-blur"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-3">
+      <div className="site-container py-3">
         <AudioPlayer />
       </div>
 

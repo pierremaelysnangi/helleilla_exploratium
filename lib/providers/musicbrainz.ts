@@ -23,13 +23,18 @@ const mbArtistSchema = z.object({
     .object({
       begin: z.string().nullable().optional(),
       end: z.string().nullable().optional(),
-      ended: z.boolean().optional(),
+      // `nullish` et non `optional` : MusicBrainz renvoie explicitement
+      // `"ended": null` pour un artiste toujours actif. Avec `optional`,
+      // la validation échouait — et comme fetchJson ne retente pas une
+      // ZodError, TOUTE recherche renvoyant un groupe en activité était
+      // perdue, y compris pour le resolver média.
+      ended: z.boolean().nullish(),
     })
-    .optional(),
+    .nullish(),
   /** Genres normalisés MusicBrainz. */
   genres: z
-    .array(z.object({ name: z.string(), count: z.number().optional() }))
-    .optional(),
+    .array(z.object({ name: z.string(), count: z.number().nullish() }))
+    .nullish(),
   /**
    * Relations artiste : membres du groupe ("member of band"),
    * identifiants externes ("wikidata" dans la cible de relation).
@@ -38,20 +43,20 @@ const mbArtistSchema = z.object({
     .array(
       z.object({
         type: z.string(),
-        direction: z.string().optional(),
-        target_type: z.string().optional(),
-        artist: z.object({ id: z.string(), name: z.string() }).optional(),
-        url: z.object({ resource: z.string() }).optional(),
+        direction: z.string().nullish(),
+        target_type: z.string().nullish(),
+        artist: z.object({ id: z.string(), name: z.string() }).nullish(),
+        url: z.object({ resource: z.string() }).nullish(),
       }),
     )
-    .optional(),
+    .nullish(),
 });
 
 export type MbArtist = z.infer<typeof mbArtistSchema>;
 
 /** Résultat de recherche : liste d'artiste + score. */
 export const mbSearchResultSchema = z.object({
-  artists: z.array(mbArtistSchema.extend({ score: z.number().optional() })),
+  artists: z.array(mbArtistSchema.extend({ score: z.number().nullish() })),
 });
 
 /**

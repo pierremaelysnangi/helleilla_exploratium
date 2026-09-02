@@ -68,7 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {/* Palette de recherche rapide, disponible sur toutes les pages */}
           <CommandPalette />
           {/* flex-1 : le contenu pousse le footer en bas de viewport */}
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+          <main className="site-container flex-1 py-6">
             {/* Capture les erreurs de rendu des composants clients */}
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>

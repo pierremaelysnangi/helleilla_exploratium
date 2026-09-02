@@ -50,6 +50,13 @@
       "when": 1788352832007,
       "tag": "0006_first_grey_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788354489211,
+      "tag": "0007_long_eternals",
+      "breakpoints": true
     }
   ]
 }

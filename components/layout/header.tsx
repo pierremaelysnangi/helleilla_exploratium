@@ -15,7 +15,10 @@ import Link from "next/link";
 export function Header() {
   return (
     <header className="border-border bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 border-b backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      {/* `flex-wrap` : sur un écran de 390 px, titre + actions de session +
+          bascule de thème ne tiennent pas sur une ligne. Passer à la ligne
+          vaut mieux que déborder ou masquer une action. */}
+      <div className="site-container flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 sm:gap-x-4">
         {/* Titre du site */}
         <Link href="/" className="metal-title text-lg sm:text-xl">
           Helleilla
@@ -35,7 +38,7 @@ export function Header() {
 
       {/* Nav repliée sur mobile, sous le header */}
       <div className="border-border/50 border-t md:hidden">
-        <div className="mx-auto max-w-6xl px-4 py-2">
+        <div className="site-container py-2">
           <Nav />
         </div>
       </div>

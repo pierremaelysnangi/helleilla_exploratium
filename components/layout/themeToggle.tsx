@@ -25,15 +25,24 @@ export function ThemeToggle() {
 
   const isDark = resolvedTheme === "dark";
 
+  // Avant montage, `resolvedTheme` est indéfini côté serveur : TOUT ce qui
+  // en dépend doit être neutralisé, attributs compris. Seul le contenu
+  // l'était, et l'aria-label divergeait donc entre serveur et client —
+  // c'est l'écart d'hydratation que React signalait sur chaque page.
+  const label = !mounted
+    ? "Changer de thème"
+    : isDark
+      ? "Passer en thème clair"
+      : "Passer en thème sombre";
+
   return (
     <button
       type="button"
-      aria-label={isDark ? "Passer en thème clair" : "Passer en thème sombre"}
+      aria-label={label}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="metal-nav-link border-border hover:border-primary/40 rounded-md border px-2 py-1"
     >
-      {/* Rendu neutre avant montage : évite l'écart d'hydratation */}
-      {mounted ? (isDark ? "☀" : "☾") : "☾"}
+      <span aria-hidden>{mounted ? (isDark ? "☀" : "☾") : "☾"}</span>
     </button>
   );
 }

@@ -34,7 +34,7 @@ export function UserMenu() {
         </Link>
         <Link
           href="/sign-up"
-          className="bg-primary text-primary-foreground rounded-md px-3 py-1.5 text-sm font-semibold tracking-widest uppercase transition-opacity hover:opacity-90"
+          className="bg-primary text-primary-foreground rounded-md px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 sm:px-3 sm:text-sm sm:tracking-widest"
         >
           Inscription
         </Link>
@@ -48,7 +48,7 @@ export function UserMenu() {
   const isAdmin = role === "admin";
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3">
       <Link href="/contributions" className="metal-nav-link">
         Contribuer
       </Link>

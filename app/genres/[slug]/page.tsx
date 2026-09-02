@@ -97,7 +97,7 @@ export default async function GenreDetailPage({ params }: GenrePageProps) {
       {genre.subgenres.length > 0 && (
         <section aria-label="Sous-genres" className="flex flex-col gap-3">
           <h2 className="metal-title text-lg">Sous-genres</h2>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
             {genre.subgenres.map((sub) => (
               <li key={sub.id}>
                 <GenreCard genre={sub} />
@@ -118,7 +118,7 @@ export default async function GenreDetailPage({ params }: GenrePageProps) {
             ctaLabel="Parcourir le catalogue"
           />
         ) : (
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="3xl:grid-cols-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {genre.bands.map((band) => (
               <li key={band.id}>
                 <BandCard band={band} />

@@ -23,7 +23,7 @@ export function RecentAlbums({ albums }: { albums: AlbumWithBand[] }) {
       <h2 id="derniers-albums" className="metal-title text-lg">
         Dernières sorties référencées
       </h2>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {albums.map((album) => (
           <li key={album.id}>
             <AlbumCard album={album} bandSlug={album.bandSlug} />

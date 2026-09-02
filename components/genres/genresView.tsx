@@ -57,7 +57,7 @@ export function GenresView() {
         </p>
       )}
 
-      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+      <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
         {visible.map((genre) => (
           <li key={genre.id}>
             <GenreCard genre={genre} />

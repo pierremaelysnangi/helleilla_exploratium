@@ -41,6 +41,17 @@ export const genres = pgTable("genres", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  /**
+   * Horodatage de dernière modification.
+   *
+   * Absent à l'origine, contrairement à toutes les autres tables : le
+   * contrat client (`genreRowSchema`) l'exigeait pourtant, et la page
+   * détail échouait à la validation. Il alimente aussi le `lastModified`
+   * des genres dans le sitemap, jusqu'ici vide.
+   */
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 /**

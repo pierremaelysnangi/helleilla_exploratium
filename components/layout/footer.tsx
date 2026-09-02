@@ -8,7 +8,7 @@
 export function Footer() {
   return (
     <footer className="border-border bg-background/60 border-t">
-      <div className="text-muted-foreground mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="text-muted-foreground site-container flex flex-col gap-2 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
         <p>
           <span className="metal-title text-sm">Helleilla Exploratium</span> —
           encyclopédie collaborative du metal.
