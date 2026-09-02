@@ -1,0 +1,22 @@
+-- Migration VOLONTAIREMENT INERTE.
+--
+-- Elle acte, au niveau du schéma suivi par Drizzle, que les tables
+-- d'identité (user, session, account, verification) ne font plus partie
+-- de la base CONTENU : elles appartiennent à la base dédiée décrite par
+-- `drizzle.auth.config.ts` (cloisonnement RGPD).
+--
+-- Aucune donnée n'est supprimée, et c'est délibéré :
+--
+--   * en mode mono-base — le repli de `lib/auth-db.ts` quand
+--     IDENTITY_AUTH_DATABASE_URL est absente, ce qui est le cas des tests
+--     E2E — ces tables portent les comptes RÉELS. Les supprimer rendrait
+--     l'authentification inopérante.
+--   * sur une base contenu déjà scindée, elles ne sont plus que des
+--     vestiges du mode initial. Les retirer physiquement est une décision
+--     distincte, à prendre après avoir vérifié que les identités ont bien
+--     été recopiées (voir scripts/migrate-auth-db.ts).
+--
+-- Le snapshot associé, lui, ne les référence plus : les prochaines
+-- générations ne proposeront donc plus de DROP surprise à chaque exécution
+-- de `pnpm db:generate`.
+SELECT 1;

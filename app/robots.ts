@@ -9,7 +9,7 @@
 import type { MetadataRoute } from "next";
 
 /** URL de base absolue (cohérente avec metadataBase du layout racine). */
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export default function robots(): MetadataRoute.Robots {
   return {

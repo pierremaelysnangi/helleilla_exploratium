@@ -10,6 +10,9 @@
 
 // Wrapper standard + réponses
 import { route } from "@/lib/api/handler";
+// Matrice RBAC : `contribution:delete` exprime déjà le rejet terminal
+import { can } from "@/lib/rbac/permissions";
+import type { Role } from "@/lib/rbac/roles";
 import { ok, fail } from "@/lib/api/response";
 import { idParamSchema } from "@/lib/api/schemas";
 // Validation des entrées (source unique)
@@ -62,8 +65,11 @@ export const PATCH = route(
 
     // --- Rejet terminal : admin uniquement ---
     if (body.status === "rejected") {
-      const role = session!.user.role ?? "user";
-      if (role !== "admin") {
+      // `contribution:delete` n'est accordé qu'à l'admin dans la matrice :
+      // c'est exactement la règle du rejet terminal, inutile de la
+      // redéclarer sous forme de comparaison de rôle.
+      const role = (session!.user.role ?? "user") as Role;
+      if (!can(role, "contribution", "delete")) {
         return fail(
           "FORBIDDEN",
           "Le rejet terminal est réservé aux administrateurs (demandez des preuves)",

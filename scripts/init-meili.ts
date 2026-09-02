@@ -6,7 +6,8 @@
  * - tracks : recherche sur titre/album/groupe, tri par numéro de piste
  */
 
-import { meili, INDEXES } from "../lib/meili"; // Client Meilisearch et noms d'index
+// Client Meilisearch et noms d'index (source unique du reste de l'app)
+import { meilisearch as meili, INDEXES } from "../lib/search/meilisearch";
 
 /**
  * Point d'entrée du script : crée chaque index avec `id` comme clé primaire

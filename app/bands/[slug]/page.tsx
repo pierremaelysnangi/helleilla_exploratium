@@ -24,7 +24,7 @@ type BandDetailPageProps = {
 };
 
 /** URL de base absolue (cohérente avec le layout racine). */
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /** Metadata dynamique : canonical, OpenGraph, description depuis la bio. */
 export async function generateMetadata({

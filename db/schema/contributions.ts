@@ -4,7 +4,7 @@
  *
  * Cycle de vie :
  *   pending -> evidence_requested <-> (preuves fournies) -> approved
- *   evidence_requested --(2 relances sans réponse / 60 jours, job BullMQ)
+ *   evidence_requested --(2 relances sans réponse / 30 jours, job BullMQ)
  *                      -> expired
  *   Seul un admin peut poser un rejet terminal manuel (`rejected`).
  *
@@ -39,7 +39,7 @@ export const contributionTypeEnum = pgEnum("contribution_type", [
  * - evidence_requested : le modérateur demande des preuves
  *   supplémentaires (boucle avec le contributeur, jamais un rejet sec) ;
  * - approved : validé — médias promus et groupe créé/enrichi ;
- * - expired : aucune preuve fournie après 2 relances / 60 jours ;
+ * - expired : aucune preuve fournie après 2 relances / 30 jours ;
  * - rejected : rejet terminal, décision manuelle d'admin uniquement.
  */
 export const contributionStatusEnum = pgEnum("contribution_status", [

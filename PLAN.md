@@ -192,19 +192,54 @@ qui demande des arbitrages plutôt que du code.
 
 ---
 
-## Dette signalée, non traitée (décisions à prendre)
+## Dette résorbée
 
-Constats relevés au fil des phases, volontairement laissés de côté car ils
-demandent un arbitrage plutôt qu'un correctif mécanique.
+Les constats relevés au fil des phases ont été traités.
 
-| Sujet                                | Détail                                                                                                                                                                                                                                                                          |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Cloisonnement RGPD non étanche**   | `db/schema/index.ts` ré-exporte `./auth` : `drizzle.config.ts` embarque donc `user/session/account/verification` dans le schéma de la base _contenu_, en doublon de `migrations-auth/`. Aucun code n'en dépend, mais retirer la ré-export génère une migration **destructive**. |
-| **L'approbation ne crée aucun band** | Une contribution approuvée passe en `approved` sans créer ni `band` ni `external_refs` depuis le `payload`. `promoteContributionFiles` n'est de plus jamais atteint pour `band_create` (la garde exige `targetBandId`, propre à `band_update`). À traiter avec la phase C.      |
-| **Délai d'expiration incohérent**    | `CONTRIBUTION_POLICY.evidenceDeadlineDays = 30` alors que les docstrings et `LEXIQUE.md` annoncent 60 jours.                                                                                                                                                                    |
-| **Repli d'URL fragile**              | `process.env.NEXT_PUBLIC_APP_URL ?? "…"` : une variable **définie mais vide** produit un lien de reset relatif cassé (`??` ne rattrape que `undefined`). Un `                                                                                                                   |     | ` suffirait. |
-| **Rôles codés en dur**               | Les deux routes de contributions testent `["moderator","admin"].includes(role)` alors que la matrice exprime déjà `contribution:moderate` / `:delete`.                                                                                                                          |
-| **Doublons**                         | `lib/meili.ts` ↔ `lib/search/meilisearch.ts` (deux clients Meilisearch) ; `scripts/check-tables.ts` ↔ `list-tables.ts`.                                                                                                                                                         |
-| **Thème « metal » rendu en gris**    | `styles/theme.css` bâtit ses accents « rouge sang » sur `var(--primary)`, resté à la valeur shadcn `neutral` (chroma 0). Les tokens de marque n'ont jamais été personnalisés.                                                                                                   |
-| **Duplication de fichiers d'état**   | 5 `loading.tsx` strictement identiques, 2 `error.tsx` quasi identiques exposant `error.message` brut à l'utilisateur.                                                                                                                                                           |
-| **`types/*` entièrement doc-only**   | 4 fichiers sans aucun export ; les types réels vivent dans les schémas zod.                                                                                                                                                                                                     |
+| Sujet                              | Traitement                                                                                                                                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approbation sans effet             | ✅ `lib/contributions/approve.ts` matérialise le dossier (phase C)                                                                                                                                                                    |
+| Délai d'expiration incohérent      | ✅ Les docstrings disent 30 jours, comme `CONTRIBUTION_POLICY`                                                                                                                                                                        |
+| Repli d'URL fragile                | ✅ `\|\|` partout : une variable définie mais VIDE retombe désormais sur le défaut, là où `??` ne rattrapait que `undefined`                                                                                                          |
+| Rôles codés en dur                 | ✅ Les deux routes de contributions interrogent `can()` (`contribution:moderate` et `:delete`) au lieu de comparer des chaînes                                                                                                        |
+| Doublons                           | ✅ `lib/meili.ts` supprimé au profit de `lib/search/meilisearch.ts`, qui porte désormais `INDEXES` ; `scripts/check-tables.ts` supprimé ; `scripts/setup/*.sh` supprimés (ils recréaient les placeholders effacés)                    |
+| `mark-migration-applied` figé      | ✅ Prend la migration en argument ; il visait la 0000 en dur, donc la mauvaise migration passé 0000                                                                                                                                   |
+| Thème « metal » rendu en gris      | ✅ `--primary` passe en rouge sang `oklch(… 0.18 25)`. Contrastes mesurés : **7,5:1** (clair) et **6,1:1** (sombre) avec le texte blanc, **3,25:1** du bouton sur fond sombre — au-dessus des seuils WCAG.                            |
+| Duplication des fichiers d'état    | ✅ 6 `loading.tsx` réduits à une déclaration de forme (`LoadingSkeleton` / `DetailSkeleton`) ; `error.tsx` partagent `<ErrorFallback>`, qui n'expose plus `error.message` mais le `digest` corrélable aux journaux                    |
+| `types/*` doc-only                 | ✅ Les 4 fichiers sans export supprimés ; les types vivent dans les schémas zod                                                                                                                                                       |
+| Cloisonnement RGPD — **côté code** | ✅ `db/schema/index.ts` ne ré-exporte plus `./auth`. Migration `0006` volontairement INERTE : le snapshot cesse de suivre les tables identité, donc `db:generate` ne propose plus de `DROP` surprise, et aucune donnée n'est touchée. |
+
+---
+
+## Reste à arbitrer : les tables identité résiduelles
+
+La base CONTENU héberge encore physiquement `user`, `session`, `account`
+et `verification` — vestiges du mode mono-base initial. Comptage réel au
+moment de l'écriture :
+
+| Base                                    | `user` | `account` |
+| --------------------------------------- | ------ | --------- |
+| contenu (`DATABASE_URL`)                | 1      | 1         |
+| identité (`IDENTITY_AUTH_DATABASE_URL`) | 1      | 1         |
+
+Les identités ont donc bien été recopiées : la version côté contenu est un
+**doublon de données personnelles** (email, hash de mot de passe) dans la
+base qui ne devrait en contenir aucune.
+
+Les supprimer est une opération **irréversible sur une base réelle**, et ne
+peut pas passer par une migration : en mode mono-base — le repli de
+`lib/auth-db.ts` quand `IDENTITY_AUTH_DATABASE_URL` est absente, ce qui est
+le cas des **tests E2E** — ces tables portent les comptes réels. Une
+migration qui les supprime casserait l'authentification en E2E.
+
+L'opération se fait donc à la main, sur la seule base contenu, après avoir
+confirmé que la base identité est bien à jour :
+
+```sql
+-- À exécuter UNIQUEMENT sur la base contenu, jamais sur la base identité
+DROP TABLE IF EXISTS "session", "account", "verification", "user" CASCADE;
+DROP TYPE IF EXISTS "user_role";
+```
+
+Tant que ce n'est pas fait, le cloisonnement est correct au niveau du code
+et de l'application, mais pas au niveau des données au repos.

@@ -17,7 +17,7 @@ import type { auth } from "@/lib/auth";
  * - plugins : fonctions admin et typage des champs additionnels définis côté serveur
  */
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   plugins: [adminClient(), inferAdditionalFields<typeof auth>()],
 });
 
