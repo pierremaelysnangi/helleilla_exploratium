@@ -82,7 +82,11 @@ export async function searchArtists(name: string) {
  */
 export async function getArtist(mbid: string) {
   return fetchJson<MbArtist>(
-    `${BASE}/artist/${encodeURIComponent(mbid)}?inc=artist-relations+url-relations+tags+genres&fmt=json`,
+    // `artist-rels` / `url-rels` : ce sont les noms attendus par l'API.
+    // « artist-relations » / « url-relations » renvoyaient un HTTP 400 —
+    // donc AUCUNE donnée Wikidata ni membre n'a jamais été résolue, et le
+    // resolver média se déclarait dégradé en permanence.
+    `${BASE}/artist/${encodeURIComponent(mbid)}?inc=artist-rels+url-rels+tags+genres&fmt=json`,
     mbArtistSchema,
     { minIntervalMs: 1100 },
   );
@@ -113,4 +117,78 @@ export function extractMembers(
         r.type === "member of band" && r.direction === "backward" && r.artist,
     )
     .map((r) => ({ id: r.artist!.id, name: r.artist!.name }));
+}
+
+/**
+ * Une piste d'un support : position, titre et durée en millisecondes.
+ */
+const mbTrackSchema = z.object({
+  position: z.number().int(),
+  title: z.string(),
+  length: z.number().int().nullish(),
+});
+
+/** Un support physique ou numérique d'une édition (disque 1, disque 2…). */
+const mbMediumSchema = z.object({
+  position: z.number().int().nullish(),
+  tracks: z.array(mbTrackSchema).default([]),
+});
+
+const mbReleaseListSchema = z.object({
+  releases: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        date: z.string().nullish(),
+        media: z.array(mbMediumSchema).default([]),
+      }),
+    )
+    .default([]),
+});
+
+/** Piste normalisée, prête à être insérée en base. */
+export type MbTrack = {
+  discNumber: number;
+  trackNumber: number;
+  title: string;
+  durationMs: number | null;
+};
+
+/**
+ * Tracklist d'une œuvre, lue sur sa PREMIÈRE édition parue.
+ *
+ * Un release-group réunit toutes les éditions d'un même album — originale,
+ * rééditions, versions augmentées. Prendre la plus ancienne donne la
+ * tracklist de référence, sans les bonus ajoutés après coup.
+ *
+ * @param releaseGroupMbid - Identifiant du release-group.
+ * @returns Les pistes ordonnées, ou un tableau vide si aucune édition
+ *   n'est documentée.
+ */
+export async function listReleaseGroupTracks(
+  releaseGroupMbid: string,
+): Promise<MbTrack[]> {
+  const result = await fetchJson(
+    `${BASE}/release?release-group=${encodeURIComponent(releaseGroupMbid)}` +
+      `&inc=recordings&limit=25&fmt=json`,
+    mbReleaseListSchema,
+    { minIntervalMs: 1100 },
+  );
+
+  // Édition la plus ancienne ; celles sans date passent en dernier
+  const releases = [...result.releases].sort((a, b) =>
+    (a.date ?? "9999").localeCompare(b.date ?? "9999"),
+  );
+  const chosen = releases.find((r) => r.media.some((m) => m.tracks.length > 0));
+  if (!chosen) return [];
+
+  return chosen.media.flatMap((medium, index) =>
+    medium.tracks.map((track) => ({
+      discNumber: medium.position ?? index + 1,
+      trackNumber: track.position,
+      title: track.title,
+      durationMs: track.length ?? null,
+    })),
+  );
 }

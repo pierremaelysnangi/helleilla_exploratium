@@ -11,6 +11,8 @@ import { bandIndexQueue } from "@/lib/queue/client";
 import { getBandById } from "@/db/queries/bands";
 // Client Meilisearch partagé
 import { meilisearch } from "@/lib/search/meilisearch";
+// Projection partagée avec la réindexation en masse (source unique)
+import { bandDocument } from "@/lib/search/documents";
 
 /** Charge utile du job : id du groupe + action à effectuer. */
 export type BandIndexJobData = {
@@ -66,16 +68,7 @@ export async function processBandIndex(data: BandIndexJobData) {
     return;
   }
 
-  await meilisearch.index("bands").addDocuments([
-    {
-      id: band.id,
-      name: band.name,
-      slug: band.slug,
-      bio: band.bio,
-      countryCode: band.countryCode,
-      formedYear: band.formedYear,
-    },
-  ]);
+  await meilisearch.index("bands").addDocuments([bandDocument(band)]);
 
   console.log(`✅ Band ${band.name} indexé dans Meilisearch`);
 }

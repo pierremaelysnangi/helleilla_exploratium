@@ -143,12 +143,18 @@ export async function resolveBandMedia(
   let wikidataSummary: Awaited<
     ReturnType<typeof dataProviders.wikidata.getSummary>
   > = null;
+  // L'image ne vient PAS du résumé : celui-ci décrit la page Wikidata,
+  // pas le sujet. Elle est portée par la déclaration P18 de l'entité,
+  // d'où deux appels distincts.
+  let wikidataImageUrl: string | null = null;
   if (wikidataId && isProviderAvailable("wikidata")) {
-    const [wd] = await Promise.allSettled([
+    const [wd, img] = await Promise.allSettled([
       dataProviders.wikidata.getSummary(wikidataId),
+      dataProviders.wikidata.getEntityImageUrl(wikidataId),
     ]);
     if (wd.status === "fulfilled") wikidataSummary = wd.value;
     else degraded = true;
+    if (img.status === "fulfilled") wikidataImageUrl = img.value;
   }
 
   // Meilleur match Discogs : détail connu, sinon recherche par nom
@@ -178,11 +184,8 @@ export async function resolveBandMedia(
       url: bestDiscogsMatch.cover_image ?? bestDiscogsMatch.thumb!,
     });
   }
-  if (wikidataSummary?.originalimage?.source) {
-    images.push({
-      provider: "wikidata",
-      url: wikidataSummary.originalimage.source,
-    });
+  if (wikidataImageUrl) {
+    images.push({ provider: "wikidata", url: wikidataImageUrl });
   }
   if (discogsArtist?.urls?.length && discogsRef) {
     for (const url of discogsArtist.urls.slice(0, 3)) {

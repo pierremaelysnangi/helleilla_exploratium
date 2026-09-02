@@ -36,7 +36,8 @@
     "openapi:lint": "pnpm openapi:export && redocly lint openapi/openapi.json",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:cov && pnpm openapi:lint",
     "seed:demo": "tsx --env-file=.env.local scripts/seed-demo.ts",
-    "covers:sync": "tsx --env-file=.env.local scripts/sync-covers.ts"
+    "search:reindex": "tsx --env-file=.env.local scripts/reindex-search.ts",
+    "media:sync": "tsx --env-file=.env.local scripts/sync-media.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",

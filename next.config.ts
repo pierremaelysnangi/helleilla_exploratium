@@ -72,7 +72,7 @@ const securityHeaders = [
       // Cover Art Archive redirige vers un nœud Internet Archive au nom
       // variable (dn710009.ca.archive.org…) : les DEUX hôtes sont requis,
       // sinon la pochette est bloquée après la redirection.
-      "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
+      "img-src 'self' data: blob: https://i.ytimg.com https://upload.wikimedia.org https://commons.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
       "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com https://widget.qobuz.com",
       // Sans media-src, l'audio retombait sur default-src 'self' : les
       // extraits Deezer et les fichiers MinIO étaient purement et
@@ -112,6 +112,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
+      // Special:FilePath, qui redirige vers upload.wikimedia.org
+      { protocol: "https", hostname: "commons.wikimedia.org" },
       { protocol: "https", hostname: "api.discogs.com" },
       { protocol: "https", hostname: "imgutils.discogs.com" },
       { protocol: "https", hostname: "**.dzcdn.net" },

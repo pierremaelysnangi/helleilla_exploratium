@@ -49,3 +49,66 @@ export async function getSummary(
     throw err;
   }
 }
+
+/**
+ * Contrat partiel de l'API EntityData : seule la propriété image (P18)
+ * nous intéresse, le reste de l'entité est volumineux et inutile ici.
+ */
+const entityImageSchema = z.object({
+  entities: z.record(
+    z.string(),
+    z.object({
+      claims: z
+        .object({
+          P18: z
+            .array(
+              z.object({
+                mainsnak: z.object({
+                  datavalue: z.object({ value: z.string() }).nullish(),
+                }),
+              }),
+            )
+            .nullish(),
+        })
+        .nullish(),
+    }),
+  ),
+});
+
+/**
+ * URL de l'image principale d'une entité Wikidata (propriété P18).
+ *
+ * L'endpoint `page/summary` utilisé par `getSummary` décrit la PAGE
+ * Wikidata, pas le sujet : il ne porte jamais la photo du groupe. La
+ * donnée vit dans la déclaration P18 de l'entité, sous forme d'un nom de
+ * fichier Commons.
+ *
+ * On renvoie l'URL `Special:FilePath`, qui redirige toujours vers le
+ * fichier courant, plutôt que l'adresse de stockage résolue : celle-ci
+ * changerait si l'image était remplacée sur Commons.
+ *
+ * @param entityId - Identifiant d'entité (« Q160119 »).
+ * @param width - Largeur souhaitée en pixels.
+ * @returns L'URL de l'image, ou `null` si l'entité n'en déclare aucune.
+ */
+export async function getEntityImageUrl(
+  entityId: string,
+  width = 800,
+): Promise<string | null> {
+  try {
+    const data = await fetchJson(
+      `https://www.wikidata.org/wiki/Special:EntityData/${encodeURIComponent(entityId)}.json`,
+      entityImageSchema,
+    );
+    const fileName =
+      data.entities[entityId]?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+    if (!fileName) return null;
+    return (
+      "https://commons.wikimedia.org/wiki/Special:FilePath/" +
+      `${encodeURIComponent(fileName)}?width=${width}`
+    );
+  } catch {
+    // Entité absente ou service indisponible : pas de visuel, pas d'erreur
+    return null;
+  }
+}

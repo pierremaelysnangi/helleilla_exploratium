@@ -11,6 +11,8 @@ import { albumIndexQueue } from "@/lib/queue/client";
 import { getAlbumById } from "@/db/queries/albums";
 // Client Meilisearch partagé
 import { meilisearch } from "@/lib/search/meilisearch";
+// Projection partagée avec la réindexation en masse (source unique)
+import { albumDocument } from "@/lib/search/documents";
 
 /** Charge utile du job : id de l'album + action à effectuer. */
 export type AlbumIndexJobData = {
@@ -66,16 +68,7 @@ export async function processAlbumIndex(data: AlbumIndexJobData) {
     return;
   }
 
-  await meilisearch.index("albums").addDocuments([
-    {
-      id: album.id,
-      title: album.title,
-      slug: album.slug,
-      bandId: album.bandId,
-      type: album.type,
-      releaseDate: album.releaseDate,
-    },
-  ]);
+  await meilisearch.index("albums").addDocuments([albumDocument(album)]);
 
   console.log(`✅ Album ${album.title} indexé dans Meilisearch`);
 }

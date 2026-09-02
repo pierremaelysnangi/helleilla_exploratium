@@ -11,6 +11,8 @@ import { trackIndexQueue } from "@/lib/queue/client";
 import { getTrackById } from "@/db/queries/tracks";
 // Client Meilisearch partagé
 import { meilisearch } from "@/lib/search/meilisearch";
+// Projection partagée avec la réindexation en masse (source unique)
+import { trackDocument } from "@/lib/search/documents";
 
 /** Charge utile du job : id de la piste + action à effectuer. */
 export type TrackIndexJobData = {
@@ -66,15 +68,7 @@ export async function processTrackIndex(data: TrackIndexJobData) {
     return;
   }
 
-  await meilisearch.index("tracks").addDocuments([
-    {
-      id: track.id,
-      title: track.title,
-      albumId: track.albumId,
-      trackNumber: track.trackNumber,
-      durationMs: track.durationMs,
-    },
-  ]);
+  await meilisearch.index("tracks").addDocuments([trackDocument(track)]);
 
   console.log(`✅ Track ${track.title} indexé dans Meilisearch`);
 }

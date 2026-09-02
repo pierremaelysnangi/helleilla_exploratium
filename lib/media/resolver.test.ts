@@ -36,6 +36,7 @@ vi.mock("@/db/queries/externalRefs", () => ({
 
 // Providers factices pilotables par test.
 const providersMock = vi.hoisted(() => ({
+  wdImage: vi.fn(),
   mbGetArtist: vi.fn(),
   mbSearch: vi.fn(),
   wdSummary: vi.fn(),
@@ -50,7 +51,10 @@ vi.mock("@/lib/providers", () => ({
       getArtist: providersMock.mbGetArtist,
       searchArtists: providersMock.mbSearch,
     },
-    wikidata: { getSummary: providersMock.wdSummary },
+    wikidata: {
+      getSummary: providersMock.wdSummary,
+      getEntityImageUrl: providersMock.wdImage,
+    },
     discogs: {
       getArtist: providersMock.discogsGetArtist,
       searchArtists: providersMock.discogsSearch,
@@ -117,8 +121,12 @@ describe("resolveBandMedia", () => {
       type: "item",
       title: "Q494",
       extract: "Groupe norvégien.",
-      originalimage: { source: "https://upload.wikimedia.org/e.jpg" },
     });
+    // L'image vient de la déclaration P18 de l'entité, pas du résumé :
+    // celui-ci décrit la page Wikidata et n'en porte jamais.
+    providersMock.wdImage.mockResolvedValue(
+      "https://commons.wikimedia.org/wiki/Special:FilePath/e.jpg?width=800",
+    );
     providersMock.deezerSearch.mockResolvedValue([
       {
         id: 1,
@@ -143,6 +151,7 @@ describe("resolveBandMedia", () => {
     });
     expect(media.info.members).toEqual([{ id: "m1", name: "Ihsahn" }]);
     expect(media.info.wikidata?.extract).toContain("norvégien");
+    expect(media.images.some((i) => i.provider === "wikidata")).toBe(true);
     expect(media.images.map((i) => i.provider)).toEqual(["wikidata"]);
     expect(media.previews).toHaveLength(1);
     expect(media.degraded).toBe(false);
