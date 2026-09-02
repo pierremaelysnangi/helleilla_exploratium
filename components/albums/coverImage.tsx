@@ -39,6 +39,8 @@ type CoverImageProps = {
   bandImageUrl?: string | null;
   /** Nom du groupe, pour l'annonce du repli. */
   bandName?: string;
+  /** Charge l'image sans attendre le défilement (candidats LCP). */
+  priority?: boolean;
 };
 
 export function CoverImage({
@@ -47,6 +49,7 @@ export function CoverImage({
   sizes,
   bandImageUrl,
   bandName,
+  priority = false,
 }: CoverImageProps) {
   // Deux échecs indépendants : la pochette peut tomber sans que le
   // visuel du groupe tombe, et inversement.
@@ -63,6 +66,7 @@ export function CoverImage({
         alt={`Pochette de ${title}`}
         fill
         sizes={sizes}
+        priority={priority}
         onError={() => setCoverFailed(true)}
         className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
       />
@@ -80,6 +84,9 @@ export function CoverImage({
         }
         fill
         sizes={sizes}
+        // Le repli peut parfaitement être le Largest Contentful Paint :
+        // sur une grille de démos sans pochette, c'est même la règle.
+        priority={priority}
         onError={() => setBandFailed(true)}
         // Assombri et désaturé : le lecteur doit voir au premier coup
         // d'œil que ce visuel tient lieu de pochette sans en être une.

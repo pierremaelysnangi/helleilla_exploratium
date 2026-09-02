@@ -20,7 +20,11 @@ import { useEffect, useRef } from "react";
 export type InfiniteGridProps<T> = {
   items: T[];
   getItemKey: (item: T, index: number) => string | number;
-  renderItem: (item: T) => React.ReactNode;
+  /**
+   * `index` permet à l'appelant de donner la priorité de chargement aux
+   * premières cartes, qui décident du Largest Contentful Paint.
+   */
+  renderItem: (item: T, index: number) => React.ReactNode;
   /** Classes de grille ; permet d'ajuster les paliers par contexte. */
   className?: string;
   onLoadMore?: () => void;
@@ -69,7 +73,7 @@ export function InfiniteGrid<T>({
             // saute pendant que le navigateur rend les cartes hors écran.
             className="[contain-intrinsic-size:auto_260px] [content-visibility:auto]"
           >
-            {renderItem(item)}
+            {renderItem(item, index)}
           </li>
         ))}
       </ul>

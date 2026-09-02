@@ -30,6 +30,14 @@ type AlbumCardProps = {
   /** Visuel du groupe : repli quand aucune pochette n'est archivée. */
   bandImageUrl?: string | null;
   /**
+   * Charge la pochette sans attendre le défilement.
+   *
+   * À réserver aux toutes premières cartes d'une grille : ce sont elles
+   * qui décident du Largest Contentful Paint, et le chargement paresseux
+   * par défaut retardait donc la mesure de la page entière.
+   */
+  priority?: boolean;
+  /**
    * Slug du groupe propriétaire.
    *
    * Obligatoire : l'URL canonique d'un album est band-scopée, car son slug
@@ -44,6 +52,7 @@ export function AlbumCard({
   bandSlug,
   bandName,
   bandImageUrl,
+  priority = false,
 }: AlbumCardProps) {
   return (
     <Link
@@ -57,6 +66,7 @@ export function AlbumCard({
           title={album.title}
           bandImageUrl={bandImageUrl}
           bandName={bandName}
+          priority={priority}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1536px) 200px, 160px"
         />
       </div>

@@ -171,6 +171,9 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             title={album.title}
             bandImageUrl={album.band.imageUrl}
             bandName={album.band.name}
+            // Visuel principal de la page : c'est lui le Largest
+            // Contentful Paint, l'attendre au défilement n'a pas de sens.
+            priority
             sizes="224px"
           />
         </div>

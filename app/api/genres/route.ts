@@ -51,7 +51,13 @@ export const GET = route(
         .select()
         .from(genres)
         .where(where)
-        .orderBy(dir(genres.name))
+        // `id` en dernier critère : sans départage stable, deux lignes
+        // de même valeur de tri peuvent s'échanger d'une requête à
+        // l'autre. En pagination LIMIT/OFFSET, la même ligne apparaît
+        // alors sur deux pages — et une autre sur aucune. React signalait
+        // le symptôme (« two children with the same key »), la cause est
+        // ici.
+        .orderBy(dir(genres.name), asc(genres.id))
         .limit(perPage)
         .offset(offset),
       db

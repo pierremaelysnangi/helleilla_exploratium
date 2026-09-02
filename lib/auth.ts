@@ -114,6 +114,18 @@ export const auth = betterAuth({
     customRules: {
       "/sign-in/email": { window: 300, max: 5 },
       "/sign-up/email": { window: 3600, max: 3 },
+      /**
+       * Lecture de session : appelée à CHAQUE affichage de page par
+       * l'en-tête. Le plafond global de 10/minute était donc atteint dès
+       * qu'une personne parcourait une dizaine de pages en une minute —
+       * ce qui n'a rien d'exceptionnel dans un catalogue — et l'en-tête
+       * la présentait alors comme déconnectée.
+       *
+       * Ce n'est pas un point d'entrée sensible : il ne consomme aucun
+       * secret et ne permet aucune énumération. Une limite haute y est
+       * appropriée, là où connexion et inscription restent verrouillées.
+       */
+      "/get-session": { window: 60, max: 120 },
     },
     storage: "secondary-storage", // compteurs stockés dans Redis
   },

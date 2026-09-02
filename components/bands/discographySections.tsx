@@ -53,6 +53,9 @@ type DiscographySectionsProps = {
   headingLevel?: "h2" | "h3";
 };
 
+/** Nombre de cartes chargées sans attendre le défilement. */
+const EAGER_CARDS = 6;
+
 export function DiscographySections({
   albums,
   bandSlug,
@@ -62,9 +65,25 @@ export function DiscographySections({
 }: DiscographySectionsProps) {
   const Heading = headingLevel;
 
+  // Rang de départ de chaque section sur la PAGE ENTIÈRE, calculé une
+  // fois. La première section peut ne contenir qu'une sortie, auquel cas
+  // le Largest Contentful Paint se trouve dans la suivante — une
+  // priorité comptée par section le manquait.
+  //
+  // Cumul par `reduce` plutôt qu'un compteur incrémenté dans le rendu :
+  // muter une variable pendant le rendu produit des résultats
+  // dépendants de l'ordre d'évaluation de React.
+  const sections = groupByType(albums).reduce<
+    { type: AlbumRow["type"]; albums: AlbumRow[]; offset: number }[]
+  >((acc, section) => {
+    const previous = acc.at(-1);
+    const offset = previous ? previous.offset + previous.albums.length : 0;
+    return [...acc, { ...section, offset }];
+  }, []);
+
   return (
     <div className="flex flex-col gap-8">
-      {groupByType(albums).map((section) => (
+      {sections.map((section) => (
         <section
           key={section.type}
           aria-label={TYPE_SECTIONS[section.type]}
@@ -78,13 +97,14 @@ export function DiscographySections({
           </Heading>
 
           <ul className="3xl:grid-cols-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {section.albums.map((album) => (
+            {section.albums.map((album, index) => (
               <li key={album.id}>
                 <AlbumCard
                   album={album}
                   bandSlug={bandSlug}
                   bandImageUrl={bandImageUrl}
                   bandName={bandName}
+                  priority={section.offset + index < EAGER_CARDS}
                 />
               </li>
             ))}

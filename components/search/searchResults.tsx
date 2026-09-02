@@ -110,7 +110,7 @@ export function SearchResults({ q }: SearchResultsProps) {
         <section>
           <SectionHeader label="Albums" count={data.albums.length} />
           <ul className="3xl:grid-cols-8 mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {data.albums.map((album) => (
+            {data.albums.map((album, index) => (
               <li key={album.id}>
                 <Link
                   href={`/bands/${album.bandSlug}/albums/${album.slug}`}
@@ -122,6 +122,7 @@ export function SearchResults({ q }: SearchResultsProps) {
                       title={album.title}
                       bandImageUrl={album.bandImageUrl}
                       bandName={album.bandName}
+                      priority={index < 6}
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                     />
                   </span>

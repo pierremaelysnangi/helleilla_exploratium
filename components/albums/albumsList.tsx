@@ -100,12 +100,15 @@ export function AlbumsList() {
         <InfiniteGrid
           items={rows}
           getItemKey={(album) => album.id}
-          renderItem={(album) => (
+          renderItem={(album, index) => (
             <AlbumCard
               album={album}
               bandSlug={album.band.slug}
               bandName={album.band.name}
               bandImageUrl={album.band.imageUrl}
+              // Première rangée en 4K : au-delà, le chargement paresseux
+              // reste préférable.
+              priority={index < 8}
             />
           )}
           hasMore={infinite.hasNextPage}
