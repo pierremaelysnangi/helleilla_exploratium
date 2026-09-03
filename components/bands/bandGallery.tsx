@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { ResilientImage } from "@/components/media/resilientImage";
 import type { BandMedia } from "@/hooks/api/schemas";
 
 type GalleryImage = BandMedia["images"][number];
@@ -69,7 +69,7 @@ export function BandGallery({
               aria-label={`Agrandir : ${KIND_LABELS[image.kind].toLowerCase()} de ${bandName}`}
               className="border-border hover:border-primary/50 group relative block h-32 w-44 overflow-hidden rounded-md border transition-colors"
             >
-              <Image
+              <ResilientImage
                 src={image.url}
                 alt={`${KIND_LABELS[image.kind]} de ${bandName}`}
                 fill
@@ -99,7 +99,10 @@ export function BandGallery({
         {current && (
           <div className="flex flex-col gap-3 p-4">
             <div className="bg-muted relative h-[60dvh] w-full">
-              <Image
+              {/* C'est à l'agrandissement que l'échec se voyait le plus :
+                  la vignette avait pu passer, mais la taille demandée ici
+                  relance une requête vers l'amont. */}
+              <ResilientImage
                 src={current.url}
                 alt={`${KIND_LABELS[current.kind]} de ${bandName}`}
                 fill

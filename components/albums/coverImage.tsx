@@ -24,7 +24,7 @@
  * une encyclopédie ne doit pas laisser croire le contraire.
  */
 
-import Image from "next/image";
+import { ResilientImage } from "@/components/media/resilientImage";
 import { useState } from "react";
 import { ArtworkFallback } from "@/components/media/artworkFallback";
 
@@ -61,13 +61,16 @@ export function CoverImage({
 
   if (useCover) {
     return (
-      <Image
+      <ResilientImage
         src={src!}
         alt={`Pochette de ${title}`}
         fill
         sizes={sizes}
         priority={priority}
-        onError={() => setCoverFailed(true)}
+        // Le repli n'intervient qu'après épuisement des réessais : une
+        // indisponibilité passagère de l'archive ne doit pas faire
+        // basculer durablement la pochette sur le visuel du groupe.
+        onExhausted={() => setCoverFailed(true)}
         className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
       />
     );
@@ -75,7 +78,7 @@ export function CoverImage({
 
   if (useBand) {
     return (
-      <Image
+      <ResilientImage
         src={bandImageUrl!}
         alt={
           bandName
@@ -87,7 +90,7 @@ export function CoverImage({
         // Le repli peut parfaitement être le Largest Contentful Paint :
         // sur une grille de démos sans pochette, c'est même la règle.
         priority={priority}
-        onError={() => setBandFailed(true)}
+        onExhausted={() => setBandFailed(true)}
         // Légèrement retenu, pas effacé : il faut RECONNAÎTRE le groupe.
         // À 55 % d'opacité le visuel passait pour un bloc gris vide, ce
         // qui manquait le but — un repli qui n'identifie rien ne vaut pas

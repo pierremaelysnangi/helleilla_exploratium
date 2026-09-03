@@ -39,7 +39,8 @@
     "search:reindex": "tsx --env-file=.env.local scripts/reindex-search.ts",
     "media:sync": "tsx --env-file=.env.local scripts/sync-media.ts",
     "dedupe:albums": "tsx --env-file=.env.local scripts/dedupe-albums.ts",
-    "check:album-types": "tsx --env-file=.env.local scripts/check-album-types.ts"
+    "check:album-types": "tsx --env-file=.env.local scripts/check-album-types.ts",
+    "album:remove": "tsx --env-file=.env.local scripts/remove-album.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",
