@@ -27,6 +27,8 @@
 import { ResilientImage } from "@/components/media/resilientImage";
 import { useState } from "react";
 import { ArtworkFallback } from "@/components/media/artworkFallback";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type CoverImageProps = {
   /** URL de la pochette, ou null si aucune n'est référencée. */
@@ -53,6 +55,7 @@ export function CoverImage({
 }: CoverImageProps) {
   // Deux échecs indépendants : la pochette peut tomber sans que le
   // visuel du groupe tombe, et inversement.
+  const t = useT();
   const [coverFailed, setCoverFailed] = useState(false);
   const [bandFailed, setBandFailed] = useState(false);
 
@@ -63,7 +66,7 @@ export function CoverImage({
     return (
       <ResilientImage
         src={src!}
-        alt={`Pochette de ${title}`}
+        alt={interpolate(t.common.coverOf, { title })}
         fill
         sizes={sizes}
         priority={priority}
@@ -80,11 +83,10 @@ export function CoverImage({
     return (
       <ResilientImage
         src={bandImageUrl!}
-        alt={
-          bandName
-            ? `Aucune pochette pour ${title} — visuel de ${bandName}`
-            : `Aucune pochette pour ${title} — visuel du groupe`
-        }
+        alt={interpolate(t.common.noCoverFor, {
+          title,
+          band: bandName ?? "",
+        })}
         fill
         sizes={sizes}
         // Le repli peut parfaitement être le Largest Contentful Paint :

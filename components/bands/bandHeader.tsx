@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * <BandHeader> — en-tête héro du détail d'un groupe (Server-friendly).
  * Reçoit le détail validé (`bandDetailSchema`) : image/logo, nom,
@@ -9,12 +11,14 @@ import Image from "next/image";
 import Link from "next/link";
 import type { BandDetail } from "@/hooks/api/schemas";
 import { ArtworkFallback } from "@/components/media/artworkFallback";
+import { useT } from "@/lib/i18n/client";
 
 type BandHeaderProps = {
   band: BandDetail;
 };
 
 export function BandHeader({ band }: BandHeaderProps) {
+  const t = useT();
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start">
       {/* Visuel principal, ou repli neutre si aucune source n'en a fourni */}
@@ -50,7 +54,9 @@ export function BandHeader({ band }: BandHeaderProps) {
               est une information, pas une donnée manquante. */}
           <span>
             {band.formedYear ?? "?"} –{" "}
-            {band.dissolvedYear ? `${band.dissolvedYear} (séparé)` : "actif"}
+            {band.dissolvedYear
+              ? `${band.dissolvedYear} (${t.band.disbanded})`
+              : t.band.active}
           </span>
         </p>
 
@@ -58,7 +64,7 @@ export function BandHeader({ band }: BandHeaderProps) {
             les genres seuls ne disent pas. Aucune parole n'est reproduite. */}
         {band.themes && band.themes.length > 0 && (
           <p className="text-muted-foreground mt-3 text-sm">
-            <span className="tracking-wide uppercase">Thèmes</span>
+            <span className="tracking-wide uppercase">{t.band.themes}</span>
             {" · "}
             {band.themes.join(", ")}
           </p>
@@ -66,7 +72,7 @@ export function BandHeader({ band }: BandHeaderProps) {
 
         {/* Genres associés -> page du genre (slug unique globalement) */}
         {band.genres.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-2" aria-label="Genres">
+          <ul className="mt-3 flex flex-wrap gap-2" aria-label={t.band.genres}>
             {band.genres.map((genre) => (
               <li key={genre.id}>
                 <Link

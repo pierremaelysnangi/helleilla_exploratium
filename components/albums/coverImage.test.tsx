@@ -8,7 +8,8 @@
  */
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { screen, fireEvent, act } from "@testing-library/react";
+import { renderWithI18n as render } from "@/lib/i18n/testing";
 import { CoverImage } from "./coverImage";
 
 // next/image exige la configuration du serveur ; on le réduit à un <img>

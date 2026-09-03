@@ -21,10 +21,13 @@ import { fetchAlbumBySlug } from "@/hooks/use-albums";
 import type { AlbumDetail } from "@/hooks/api/schemas";
 // Note personnelle et liste de l'utilisateur (client)
 import { AlbumActions } from "@/components/collections/albumActions";
+// Mise en forme des durées, partagée avec la tracklist
+import { formatTotalDuration, totalDurationIso } from "@/lib/media/duration";
 // Tracklist interactive : menu déroulant par piste (écoute + paroles)
 import { AlbumTracklist } from "@/components/albums/albumTracklist";
 // Critiques de presse : pendant professionnel des notes d'auditeurs
 import { PressReviews } from "@/components/albums/pressReviews";
+import { getTranslations } from "@/lib/i18n/server";
 
 type AlbumPageProps = {
   params: Promise<{ slug: string; albumSlug: string }>;
@@ -33,7 +36,14 @@ type AlbumPageProps = {
 /** URL de base absolue (cohérente avec le layout racine). */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-/** Libellés français du type de sortie. */
+/**
+ * Libellés français du type de sortie, pour les MÉTADONNÉES seules.
+ *
+ * Le titre et la description d'une page sont produits avant la
+ * résolution de la langue du visiteur, et servent surtout au
+ * référencement : ils restent dans la langue par défaut du site. Ce que
+ * le lecteur voit, lui, passe par le dictionnaire.
+ */
 const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
   album: "Album",
   ep: "EP",
@@ -43,45 +53,6 @@ const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
   demo: "Démo",
   split: "Split",
 };
-
-/**
- * Durée cumulée d'une tracklist, en `1 h 12 min` ou `47 min`.
- *
- * Affichée en tête de fiche : c'est l'information qu'on cherche avant
- * d'ouvrir la tracklist, et elle situe une sortie (EP ou double album)
- * mieux que le nombre de pistes seul.
- */
-function formatTotalDuration(
-  tracks: AlbumDetail["tracks"],
-): { label: string; partial: boolean } | null {
-  const timed = tracks.filter((t) => t.durationMs != null);
-  if (timed.length === 0) return null;
-
-  const total = timed.reduce((sum, t) => sum + (t.durationMs ?? 0), 0);
-  const minutes = Math.round(total / 60000);
-  const rest = minutes % 60;
-  const label =
-    minutes < 60
-      ? `${minutes} min`
-      : rest === 0
-        ? `${Math.floor(minutes / 60)} h`
-        : `${Math.floor(minutes / 60)} h ${String(rest).padStart(2, "0")} min`;
-
-  // Une partie seulement des pistes est minutée : le total est un
-  // MINIMUM, et l'annoncer sec laisserait croire à un album plus court
-  // qu'il ne l'est. MusicBrainz ne renseigne pas les longueurs de
-  // certaines rééditions et de beaucoup d'enregistrements de répétition.
-  return { label, partial: timed.length < tracks.length };
-}
-
-/** Durée cumulée de la tracklist, au format ISO 8601 pour schema.org. */
-function totalDurationIso(tracks: AlbumDetail["tracks"]): string | null {
-  const total = tracks.reduce((sum, t) => sum + (t.durationMs ?? 0), 0);
-  if (total === 0) return null;
-  const minutes = Math.floor(total / 60000);
-  const seconds = Math.round((total % 60000) / 1000);
-  return `PT${minutes}M${seconds}S`;
-}
 
 export async function generateMetadata({
   params,
@@ -148,6 +119,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
   if (!album) notFound();
 
   const totalDuration = formatTotalDuration(album.tracks);
+  const { t } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
@@ -203,7 +175,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
               {album.band.name}
             </Link>
             <span className="border-border rounded border px-2 py-0.5 text-xs tracking-wide uppercase">
-              {TYPE_LABELS[album.type]}
+              {t.releaseType[album.type]}
             </span>
             {/* Année masquée quand elle est inconnue : écrire
                 « année inconnue » occupait une place pour ne rien dire. */}
@@ -213,7 +185,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             {album.tracks.length > 0 && (
               <span>
                 {album.tracks.length}{" "}
-                {album.tracks.length > 1 ? "pistes" : "piste"}
+                {album.tracks.length > 1 ? t.album.tracks : t.album.track}
               </span>
             )}
             {totalDuration && (
@@ -232,7 +204,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section aria-label="Tracklist" className="flex flex-col gap-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="metal-title text-lg">Tracklist</h2>
+            <h2 className="metal-title text-lg">{t.album.tracklist}</h2>
             {totalDuration && (
               <span
                 className="text-muted-foreground font-mono text-sm"
@@ -242,16 +214,14 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
                     : undefined
                 }
               >
-                Durée totale : {totalDuration.partial ? "≥ " : ""}
+                {t.album.totalDuration} : {totalDuration.partial ? "≥ " : ""}
                 {totalDuration.label}
               </span>
             )}
           </div>
 
           {album.tracks.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Aucune piste référencée pour cette sortie.
-            </p>
+            <p className="text-muted-foreground text-sm">{t.album.noTracks}</p>
           ) : (
             <AlbumTracklist
               tracks={album.tracks}
@@ -262,7 +232,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
         </section>
 
         <section aria-label="Critiques" className="flex flex-col gap-3">
-          <h2 className="metal-title text-lg">Critiques</h2>
+          <h2 className="metal-title text-lg">{t.album.reviews}</h2>
           {/* Presse et auditeurs séparés : ce sont deux jugements
               différents, et les fondre en une note unique effacerait
               l'écart qui fait justement l'intérêt de la comparaison. */}

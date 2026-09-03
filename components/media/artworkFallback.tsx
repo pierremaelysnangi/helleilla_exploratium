@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * <ArtworkFallback> — visuel de repli quand aucune image n'est
  * disponible pour une entité.
@@ -13,6 +15,8 @@
  */
 
 import { Disc3, Users, Music4 } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 /** Nature de l'entité représentée : détermine le pictogramme. */
 export type ArtworkKind = "band" | "album" | "track";
@@ -36,12 +40,13 @@ export function ArtworkFallback({
   label,
   className = "",
 }: ArtworkFallbackProps) {
+  const t = useT();
   const Icon = ICONS[kind];
 
   return (
     <span
       role="img"
-      aria-label={`Aucun visuel disponible pour ${label}`}
+      aria-label={interpolate(t.common.noVisual, { name: label })}
       className={
         "from-muted via-muted/60 to-background text-muted-foreground/50 " +
         "border-border flex items-center justify-center border " +

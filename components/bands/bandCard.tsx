@@ -12,6 +12,7 @@ import Image from "next/image";
 // Type de ligne validée côté client
 import type { BandRow } from "@/hooks/api/schemas";
 import { ArtworkFallback } from "@/components/media/artworkFallback";
+import { useT } from "@/lib/i18n/client";
 
 /** Props : la ligne de groupe à afficher. */
 type BandCardProps = {
@@ -24,12 +25,13 @@ type BandCardProps = {
  * L'absence de date de fin signifie que le groupe existe encore ; une
  * ellipse laissait croire à une donnée manquante.
  */
-function activityPeriod(band: BandRow): string {
+function activityPeriod(band: BandRow, activeLabel: string): string {
   const begin = band.formedYear ?? "?";
-  return `${begin} – ${band.dissolvedYear ?? "actif"}`;
+  return `${begin} – ${band.dissolvedYear ?? activeLabel}`;
 }
 
 export function BandCard({ band }: BandCardProps) {
+  const t = useT();
   return (
     <Link
       href={`/bands/${band.slug}`}
@@ -62,8 +64,8 @@ export function BandCard({ band }: BandCardProps) {
                 {band.countryCode}
               </span>
             )}
-            <span>{activityPeriod(band)}</span>
-            {band.dissolvedYear && <span>(séparé)</span>}
+            <span>{activityPeriod(band, t.band.active)}</span>
+            {band.dissolvedYear && <span>({t.band.disbanded})</span>}
           </p>
         </div>
       </div>

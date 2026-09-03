@@ -17,6 +17,7 @@
 import { useState } from "react";
 import type { TrackRow } from "@/hooks/api/schemas";
 import { trackSearchLinks, trackLyricsLinks } from "@/lib/media/platformLinks";
+import { formatTrackDuration } from "@/lib/media/duration";
 import { useT } from "@/lib/i18n/client";
 import { interpolate } from "@/lib/i18n/format";
 
@@ -27,13 +28,6 @@ type AlbumTracklistProps = {
   /** Titre de l'album : DarkLyrics indexe ses pages par album. */
   albumTitle?: string;
 };
-
-/** Formate une durée en minutes:secondes. */
-function formatDuration(ms?: number | null): string {
-  if (!ms && ms !== 0) return "—";
-  const total = Math.round(ms / 1000);
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
-}
 
 export function AlbumTracklist({
   tracks,
@@ -61,7 +55,7 @@ export function AlbumTracklist({
                 {track.title}
               </span>
               <span className="text-muted-foreground shrink-0 font-mono text-xs tabular-nums">
-                {formatDuration(track.durationMs)}
+                {formatTrackDuration(track.durationMs)}
               </span>
               {/* Carré fixe, contenu centré : le chevron était calé sur
                   la ligne de base du texte et sautait d'une ligne à
