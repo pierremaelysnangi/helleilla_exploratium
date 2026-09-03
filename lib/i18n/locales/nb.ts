@@ -14,6 +14,7 @@ export const nb: Dictionary = {
     albums: "Album",
     genres: "Sjangere",
     search: "Søk",
+    festivals: "Festivaler",
     openMenu: "Åpne menyen",
     closeMenu: "Lukk menyen",
     mainNavigation: "Hovednavigasjon",

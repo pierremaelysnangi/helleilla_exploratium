@@ -15,6 +15,7 @@ export const zh: Dictionary = {
     albums: "专辑",
     genres: "流派",
     search: "搜索",
+    festivals: "音乐节",
     openMenu: "打开菜单",
     closeMenu: "关闭菜单",
     mainNavigation: "主导航",

@@ -14,6 +14,7 @@ export const nl: Dictionary = {
     albums: "Albums",
     genres: "Genres",
     search: "Zoeken",
+    festivals: "Festivals",
     openMenu: "Menu openen",
     closeMenu: "Menu sluiten",
     mainNavigation: "Hoofdnavigatie",

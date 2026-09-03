@@ -17,6 +17,7 @@ export const ru: Dictionary = {
     albums: "Альбомы",
     genres: "Жанры",
     search: "Поиск",
+    festivals: "Фестивали",
     openMenu: "Открыть меню",
     closeMenu: "Закрыть меню",
     mainNavigation: "Основная навигация",

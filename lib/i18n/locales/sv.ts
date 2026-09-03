@@ -14,6 +14,7 @@ export const sv: Dictionary = {
     albums: "Album",
     genres: "Genrer",
     search: "Sök",
+    festivals: "Festivaler",
     openMenu: "Öppna menyn",
     closeMenu: "Stäng menyn",
     mainNavigation: "Huvudnavigering",

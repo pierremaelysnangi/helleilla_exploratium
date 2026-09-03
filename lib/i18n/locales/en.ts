@@ -19,6 +19,7 @@ export const en: Dictionary = {
     albums: "Albums",
     genres: "Genres",
     search: "Search",
+    festivals: "Festivals",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     mainNavigation: "Main navigation",

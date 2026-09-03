@@ -27,6 +27,7 @@ const LINKS = [
   { href: "/bands", key: "bands" },
   { href: "/albums", key: "albums" },
   { href: "/genres", key: "genres" },
+  { href: "/festivals", key: "festivals" },
   { href: "/search", key: "search" },
 ] as const;
 

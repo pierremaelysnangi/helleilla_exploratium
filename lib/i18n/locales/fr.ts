@@ -17,6 +17,7 @@ export const fr = {
     albums: "Albums",
     genres: "Genres",
     search: "Recherche",
+    festivals: "Festivals",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
     mainNavigation: "Navigation principale",

@@ -17,6 +17,7 @@ export const fi: Dictionary = {
     albums: "Albumit",
     genres: "Tyylilajit",
     search: "Haku",
+    festivals: "Festivaalit",
     openMenu: "Avaa valikko",
     closeMenu: "Sulje valikko",
     mainNavigation: "Päänavigointi",

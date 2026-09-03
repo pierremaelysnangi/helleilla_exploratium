@@ -40,7 +40,8 @@
     "media:sync": "tsx --env-file=.env.local scripts/sync-media.ts",
     "dedupe:albums": "tsx --env-file=.env.local scripts/dedupe-albums.ts",
     "check:album-types": "tsx --env-file=.env.local scripts/check-album-types.ts",
-    "album:remove": "tsx --env-file=.env.local scripts/remove-album.ts"
+    "album:remove": "tsx --env-file=.env.local scripts/remove-album.ts",
+    "seed:venues": "tsx --env-file=.env.local scripts/seed-venues.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1116.0",

@@ -17,6 +17,7 @@ export const ar: Dictionary = {
     albums: "الألبومات",
     genres: "الأنواع",
     search: "البحث",
+    festivals: "المهرجانات",
     openMenu: "فتح القائمة",
     closeMenu: "إغلاق القائمة",
     mainNavigation: "التنقل الرئيسي",

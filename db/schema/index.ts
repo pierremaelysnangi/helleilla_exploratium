@@ -38,3 +38,5 @@ export * from "./members";
 export * from "./collections";
 // Critiques de presse rattachées aux albums (lien vers la source, jamais le texte)
 export * from "./pressReviews";
+// Festivals et salles de concert récurrentes, regroupés par pays
+export * from "./venues";

@@ -17,6 +17,7 @@ export const pl: Dictionary = {
     albums: "Albumy",
     genres: "Gatunki",
     search: "Szukaj",
+    festivals: "Festiwale",
     openMenu: "Otwórz menu",
     closeMenu: "Zamknij menu",
     mainNavigation: "Nawigacja główna",

@@ -17,6 +17,7 @@ export const ja: Dictionary = {
     albums: "アルバム",
     genres: "ジャンル",
     search: "検索",
+    festivals: "フェス",
     openMenu: "メニューを開く",
     closeMenu: "メニューを閉じる",
     mainNavigation: "メインナビゲーション",
