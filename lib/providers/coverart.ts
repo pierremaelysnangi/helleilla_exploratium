@@ -32,6 +32,18 @@ const releaseGroupSchema = z.object({
    * indiscernables.
    */
   "secondary-types": z.array(z.string()).default([]),
+  /**
+   * Artistes crédités sur l'œuvre.
+   *
+   * Seul signal fiable pour reconnaître un SPLIT : MusicBrainz ne pose
+   * pas toujours le type secondaire « Split », mais une sortie partagée
+   * est toujours créditée à plus d'un artiste. « Cromlech / Spectres
+   * Over Gorgoroth » (Darkthrone et Isengard) n'a aucun type secondaire
+   * et se retrouvait donc parmi les albums studio de Darkthrone.
+   */
+  "artist-credit": z
+    .array(z.object({ name: z.string().nullish() }))
+    .default([]),
   "first-release-date": z.string().nullish(),
 });
 
@@ -90,7 +102,8 @@ export async function listReleaseGroups(
     // seules). Le tri se fait chez nous, sur le type projeté.
     const url =
       `${MB_BASE}/release-group?artist=${encodeURIComponent(artistMbid)}` +
-      `&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}&fmt=json`;
+      `&limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}` +
+      `&inc=artist-credits&fmt=json`;
     const result = await fetchJson(url, releaseGroupListSchema, {
       minIntervalMs: 1100,
     });
@@ -162,7 +175,7 @@ export function normalizeTitle(title: string): string {
 
 /** Valeurs de l'enum PostgreSQL `album_type`. */
 export type AlbumType =
-  "album" | "ep" | "single" | "compilation" | "live" | "demo";
+  "album" | "ep" | "single" | "compilation" | "live" | "demo" | "split";
 
 /**
  * Projection des types secondaires MusicBrainz, par ordre de priorité.
@@ -173,6 +186,10 @@ export type AlbumType =
  * « Are You Morbid? » parmi les albums studio.
  */
 const SECONDARY_TYPE_MAP: [string, AlbumType][] = [
+  // Le split passe AVANT les autres : une sortie partagée reste un
+  // split même si elle est aussi live ou démo, et l'attribuer à un seul
+  // groupe fausserait sa discographie.
+  ["Split", "split"],
   ["Demo", "demo"],
   ["Live", "live"],
   ["Compilation", "compilation"],
@@ -197,6 +214,12 @@ export function albumTypeOf(group: ReleaseGroup): AlbumType | null {
   for (const [label, type] of SECONDARY_TYPE_MAP) {
     if (group["secondary-types"].includes(label)) return type;
   }
+
+  // Plusieurs artistes crédités et aucun type secondaire : c'est un
+  // split. Une compilation multi-artistes, elle, porte le type
+  // « Compilation » et a déjà été classée par la boucle ci-dessus.
+  if (group["artist-credit"].length > 1) return "split";
+
   const primary = group["primary-type"];
   return primary ? (PRIMARY_TYPE_MAP[primary] ?? null) : null;
 }

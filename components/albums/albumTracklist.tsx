@@ -6,7 +6,9 @@
  *
  * Design validé : chaque ligne de piste porte un chevron `>` ouvrant un
  * panneau listant les plateformes officielles (Deezer, Spotify,
- * Bandcamp, YouTube) et les sites de paroles (Metal Archives, Genius).
+ * Bandcamp, YouTube) et les sites de paroles (Genius, DarkLyrics,
+ * AZLyrics).
+ *
  * Un extrait Deezer 30 s est jouable inline si un preview correspond au
  * titre (données du resolver média) ; sinon les liens mènent à la
  * recherche officielle de la plateforme. Aucune parole n'est reproduite

@@ -36,6 +36,33 @@ export const MIN_LENGTH = 12;
 export const MIN_SCORE = 3 as const;
 
 /**
+ * Ce qu'un mot de passe doit satisfaire, énoncé pour la personne qui le
+ * choisit — et non après coup, sous forme de refus.
+ *
+ * Volontairement PAS de « une majuscule, un chiffre, un symbole » : ces
+ * règles produisent des mots de passe courts et prévisibles. La longueur
+ * et le score zxcvbn, eux, mesurent la résistance réelle.
+ */
+const REQUIREMENTS: {
+  label: string;
+  test: (value: string, score: number | null) => boolean;
+}[] = [
+  {
+    label: `Au moins ${MIN_LENGTH} caractères — la longueur compte plus que la complexité`,
+    test: (value) => value.length >= MIN_LENGTH,
+  },
+  {
+    label:
+      "Difficile à deviner : ni mot du dictionnaire, ni suite de touches, ni date",
+    test: (_value, score) => score !== null && score >= MIN_SCORE,
+  },
+  {
+    label: "Sans rapport avec votre nom ni votre adresse e-mail",
+    test: (value, score) => value.length > 0 && score !== null && score >= 2,
+  },
+];
+
+/**
  * Champ contrôlé : expose via `onChange` la valeur ; le parent lit la
  * force retournée par sa propre instance de usePasswordStrength ou se
  * fie aux exigences affichées ici.
@@ -50,10 +77,17 @@ export function PasswordField({
   const [generatedLength, setGeneratedLength] = useState(20);
   const strength = usePasswordStrength(value, userInputs);
 
-  /** Génère et remplit le champ avec un mot de passe CSPRNG. */
+  /**
+   * Génère et remplit le champ avec un mot de passe CSPRNG.
+   *
+   * Le champ RESTE masqué. L'afficher automatiquement exposait le mot de
+   * passe à toute personne présente dans la pièce ou derrière une
+   * caméra, au moment précis où il a le plus de valeur. Le bouton
+   * « Copier » suffit à l'usage courant, et « Afficher » reste
+   * disponible pour qui veut le lire.
+   */
   function handleGenerate() {
     onChange(generatePassword({ length: generatedLength }));
-    setVisible(true); // montrer ce qui vient d'être généré
   }
 
   async function handleCopy() {
@@ -110,6 +144,32 @@ export function PasswordField({
           </button>
         ))}
       </div>
+
+      {/* Exigences énoncées AVANT la saisie : les découvrir en échouant
+          au moment de valider est la pire façon de les apprendre. */}
+      <ul className="text-muted-foreground flex flex-col gap-1 text-xs">
+        {REQUIREMENTS.map((requirement) => {
+          const met = requirement.test(value, strength?.score ?? null);
+          return (
+            <li key={requirement.label} className="flex items-start gap-2">
+              <span
+                aria-hidden
+                className={met ? "text-emerald-500" : "text-muted-foreground"}
+              >
+                {met ? "✓" : "○"}
+              </span>
+              <span className={met ? "text-foreground" : undefined}>
+                {requirement.label}
+              </span>
+              {/* Doublon textuel pour les lecteurs d'écran : la coche
+                  seule n'est pas annoncée. */}
+              <span className="sr-only">
+                {met ? "(satisfait)" : "(non satisfait)"}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
 
       {/* Longueur générée souhaitée */}
       <label className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">

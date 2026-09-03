@@ -21,6 +21,7 @@ const TYPE_LABELS: Record<AlbumRow["type"], string> = {
   compilation: "Compilation",
   live: "Live",
   demo: "Démo",
+  split: "Split",
 };
 
 type AlbumCardProps = {
@@ -79,7 +80,10 @@ export function AlbumCard({
           <p className="text-muted-foreground truncate text-xs">{bandName}</p>
         )}
         <p className="text-muted-foreground flex items-center gap-2 text-xs">
-          <span className="font-mono">{album.releaseYear ?? "—"}</span>
+          {/* Pas de tiret de remplacement : une année absente se tait. */}
+          {album.releaseYear !== null && album.releaseYear !== undefined && (
+            <span className="font-mono">{album.releaseYear}</span>
+          )}
           <span className="border-border rounded border px-1.5 py-0.5 tracking-wide uppercase">
             {TYPE_LABELS[album.type]}
           </span>

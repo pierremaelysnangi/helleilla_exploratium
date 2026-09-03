@@ -41,6 +41,7 @@ const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
   compilation: "Compilation",
   live: "Live",
   demo: "Démo",
+  split: "Split",
 };
 
 /**
@@ -192,9 +193,11 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             <span className="border-border rounded border px-2 py-0.5 text-xs tracking-wide uppercase">
               {TYPE_LABELS[album.type]}
             </span>
-            <span className="font-mono">
-              {album.releaseYear ?? "année inconnue"}
-            </span>
+            {/* Année masquée quand elle est inconnue : écrire
+                « année inconnue » occupait une place pour ne rien dire. */}
+            {album.releaseYear !== null && (
+              <span className="font-mono">{album.releaseYear}</span>
+            )}
             {album.tracks.length > 0 && (
               <span>
                 {album.tracks.length}{" "}

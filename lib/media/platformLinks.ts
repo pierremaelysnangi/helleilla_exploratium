@@ -59,12 +59,13 @@ export function trackSearchLinks(
 }
 
 /** Sites de paroles proposés pour une piste. */
-export type LyricsSource = "metal-archives" | "genius";
+export type LyricsSource = "genius" | "darklyrics" | "azlyrics";
 
 /** Libellés affichés dans le panneau d'une piste. */
 const LYRICS_LABELS: Record<LyricsSource, string> = {
-  "metal-archives": "Metal Archives",
   genius: "Genius",
+  darklyrics: "DarkLyrics",
+  azlyrics: "AZLyrics",
 };
 
 /**
@@ -72,8 +73,13 @@ const LYRICS_LABELS: Record<LyricsSource, string> = {
  *
  * Aucune parole n'est reproduite ici : elles sont protégées par le droit
  * d'auteur et appartiennent aux auteurs et à leurs éditeurs. On renvoie
- * vers les bases qui les publient avec l'autorisation nécessaire —
- * Metal Archives pour le metal, Genius en couverture générale.
+ * vers les bases qui les publient.
+ *
+ * Metal Archives a été retiré : son moteur exige une navigation en
+ * plusieurs étapes avant d'atteindre un texte, et une recherche y aboutit
+ * le plus souvent sur une page vide. DarkLyrics le remplace pour le metal
+ * — c'est la base la plus complète du genre — avec Genius et AZLyrics en
+ * couverture générale.
  *
  * Ce sont des URLs de RECHERCHE : les identifiants internes de ces sites
  * ne sont pas connus du projet, et une recherche reste juste même si la
@@ -88,16 +94,22 @@ export function trackLyricsLinks(
 ): Record<LyricsSource, { label: string; url: string }> {
   const q = searchQuery(artistName, trackTitle);
   return {
-    "metal-archives": {
-      label: LYRICS_LABELS["metal-archives"],
-      url:
-        "https://www.metal-archives.com/search/advanced/searching/songs" +
-        `?bandName=${encodeURIComponent(artistName)}` +
-        `&songTitle=${encodeURIComponent(trackTitle)}`,
-    },
     genius: {
       label: LYRICS_LABELS.genius,
       url: `https://genius.com/search?q=${q}`,
+    },
+    darklyrics: {
+      label: LYRICS_LABELS.darklyrics,
+      // DarkLyrics n'a pas de moteur propre exploitable : sa page
+      // d'aide recommande elle-même de passer par une recherche externe
+      // restreinte au domaine.
+      url:
+        "https://duckduckgo.com/?q=" +
+        encodeURIComponent(`site:darklyrics.com ${artistName} ${trackTitle}`),
+    },
+    azlyrics: {
+      label: LYRICS_LABELS.azlyrics,
+      url: `https://search.azlyrics.com/search.php?q=${q}`,
     },
   };
 }

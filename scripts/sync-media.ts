@@ -110,6 +110,9 @@ async function main() {
         if (disco.imported > 0) {
           parts.push(`${disco.imported} sortie(s) importée(s)`);
         }
+        if (disco.retyped > 0) {
+          parts.push(`${disco.retyped} reclassée(s) en split`);
+        }
         if (disco.skipped.length > 0) {
           parts.push(`${disco.skipped.length} écartée(s)`);
         }

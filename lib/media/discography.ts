@@ -55,6 +55,7 @@ export const IMPORTED_RELEASE_TYPES: ReadonlySet<AlbumType> = new Set([
   "live",
   "demo",
   "compilation",
+  "split",
 ]);
 
 /** Bilan d'un import, du même style que `CoverResolution`. */
@@ -65,6 +66,8 @@ export type DiscographyImport = {
   matched: number;
   /** Titres écartés, avec la raison. */
   skipped: string[];
+  /** Sorties reclassées en split d'après leurs crédits amont. */
+  retyped: number;
 };
 
 /**
@@ -113,7 +116,12 @@ export async function importDiscographyForBand(
       .where(eq(albums.bandId, bandId)),
   ]);
 
-  const result: DiscographyImport = { imported: 0, matched: 0, skipped: [] };
+  const result: DiscographyImport = {
+    imported: 0,
+    matched: 0,
+    skipped: [],
+    retyped: 0,
+  };
 
   // Première passe : quelle œuvre amont correspond à chaque sortie déjà
   // en base ? On réutilise `matchReleaseGroup`, celle-là même qui sert à
@@ -129,6 +137,22 @@ export async function importDiscographyForBand(
 
     consumed.add(group.id);
     result.matched += 1;
+
+    // Correction de type limitée aux SPLITS.
+    //
+    // L'import est additif et ne réécrit pas les saisies locales, mais
+    // un split mal typé n'est pas une nuance éditoriale : c'est une
+    // œuvre partagée attribuée à un seul groupe. « Cromlech / Spectres
+    // Over Gorgoroth » figurait ainsi parmi les albums studio de
+    // Darkthrone alors qu'il est co-crédité à Isengard.
+    if (albumTypeOf(group) === "split" && album.type !== "split") {
+      await db
+        .update(albums)
+        .set({ type: "split", updatedAt: new Date() })
+        .where(eq(albums.id, album.id));
+      result.retyped += 1;
+    }
+
     if (!(await linkAlbumToReleaseGroup(album.id, group.id))) {
       result.skipped.push(`${album.title} (référence déjà attribuée)`);
     }

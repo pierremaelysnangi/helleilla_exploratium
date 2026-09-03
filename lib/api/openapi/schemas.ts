@@ -88,7 +88,15 @@ export const AlbumSchema = z
     bandId: z.string().uuid(),
     title: z.string().meta({ example: "Frozen Depths" }),
     slug: z.string(),
-    type: z.enum(["album", "ep", "single", "compilation", "live", "demo"]),
+    type: z.enum([
+      "album",
+      "ep",
+      "single",
+      "compilation",
+      "live",
+      "demo",
+      "split",
+    ]),
     releaseYear: z.number().int().nullable(),
     releaseDate: z.string().nullable(),
     coverUrl: z.string().nullable(),
@@ -411,7 +419,17 @@ export const BandMediaSchema = z
         })
         .nullish(),
     }),
-    images: z.array(z.object({ provider: z.string(), url: z.string() })),
+    images: z.array(
+      z.object({
+        provider: z.string(),
+        url: z.string(),
+        /** Nature du visuel : photo de scène/studio, ou logo officiel. */
+        kind: z.enum(["photo", "logo"]),
+        /** Page d'origine : auteur, licence, historique. */
+        sourceUrl: z.string().nullable(),
+        credit: z.string().nullable(),
+      }),
+    ),
     links: z.array(
       z.object({ provider: z.string(), label: z.string(), url: z.string() }),
     ),

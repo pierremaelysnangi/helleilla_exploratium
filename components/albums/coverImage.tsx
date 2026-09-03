@@ -88,9 +88,11 @@ export function CoverImage({
         // sur une grille de démos sans pochette, c'est même la règle.
         priority={priority}
         onError={() => setBandFailed(true)}
-        // Assombri et désaturé : le lecteur doit voir au premier coup
-        // d'œil que ce visuel tient lieu de pochette sans en être une.
-        className="scale-105 object-cover opacity-55 grayscale-[35%] transition-transform duration-300 group-hover:scale-110"
+        // Légèrement retenu, pas effacé : il faut RECONNAÎTRE le groupe.
+        // À 55 % d'opacité le visuel passait pour un bloc gris vide, ce
+        // qui manquait le but — un repli qui n'identifie rien ne vaut pas
+        // mieux qu'un pictogramme.
+        className="scale-105 object-cover opacity-85 transition-transform duration-300 group-hover:scale-110 group-hover:opacity-100"
       />
     );
   }

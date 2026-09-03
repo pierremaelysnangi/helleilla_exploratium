@@ -67,6 +67,7 @@ const ALBUM_TYPES = [
   "compilation",
   "live",
   "demo",
+  "split",
 ] as const;
 
 // Résultat "album" tel qu'indexé dans Meilisearch

@@ -33,7 +33,18 @@ export const albumRowSchema = z.object({
   bandId: z.uuid(),
   title: z.string(),
   slug: z.string(),
-  type: z.enum(["album", "ep", "single", "compilation", "live", "demo"]),
+  // `split` : sortie partagée entre plusieurs groupes, distincte d'un
+  // album studio — l'y ranger attribuerait à un groupe une œuvre qui
+  // n'est pas la sienne seule.
+  type: z.enum([
+    "album",
+    "ep",
+    "single",
+    "compilation",
+    "live",
+    "demo",
+    "split",
+  ]),
   releaseDate: z.string().nullable().optional(),
   releaseYear: z.number().int().nullable().optional(),
   coverUrl: z.string().nullable().optional(),
@@ -274,7 +285,23 @@ export const bandMediaSchema = z.object({
       })
       .nullish(),
   }),
-  images: z.array(z.object({ provider: z.string(), url: z.string() })),
+  /**
+   * PHOTOS du groupe — scène ou studio —, avec leur provenance.
+   *
+   * Les pochettes d'album n'y figurent plus : elles montrent une œuvre,
+   * pas un groupe. `sourceUrl` mène à la page du fichier, où l'auteur et
+   * la licence sont indiqués — condition des licences libres de
+   * Wikimedia Commons.
+   */
+  images: z.array(
+    z.object({
+      provider: z.string(),
+      url: z.string(),
+      kind: z.enum(["photo", "logo"]),
+      sourceUrl: z.string().nullish(),
+      credit: z.string().nullish(),
+    }),
+  ),
   links: z.array(
     z.object({ provider: z.string(), label: z.string(), url: z.string() }),
   ),

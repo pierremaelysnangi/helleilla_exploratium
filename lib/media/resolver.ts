@@ -25,6 +25,8 @@ import {
 import { stripTracking } from "@/lib/url/tracking";
 // Nommage des liens par destination plutôt que par type de relation
 import { officialLinkLabel } from "@/lib/media/linkLabels";
+// Hiérarchie d'écoute des liens sortants
+import { byListenOrder } from "@/lib/media/listenOrder";
 // Cache Redis partagé
 import { redis } from "@/lib/redis";
 
@@ -121,8 +123,30 @@ export const bandMediaSchema = z.object({
       })
       .nullish(),
   }),
-  /** Images officielles (Discogs, Wikidata) — URLs brutes, jamais copiées. */
-  images: z.array(z.object({ provider: z.string(), url: z.string().url() })),
+  /**
+   * PHOTOS du groupe — scène ou studio —, jamais copiées.
+   *
+   * Uniquement des photos : les pochettes d'album n'y figurent plus.
+   * Elles montraient une œuvre, pas le groupe, et la discographie les
+   * présente déjà à leur place.
+   *
+   * Chaque entrée porte sa PROVENANCE. Les photos de Wikimedia Commons
+   * sont publiées sous licence libre, laquelle exige d'en créditer
+   * l'auteur : afficher l'image sans lien vers sa page de fichier ne
+   * respecterait pas cette condition.
+   */
+  images: z.array(
+    z.object({
+      provider: z.string(),
+      url: z.string().url(),
+      /** Nature du visuel, pour l'annoncer sans deviner. */
+      kind: z.enum(["photo", "logo"]),
+      /** Page d'origine : auteur, licence, historique. */
+      sourceUrl: z.string().url().nullish(),
+      /** Libellé de provenance affiché sous la photo. */
+      credit: z.string().nullish(),
+    }),
+  ),
   /** Liens officiels (site, Discogs, Wikipédia…). */
   links: z.array(
     z.object({
@@ -220,63 +244,58 @@ export async function resolveBandMedia(
   // L'image ne vient PAS du résumé : celui-ci décrit la page Wikidata,
   // pas le sujet. Elle est portée par la déclaration P18 de l'entité,
   // d'où deux appels distincts.
-  let wikidataImageUrl: string | null = null;
-  let wikidataLogoUrl: string | null = null;
+  let wikidataImage: Awaited<
+    ReturnType<typeof dataProviders.wikidata.getEntityImage>
+  > = null;
+  let wikidataLogo: Awaited<
+    ReturnType<typeof dataProviders.wikidata.getEntityLogo>
+  > = null;
   if (wikidataId && isProviderAvailable("wikidata")) {
     const [wd, img, logo] = await Promise.allSettled([
       dataProviders.wikidata.getSummary(wikidataId),
-      dataProviders.wikidata.getEntityImageUrl(wikidataId),
-      dataProviders.wikidata.getEntityLogoUrl(wikidataId),
+      dataProviders.wikidata.getEntityImage(wikidataId),
+      dataProviders.wikidata.getEntityLogo(wikidataId),
     ]);
     if (wd.status === "fulfilled") wikidataSummary = wd.value;
     else degraded = true;
-    if (img.status === "fulfilled") wikidataImageUrl = img.value;
-    if (logo.status === "fulfilled") wikidataLogoUrl = logo.value;
+    if (img.status === "fulfilled") wikidataImage = img.value;
+    if (logo.status === "fulfilled") wikidataLogo = logo.value;
   }
 
-  // Meilleur match Discogs : détail connu, sinon recherche par nom
-  let bestDiscogsMatch: {
-    id?: number;
-    title?: string;
-    cover_image?: string | null;
-    thumb?: string | null;
-    profile?: string | null;
-    urls?: string[];
-  } | null = discogsArtist;
-  if (!bestDiscogsMatch && discogsRef && isProviderAvailable("discogs")) {
-    const [search] = await Promise.allSettled([
-      dataProviders.discogs.searchArtists(band.name),
-    ]);
-    if (search.status === "fulfilled")
-      bestDiscogsMatch = search.value?.results.at(0) ?? null;
-    else degraded = true;
-  }
+  // La recherche Discogs par nom a été retirée : elle ne servait qu'à
+  // trouver une vignette de secours pour la galerie, laquelle n'accepte
+  // plus que des photos sourcées. Les liens Discogs, eux, viennent de la
+  // référence exacte (`discogsArtist`), jamais d'un nom approchant.
+
   // 4. Fusion des sources
   const images: BandMedia["images"] = [];
   const links: BandMedia["links"] = [];
 
-  if (bestDiscogsMatch?.cover_image || bestDiscogsMatch?.thumb) {
+  // Photo du groupe, puis logo officiel. Les pochettes rapportées par
+  // les plateformes ont été retirées : une galerie de GROUPE montre le
+  // groupe, et la discographie affiche déjà les pochettes.
+  if (wikidataImage) {
     images.push({
-      provider: "discogs",
-      url: bestDiscogsMatch.cover_image ?? bestDiscogsMatch.thumb!,
+      provider: "wikimedia",
+      url: wikidataImage.url,
+      kind: "photo",
+      sourceUrl: wikidataImage.sourceUrl,
+      credit: "Wikimedia Commons — auteur et licence sur la page du fichier",
     });
   }
-  // Ordre de la galerie : photo du groupe, puis logo, puis pochettes
-  // rapportées par les plateformes — du plus au moins représentatif.
-  if (wikidataImageUrl) {
-    images.push({ provider: "wikidata", url: wikidataImageUrl });
+  if (wikidataLogo) {
+    images.push({
+      provider: "wikimedia",
+      url: wikidataLogo.url,
+      kind: "logo",
+      sourceUrl: wikidataLogo.sourceUrl,
+      credit: "Wikimedia Commons — auteur et licence sur la page du fichier",
+    });
   }
-  if (wikidataLogoUrl) {
-    images.push({ provider: "wikidata", url: wikidataLogoUrl });
-  }
-  // Les visuels d'album rapportés par Deezer complètent une galerie que
-  // les sources encyclopédiques laissent souvent à une seule image.
-  for (const track of deezerTracks) {
-    const cover = track.album.cover_big ?? track.album.cover_medium;
-    if (cover) images.push({ provider: "deezer", url: cover });
-  }
-  // Liens officiels déclarés dans MusicBrainz (site, réseaux, labels,
-  // plateformes) : la source la plus fiable, donc en tête de liste.
+
+  // Liens officiels déclarés dans MusicBrainz : quelqu'un les a
+  // vérifiés, ils existent — contrairement à une URL de recherche
+  // fabriquée à l'aveugle, qui peut ne mener nulle part.
   if (mbArtist) {
     for (const link of extractOfficialLinks(mbArtist)) {
       links.push({
@@ -334,7 +353,10 @@ export async function resolveBandMedia(
           : null,
     },
     images: dedupeImages(images),
-    links: dedupeLinks(links),
+    // Hiérarchie d'écoute : site officiel ou label d'abord, puis
+    // Bandcamp, Spotify, YouTube, Deezer ; documentation et réseaux
+    // sociaux ensuite. L'ordre de MusicBrainz ne dit rien de l'usage.
+    links: byListenOrder(dedupeLinks(links)),
     previews: deezerTracks.map((t) => ({
       title: t.title,
       artistName: t.artist.name,

@@ -91,11 +91,28 @@ const entityImageSchema = z.object({
  * @param width - Largeur souhaitée en pixels.
  * @returns L'URL de l'image, ou `null` si l'entité n'en déclare aucune.
  */
-async function claimFileUrl(
+/**
+ * Visuel Wikimedia Commons, avec son ADRESSE DE PROVENANCE.
+ *
+ * L'URL de l'image ne suffit pas : une photo de Commons est publiée sous
+ * une licence libre qui exige d'en créditer l'auteur. Ce crédit vit sur
+ * la page du fichier, pas dans le fichier — d'où `sourceUrl`, que
+ * l'interface doit rendre atteignable en un clic.
+ */
+export type CommonsImage = {
+  /** URL de l'image, dimensionnée. */
+  url: string;
+  /** Page Commons du fichier : auteur, licence, historique. */
+  sourceUrl: string;
+  /** Nom du fichier, tel que déclaré par Wikidata. */
+  fileName: string;
+};
+
+async function claimFile(
   entityId: string,
   property: "P18" | "P154",
   width: number,
-): Promise<string | null> {
+): Promise<CommonsImage | null> {
   try {
     const data = await fetchJson(
       `https://www.wikidata.org/wiki/Special:EntityData/${encodeURIComponent(entityId)}.json`,
@@ -105,21 +122,32 @@ async function claimFileUrl(
       data.entities[entityId]?.claims?.[property]?.[0]?.mainsnak?.datavalue
         ?.value;
     if (!fileName) return null;
-    return (
-      "https://commons.wikimedia.org/wiki/Special:FilePath/" +
-      `${encodeURIComponent(fileName)}?width=${width}`
-    );
+
+    const encoded = encodeURIComponent(fileName);
+    return {
+      url: `https://commons.wikimedia.org/wiki/Special:FilePath/${encoded}?width=${width}`,
+      sourceUrl: `https://commons.wikimedia.org/wiki/File:${encoded}`,
+      fileName,
+    };
   } catch {
     // Entité absente ou service indisponible : pas de visuel, pas d'erreur
     return null;
   }
 }
 
+export async function getEntityImage(
+  entityId: string,
+  width = 800,
+): Promise<CommonsImage | null> {
+  return claimFile(entityId, "P18", width);
+}
+
+/** URL seule de la photo — pour les appelants qui n'affichent pas de crédit. */
 export async function getEntityImageUrl(
   entityId: string,
   width = 800,
 ): Promise<string | null> {
-  return claimFileUrl(entityId, "P18", width);
+  return (await claimFile(entityId, "P18", width))?.url ?? null;
 }
 
 /**
@@ -128,9 +156,17 @@ export async function getEntityImageUrl(
  * Repli de P18 : un groupe sans photo de ses membres a souvent un logo,
  * et c'est le visuel qui l'identifie le mieux après une photo.
  */
+export async function getEntityLogo(
+  entityId: string,
+  width = 800,
+): Promise<CommonsImage | null> {
+  return claimFile(entityId, "P154", width);
+}
+
+/** URL seule du logo. */
 export async function getEntityLogoUrl(
   entityId: string,
   width = 800,
 ): Promise<string | null> {
-  return claimFileUrl(entityId, "P154", width);
+  return (await claimFile(entityId, "P154", width))?.url ?? null;
 }

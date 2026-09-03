@@ -134,9 +134,9 @@ export function SearchResults({ q }: SearchResultsProps) {
                       {album.bandName}
                     </span>
                     <span className="text-muted-foreground flex items-center gap-2 text-xs">
-                      <span className="font-mono">
-                        {album.releaseYear ?? "—"}
-                      </span>
+                      {album.releaseYear !== null && (
+                        <span className="font-mono">{album.releaseYear}</span>
+                      )}
                       <span className="border-border rounded border px-1.5 py-0.5 tracking-wide uppercase">
                         {album.type}
                       </span>

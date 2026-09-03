@@ -3,8 +3,8 @@
  *
  * Server Component : une image et deux dégradés, sans état.
  *
- * L'image est très assombrie et fondue vers le fond de la page par le
- * haut ET par le bas. C'est une contrainte de lisibilité, pas un choix
+ * L'image est assombrie et fondue vers le fond de la page par le haut
+ * ET par le bas. C'est une contrainte de lisibilité, pas un choix
  * esthétique : la fiche porte du texte long (biographie, tracklists,
  * liens) qui doit rester lisible quelle que soit la photo — une scène de
  * concert surexposée comme un logo blanc sur fond noir.
@@ -38,11 +38,11 @@ export function BandBackdrop({ imageUrl }: BandBackdropProps) {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center opacity-20"
+        className="object-cover object-center opacity-40"
       />
       {/* Fondu vers le fond de page : sans lui, la coupure basse de
           l'image traverse le contenu comme une ligne d'horizon. */}
-      <div className="from-background/40 via-background/80 to-background absolute inset-0 bg-gradient-to-b" />
+      <div className="from-background/20 via-background/65 to-background absolute inset-0 bg-gradient-to-b" />
     </div>
   );
 }

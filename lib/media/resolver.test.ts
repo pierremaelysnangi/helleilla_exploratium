@@ -54,8 +54,8 @@ vi.mock("@/lib/providers", () => ({
     },
     wikidata: {
       getSummary: providersMock.wdSummary,
-      getEntityImageUrl: providersMock.wdImage,
-      getEntityLogoUrl: providersMock.wdLogo,
+      getEntityImage: providersMock.wdImage,
+      getEntityLogo: providersMock.wdLogo,
     },
     discogs: {
       getArtist: providersMock.discogsGetArtist,
@@ -141,13 +141,17 @@ describe("resolveBandMedia", () => {
     });
     // L'image vient de la déclaration P18 de l'entité, pas du résumé :
     // celui-ci décrit la page Wikidata et n'en porte jamais.
-    providersMock.wdImage.mockResolvedValue(
-      "https://commons.wikimedia.org/wiki/Special:FilePath/e.jpg?width=800",
-    );
+    providersMock.wdImage.mockResolvedValue({
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/e.jpg?width=800",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:e.jpg",
+      fileName: "e.jpg",
+    });
     // Logo officiel (P154) : second visuel de la galerie
-    providersMock.wdLogo.mockResolvedValue(
-      "https://commons.wikimedia.org/wiki/Special:FilePath/logo.svg?width=800",
-    );
+    providersMock.wdLogo.mockResolvedValue({
+      url: "https://commons.wikimedia.org/wiki/Special:FilePath/logo.svg?width=800",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:logo.svg",
+      fileName: "logo.svg",
+    });
     providersMock.deezerSearch.mockResolvedValue([
       {
         id: 1,
@@ -199,13 +203,15 @@ describe("resolveBandMedia", () => {
       url: "https://emperor.test/",
     });
     expect(media.info.wikidata?.extract).toContain("norvégien");
-    // Galerie : photo puis logo Wikidata, puis la pochette rapportée
-    // par Deezer — la fiche ne se contente plus d'un seul visuel.
-    expect(media.images.map((i) => i.provider)).toEqual([
-      "wikidata",
-      "wikidata",
-      "deezer",
-    ]);
+    // Galerie : la PHOTO puis le logo, et rien d'autre. Les pochettes
+    // rapportées par les plateformes en ont été retirées — elles
+    // montrent une œuvre, pas le groupe.
+    expect(media.images.map((i) => i.kind)).toEqual(["photo", "logo"]);
+    // Chaque visuel porte sa page d'origine : les licences libres de
+    // Wikimedia Commons imposent d'en créditer l'auteur.
+    expect(media.images[0].sourceUrl).toContain(
+      "commons.wikimedia.org/wiki/File:",
+    );
     expect(media.previews).toHaveLength(1);
     expect(media.degraded).toBe(false);
 

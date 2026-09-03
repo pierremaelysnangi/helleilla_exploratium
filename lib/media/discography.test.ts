@@ -74,6 +74,9 @@ function rg(
     title,
     "primary-type": primary,
     "secondary-types": secondary,
+    // Un seul crédit par défaut : plusieurs feraient de chaque fixture
+    // un split, ce qui est justement le cas particulier à isoler.
+    "artist-credit": [{ name: "Un Groupe" }],
     "first-release-date": date,
   };
 }
@@ -94,6 +97,7 @@ describe("IMPORTED_RELEASE_TYPES", () => {
       "ep",
       "live",
       "single",
+      "split",
     ]);
   });
 });

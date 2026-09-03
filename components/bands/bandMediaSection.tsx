@@ -16,6 +16,7 @@
 // Hook média + composants UI de base
 import { useBandMedia } from "@/hooks/use-band-media";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BandGallery } from "./bandGallery";
 // Lecteur global : une seule piste joue à la fois dans toute l'application
 import {
   useAudioPlayerStore,
@@ -24,6 +25,8 @@ import {
 
 type BandMediaSectionProps = {
   bandId: string;
+  /** Nom du groupe : texte alternatif et crédits de la galerie. */
+  bandName: string;
 };
 
 /**
@@ -44,7 +47,7 @@ function toPlayable(preview: {
   };
 }
 
-export function BandMediaSection({ bandId }: BandMediaSectionProps) {
+export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
   const { data: media, isPending, isError } = useBandMedia(bandId);
   // Hooks avant tout retour anticipé : leur ordre doit être stable d'un
   // rendu à l'autre, quel que soit l'état de la requête.
@@ -130,25 +133,8 @@ export function BandMediaSection({ bandId }: BandMediaSectionProps) {
         </div>
       )}
 
-      {/* Galerie d'images officielles (jamais copiées : URLs sources) */}
-      {images.length > 0 && (
-        <div>
-          <h2 className="metal-title text-sm">Galerie</h2>
-          <ul className="mt-3 flex gap-3 overflow-x-auto pb-2">
-            {images.slice(0, 8).map((image, index) => (
-              <li key={`${image.provider}-${index}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element -- URLs hétérogènes multi-providers, dimensions libres */}
-                <img
-                  src={image.url}
-                  alt={`Média ${index + 1} (${image.provider})`}
-                  loading="lazy"
-                  className="border-border h-32 w-auto rounded-md border object-cover"
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Galerie : photos créditées, agrandissables (jamais copiées) */}
+      <BandGallery images={images} bandName={bandName} />
 
       {/* Aperçus audio Deezer (extraits 30 s hébergés par la plateforme).
           La lecture passe par le lecteur global : un <audio controls> par

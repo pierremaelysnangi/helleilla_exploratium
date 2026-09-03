@@ -235,10 +235,20 @@ export const LABELS: SeedLabel[] = [
 export type SeedAlbum = {
   title: string;
   slug: string;
-  type: "album" | "ep" | "single" | "compilation" | "live" | "demo";
+  type: "album" | "ep" | "single" | "compilation" | "live" | "demo" | "split";
   releaseYear: number;
   /** Slug du label éditeur, s'il figure dans LABELS. */
   label?: string;
+  /**
+   * Genres PROPRES à cette sortie, quand ils diffèrent de ceux du groupe.
+   *
+   * Un groupe évolue : « Soulside Journey » est du death metal alors que
+   * Darkthrone est un groupe de black metal. Sans cette qualification,
+   * filtrer sur « death metal » remontait toute sa discographie.
+   *
+   * Facultatif : une sortie sans genre propre hérite de son groupe.
+   */
+  genres?: string[];
   /** Quelques titres de l'album, dans l'ordre de la tracklist. */
   tracks?: string[];
 };
@@ -364,7 +374,7 @@ export const BANDS: SeedBand[] = [
     formedYear: 1986,
     bio: "Groupe norvégien originaire de Kolbotn, d'abord orienté death metal avant de basculer vers un black metal volontairement brut. Le duo Nocturno Culto / Fenriz en constitue le noyau depuis 1991.",
     themes: ["Misanthropie", "Hiver", "Satanisme", "Contre-culture"],
-    genres: ["black-metal", "death-metal"],
+    genres: ["black-metal"],
     members: [
       {
         name: "Fenriz",
@@ -385,6 +395,8 @@ export const BANDS: SeedBand[] = [
         slug: "soulside-journey",
         type: "album",
         releaseYear: 1991,
+        // Seul album de death metal du groupe, avant son virage black
+        genres: ["death-metal", "old-school-death-metal"],
         label: "peaceville-records",
       },
       {

@@ -22,6 +22,7 @@ const albumTypeEnum = z.enum([
   "compilation",
   "live",
   "demo",
+  "split",
 ]);
 
 // Forme de base réutilisable (sans refine), permettant les variantes .partial()

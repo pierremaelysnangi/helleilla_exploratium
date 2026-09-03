@@ -36,6 +36,15 @@ export const albumTypeEnum = pgEnum("album_type", [
   "compilation",
   "live",
   "demo",
+  /**
+   * Split : sortie partagée entre plusieurs groupes.
+   *
+   * Type à part entière et non un album studio. « Cromlech / Spectres
+   * Over Gorgoroth » réunit Darkthrone et Isengard : le ranger parmi les
+   * albums studio de Darkthrone attribue au groupe une œuvre qui n'est
+   * pas la sienne seule.
+   */
+  "split",
 ]);
 
 /**

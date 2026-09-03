@@ -19,6 +19,7 @@ import {
   albums,
   albumLineups,
   bandGenres,
+  albumGenres,
   bandMembers,
   bands,
   externalRefs,
@@ -201,6 +202,19 @@ async function seedBands(
           set: { title: album.title, releaseYear: album.releaseYear },
         })
         .returning({ id: albums.id });
+
+      // Genres propres à la sortie : synchronisation complète, comme
+      // pour les genres du groupe. Une sortie sans genre propre hérite
+      // de ceux de son groupe au moment du filtrage.
+      await db.delete(albumGenres).where(eq(albumGenres.albumId, albumRow.id));
+      if (album.genres?.length) {
+        await db.insert(albumGenres).values(
+          album.genres.map((slug) => ({
+            albumId: albumRow.id,
+            genreId: genreIds.get(slug)!,
+          })),
+        );
+      }
 
       if (album.tracks?.length) {
         await db.delete(tracks).where(eq(tracks.albumId, albumRow.id));

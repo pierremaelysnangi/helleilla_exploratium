@@ -107,7 +107,7 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
 
       <BandHeader band={band} />
       {/* Enrichissement providers externes (client, progressif) */}
-      <BandMediaSection bandId={band.id} />
+      <BandMediaSection bandId={band.id} bandName={band.name} />
 
       {/* Discographie en cartes : rendue côté serveur, donc présente au
           premier affichage — le tableau client précédent laissait un

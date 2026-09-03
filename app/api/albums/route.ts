@@ -16,9 +16,24 @@ import { listQuerySchema } from "@/lib/api/schemas";
 import { createAlbumSchema } from "@/lib/validations/album";
 import { db } from "@/db";
 import { albums, bands } from "@/db/schema";
-import { desc, asc, ilike, sql, and, eq, type SQL } from "drizzle-orm";
+import {
+  desc,
+  asc,
+  ilike,
+  sql,
+  and,
+  eq,
+  or,
+  notInArray,
+  type SQL,
+} from "drizzle-orm";
 import { z } from "zod";
-import { bandIdsByGenreSlug, restrictTo } from "@/db/queries/genreFilter";
+import {
+  albumIdsByGenreSlug,
+  albumIdsWithOwnGenres,
+  bandIdsByGenreSlug,
+  restrictTo,
+} from "@/db/queries/genreFilter";
 import { albumIndexQueue } from "@/lib/queue/client";
 
 /**
@@ -43,6 +58,34 @@ const albumListQuerySchema = listQuerySchema.extend({
 });
 
 /**
+ * Clause de filtre par genre pour les sorties.
+ *
+ * Retient une sortie si :
+ * - elle porte elle-même ce genre (ou l'un de ses sous-genres) ;
+ * - ou bien elle n'est qualifiée par aucun genre propre, et c'est son
+ *   groupe qui porte le genre demandé.
+ */
+async function albumGenreClause(genre: string): Promise<SQL> {
+  const [matchingAlbums, qualifiedAlbums, matchingBands] = await Promise.all([
+    albumIdsByGenreSlug(genre),
+    albumIdsWithOwnGenres(),
+    bandIdsByGenreSlug(genre),
+  ]);
+
+  const inherited = and(
+    restrictTo(albums.bandId, matchingBands),
+    // `notInArray` sur une liste vide serait ignoré par Drizzle : la
+    // clause est simplement omise, ce qui est le comportement voulu
+    // quand aucune sortie n'est encore qualifiée.
+    qualifiedAlbums.length > 0
+      ? notInArray(albums.id, qualifiedAlbums)
+      : undefined,
+  );
+
+  return or(restrictTo(albums.id, matchingAlbums), inherited)!;
+}
+
+/**
  * GET /api/albums — liste paginée d'albums avec recherche, tri et
  * filtre facultatif par groupe.
  *
@@ -57,13 +100,21 @@ export const GET = route(
   async ({ query }) => {
     const { page, perPage, q, sort, order, bandId, genre } = query;
     const offset = (page - 1) * perPage;
-    // Un album n'a pas de genre propre : il hérite de celui de son
-    // groupe, comme partout ailleurs dans le catalogue.
-    const genreIds = genre ? await bandIdsByGenreSlug(genre) : null;
+    // Filtre par genre en deux temps.
+    //
+    // Une sortie peut être qualifiée pour elle-même : « Soulside
+    // Journey » est du death metal alors que Darkthrone est un groupe de
+    // black metal. Se fier aux seuls genres du groupe faisait remonter
+    // TOUTE sa discographie sous le mauvais filtre.
+    //
+    // Une sortie non qualifiée hérite donc de son groupe, mais une
+    // sortie qualifiée ne répond QUE de sa propre qualification —
+    // sinon l'héritage la ferait réapparaître sous le genre du groupe.
+    const genreWhere = genre ? await albumGenreClause(genre) : undefined;
     const where: SQL | undefined = and(
       q ? ilike(albums.title, `%${q}%`) : undefined,
       bandId ? eq(albums.bandId, bandId) : undefined,
-      genreIds ? restrictTo(albums.bandId, genreIds) : undefined,
+      genreWhere,
     );
     const dir = order === "asc" ? asc : desc;
     const column =

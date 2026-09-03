@@ -19,6 +19,7 @@ import type { AlbumRow } from "@/hooks/api/schemas";
 export const TYPE_ORDER: AlbumRow["type"][] = [
   "album",
   "ep",
+  "split",
   "live",
   "demo",
   "compilation",
@@ -33,6 +34,7 @@ export const TYPE_SECTIONS: Record<AlbumRow["type"], string> = {
   live: "Live",
   compilation: "Compilations",
   demo: "Démos",
+  split: "Splits",
 };
 
 /** Regroupe une discographie par type, sections vides écartées. */

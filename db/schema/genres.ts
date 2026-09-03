@@ -18,6 +18,7 @@ import {
 } from "drizzle-orm/pg-core";
 // Table `bands` référencée par la table de jonction
 import { bands } from "./bands";
+import { albums } from "./albums";
 
 /**
  * Table `genres` : un genre musical, potentiellement sous-genre
@@ -75,5 +76,37 @@ export const bandGenres = pgTable(
     primaryKey({ columns: [t.bandId, t.genreId] }),
     // Accélération des requêtes « groupes d'un genre »
     index("band_genres_genre_idx").on(t.genreId),
+  ],
+);
+
+/**
+ * Table `album_genres` : genres propres à une SORTIE.
+ *
+ * Les genres d'un groupe ne suffisent pas à classer ses sorties. Un
+ * groupe évolue : le premier album de Darkthrone, « Soulside Journey »,
+ * est du death metal, tout le reste de sa discographie du black metal.
+ * Tant que le filtre par genre reposait sur les seuls genres du groupe,
+ * demander « death metal » renvoyait TOUTE la discographie de
+ * Darkthrone — le reproche était fondé.
+ *
+ * Cette table est facultative par sortie : un album sans genre propre
+ * hérite de ceux de son groupe, ce qui évite d'avoir à qualifier trois
+ * cents sorties avant que le filtre ne fonctionne.
+ */
+export const albumGenres = pgTable(
+  "album_genres",
+  {
+    /** Sortie concernée ; suppression en cascade. */
+    albumId: uuid("album_id")
+      .notNull()
+      .references(() => albums.id, { onDelete: "cascade" }),
+    /** Genre associé ; suppression en cascade. */
+    genreId: uuid("genre_id")
+      .notNull()
+      .references(() => genres.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.albumId, t.genreId] }),
+    index("album_genres_genre_idx").on(t.genreId),
   ],
 );

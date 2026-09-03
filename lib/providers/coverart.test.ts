@@ -39,6 +39,7 @@ function group(
     "primary-type":
       "primary-type" in partial ? partial["primary-type"] : "Album",
     "secondary-types": partial["secondary-types"] ?? [],
+    "artist-credit": partial["artist-credit"] ?? [{ name: "Un Groupe" }],
     "first-release-date": partial["first-release-date"] ?? null,
   };
 }
@@ -68,6 +69,36 @@ describe("albumTypeOf", () => {
     expect(albumTypeOf(group({ title: "C", "primary-type": "Single" }))).toBe(
       "single",
     );
+  });
+
+  it("reconnaît un split à ses crédits multiples", () => {
+    // « Cromlech / Spectres Over Gorgoroth » réunit Darkthrone et
+    // Isengard sans porter aucun type secondaire : sans ce contrôle, il
+    // atterrissait parmi les albums studio de Darkthrone.
+    expect(
+      albumTypeOf(
+        group({
+          title: "Cromlech / Spectres Over Gorgoroth",
+          "primary-type": "Album",
+          "artist-credit": [{ name: "Darkthrone" }, { name: "Isengard" }],
+        }),
+      ),
+    ).toBe("split");
+  });
+
+  it("laisse une compilation multi-artistes en compilation", () => {
+    // Un split et une compilation « various artists » ont tous deux
+    // plusieurs crédits : c'est le type secondaire qui les sépare.
+    expect(
+      albumTypeOf(
+        group({
+          title: "The True Legends in Black",
+          "primary-type": "Album",
+          "secondary-types": ["Compilation"],
+          "artist-credit": [{ name: "A" }, { name: "B" }],
+        }),
+      ),
+    ).toBe("compilation");
   });
 
   it("n'affirme rien quand MusicBrainz ne déclare aucun type", () => {
