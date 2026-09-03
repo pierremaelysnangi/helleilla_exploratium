@@ -202,3 +202,45 @@
     padding-inline: 2rem;
   }
 }
+
+/*
+ * Listes déroulantes natives.
+ *
+ * Un `<select>` non stylé emprunte l'apparence du système : fond clair,
+ * flèche grise, coins carrés. Au milieu d'une interface sombre, il se
+ * remarque comme un corps étranger — et sur macOS il reste clair même
+ * quand la page ne l'est pas.
+ *
+ * On retire l'apparence native et on redessine la flèche en fond, ce
+ * qui laisse le contrôle entièrement natif pour le clavier, le lecteur
+ * d'écran et le sélecteur plein écran des mobiles.
+ */
+select {
+  appearance: none;
+  /* Place pour la flèche, du côté de la fin de ligne : en arabe la mise
+     en page est retournée et la flèche passe à gauche. */
+  padding-inline-end: 1.75rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted-foreground) 50%),
+    linear-gradient(135deg, var(--muted-foreground) 50%, transparent 50%);
+  background-position:
+    right 0.85rem center,
+    right 0.55rem center;
+  background-size:
+    0.3rem 0.3rem,
+    0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+[dir="rtl"] select {
+  background-position:
+    left 0.85rem center,
+    left 0.55rem center;
+}
+
+/* Le menu déroulant lui-même reste dessiné par le système : seules ses
+   couleurs sont ajustables, et un fond clair y serait illisible. */
+select option {
+  background-color: var(--card);
+  color: var(--card-foreground);
+}

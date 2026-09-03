@@ -14,6 +14,7 @@
 
 import { AlbumCard } from "@/components/albums/albumCard";
 import type { AlbumRow } from "@/hooks/api/schemas";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /** Ordre d'affichage : sorties principales d'abord. */
 export const TYPE_ORDER: AlbumRow["type"][] = [
@@ -26,17 +27,6 @@ export const TYPE_ORDER: AlbumRow["type"][] = [
   "single",
 ];
 
-/** Titres de section par type de sortie. */
-export const TYPE_SECTIONS: Record<AlbumRow["type"], string> = {
-  album: "Albums studio",
-  ep: "EP",
-  single: "Singles",
-  live: "Live",
-  compilation: "Compilations",
-  demo: "Démos",
-  split: "Splits",
-};
-
 /** Regroupe une discographie par type, sections vides écartées. */
 export function groupByType(albums: AlbumRow[]) {
   return TYPE_ORDER.map((type) => ({
@@ -47,6 +37,8 @@ export function groupByType(albums: AlbumRow[]) {
 
 type DiscographySectionsProps = {
   albums: AlbumRow[];
+  /** Dictionnaire : les titres de section suivent la langue du lecteur. */
+  t: Dictionary;
   bandSlug: string;
   bandName: string;
   /** Visuel du groupe : repli des pochettes non archivées. */
@@ -70,6 +62,7 @@ export function DiscographySections({
   bandSlug,
   bandName,
   bandImageUrl,
+  t,
   headingLevel = "h2",
 }: DiscographySectionsProps) {
   const Heading = headingLevel;
@@ -95,11 +88,11 @@ export function DiscographySections({
       {sections.map((section) => (
         <section
           key={section.type}
-          aria-label={TYPE_SECTIONS[section.type]}
+          aria-label={t.releaseSection[section.type]}
           className="flex flex-col gap-3"
         >
           <Heading className="metal-title flex items-baseline gap-2 text-base">
-            {TYPE_SECTIONS[section.type]}
+            {t.releaseSection[section.type]}
             <span className="text-muted-foreground font-mono text-xs">
               {section.albums.length}
             </span>

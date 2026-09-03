@@ -16,6 +16,7 @@
 import { useBandMedia } from "@/hooks/use-band-media";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BandGallery } from "./bandGallery";
+import { useT } from "@/lib/i18n/client";
 
 type BandMediaSectionProps = {
   bandId: string;
@@ -24,6 +25,7 @@ type BandMediaSectionProps = {
 };
 
 export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
+  const t = useT();
   const { data: media, isPending, isError } = useBandMedia(bandId);
 
   if (isPending) {
@@ -51,26 +53,23 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
     >
       {/* Indicateur discret de dégradation (une source en panne) */}
       {degraded && (
-        <p className="text-muted-foreground text-xs">
-          Certaines sources externes sont momentanément indisponibles —
-          informations partielles.
-        </p>
+        <p className="text-muted-foreground text-xs">{t.common.unavailable}</p>
       )}
 
       {/* Infos structurées MusicBrainz + Wikidata */}
       {hasInfo && (
         <div className="metal-card p-4">
-          <h2 className="metal-title text-sm">Informations</h2>
+          <h2 className="metal-title text-sm">{t.band.genres}</h2>
           <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             {info.area && (
               <>
-                <dt className="text-muted-foreground">Pays</dt>
+                <dt className="text-muted-foreground">{t.band.country}</dt>
                 <dd>{info.area}</dd>
               </>
             )}
             {activeMembers.length > 0 && (
               <>
-                <dt className="text-muted-foreground">Membres</dt>
+                <dt className="text-muted-foreground">{t.band.members}</dt>
                 <dd>
                   {activeMembers.map((m) => m.name).join(", ")}
                   {/* Anciens membres repliés : la fiche décrit le groupe
@@ -78,7 +77,7 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
                   {pastMembers.length > 0 && (
                     <details className="mt-1">
                       <summary className="text-muted-foreground cursor-pointer text-xs">
-                        Anciens membres ({pastMembers.length})
+                        {t.band.formerMembers} ({pastMembers.length})
                       </summary>
                       <p className="text-muted-foreground mt-1 text-xs">
                         {pastMembers.map((m) => m.name).join(", ")}
@@ -90,7 +89,7 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
             )}
             {info.genres.length > 0 && (
               <>
-                <dt className="text-muted-foreground">Genres</dt>
+                <dt className="text-muted-foreground">{t.band.genres}</dt>
                 <dd>{info.genres.slice(0, 6).join(", ")}</dd>
               </>
             )}
@@ -111,7 +110,7 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
       {/* Liens officiels */}
       {links.length > 0 && (
         <div>
-          <h2 className="metal-title text-sm">Liens officiels</h2>
+          <h2 className="metal-title text-sm">{t.band.officialLinks}</h2>
           <ul className="mt-2 flex flex-wrap gap-2">
             {links.map((link) => (
               <li key={link.url}>

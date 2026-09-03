@@ -16,6 +16,7 @@ import { fetchDiscography } from "@/lib/api/discography";
 // Présentation — mêmes sections que la fiche du groupe
 import { DiscographySections } from "@/components/bands/discographySections";
 import { EmptyState } from "@/components/shared/emptyState";
+import { getTranslations } from "@/lib/i18n/server";
 
 type DiscographyPageProps = {
   params: Promise<{ slug: string }>;
@@ -56,6 +57,7 @@ export default async function DiscographyPage({
   if (!band) notFound();
 
   const albums = await fetchDiscography(band.id);
+  const { t } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
@@ -90,6 +92,7 @@ export default async function DiscographyPage({
         />
       ) : (
         <DiscographySections
+          t={t}
           albums={albums}
           bandSlug={band.slug}
           bandName={band.name}

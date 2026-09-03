@@ -17,6 +17,8 @@
 import { useState } from "react";
 import type { TrackRow } from "@/hooks/api/schemas";
 import { trackSearchLinks, trackLyricsLinks } from "@/lib/media/platformLinks";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type AlbumTracklistProps = {
   tracks: TrackRow[];
@@ -38,6 +40,7 @@ export function AlbumTracklist({
   artistName,
   albumTitle,
 }: AlbumTracklistProps) {
+  const t = useT();
   // Une seule piste dépliée à la fois (index dans la liste)
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -66,7 +69,9 @@ export function AlbumTracklist({
               <button
                 type="button"
                 aria-expanded={isOpen}
-                aria-label={`Liens pour ${track.title}`}
+                aria-label={interpolate(t.album.linksFor, {
+                  track: track.title,
+                })}
                 onClick={() => setOpenIndex(isOpen ? null : index)}
                 className="border-border hover:border-primary/50 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-xs leading-none transition-colors"
               >
@@ -77,7 +82,7 @@ export function AlbumTracklist({
             {isOpen && (
               <div className="border-border/60 bg-background/40 border-t px-4 py-3">
                 <p className="text-muted-foreground mb-1.5 text-[11px] tracking-wide uppercase">
-                  Écouter chez le diffuseur
+                  {t.album.listenAt}
                 </p>
                 <ul className="flex flex-wrap gap-2">
                   {Object.entries(listen).map(([platform, link]) => (
@@ -95,7 +100,7 @@ export function AlbumTracklist({
                 </ul>
 
                 <p className="text-muted-foreground mt-3 mb-1.5 text-[11px] tracking-wide uppercase">
-                  Paroles
+                  {t.album.lyrics}
                 </p>
                 <ul className="flex flex-wrap gap-2">
                   {Object.entries(lyrics).map(([source, link]) => (

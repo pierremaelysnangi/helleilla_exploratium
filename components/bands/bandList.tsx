@@ -27,6 +27,7 @@ import { BandCard } from "./bandCard";
 // Filtre par genre partagé (inclusif des sous-genres)
 import { GenreSelect } from "@/components/genres/genreSelect";
 import { z } from "zod";
+import { useT } from "@/lib/i18n/client";
 
 /** Schéma du payload paginé renvoyé par l'API (validation runtime). */
 const pageSchema = z.object({
@@ -58,6 +59,7 @@ const PER_PAGE = 20;
  * Les filtres changent -> nouvelle clé de requête -> reset propre des pages.
  */
 export function BandList() {
+  const t = useT();
   const [filters, setFilters] = useQueryStates(bandFilters);
 
   const infinite = useInfiniteQuery({
@@ -94,26 +96,26 @@ export function BandList() {
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
-          placeholder="Rechercher un groupe…"
+          placeholder={t.catalogue.searchBand}
           value={filters.q}
           onChange={(e) => setFilters({ q: e.target.value || null })}
           className="border-border bg-card focus:border-primary/50 w-full max-w-xs rounded-md border px-3 py-2 text-sm outline-none"
-          aria-label="Rechercher un groupe"
+          aria-label={t.catalogue.searchBand}
         />
         <GenreSelect
           value={filters.genre}
           onChange={(genre) => setFilters({ genre: genre || null })}
-          label="Filtrer les groupes par genre"
+          label={t.catalogue.filterByGenre}
         />
         <select
           value={filters.sort}
           onChange={(e) => setFilters({ sort: e.target.value as never })}
-          aria-label="Trier par"
+          aria-label={t.catalogue.sortBy}
           className="border-border bg-card rounded-md border px-3 py-2 text-sm"
         >
-          <option value="createdAt">Plus récents</option>
-          <option value="name">Nom</option>
-          <option value="year">Année</option>
+          <option value="createdAt">{t.catalogue.newest}</option>
+          <option value="name">{t.catalogue.name}</option>
+          <option value="year">{t.catalogue.year}</option>
         </select>
         <button
           type="button"
@@ -121,9 +123,15 @@ export function BandList() {
             setFilters({ order: filters.order === "asc" ? "desc" : "asc" })
           }
           className="metal-nav-link border-border hover:border-primary/40 rounded-md border px-3 py-2"
-          aria-label={`Ordre ${filters.order === "asc" ? "croissant" : "décroissant"}`}
+          aria-label={
+            filters.order === "asc"
+              ? t.catalogue.ascending
+              : t.catalogue.descending
+          }
         >
-          {filters.order === "asc" ? "↑ Croissant" : "↓ Décroissant"}
+          {filters.order === "asc"
+            ? `↑ ${t.catalogue.ascending}`
+            : `↓ ${t.catalogue.descending}`}
         </button>
         {meta && (
           <span className="text-muted-foreground text-sm">
@@ -135,16 +143,14 @@ export function BandList() {
       {/* Liste virtualisée : hauteur ~120 px estimée par carte */}
       <div className="h-[calc(100vh-320px)] min-h-[400px]">
         {infinite.isPending ? (
-          <p className="text-muted-foreground">Chargement du catalogue…</p>
+          <p className="text-muted-foreground">{t.catalogue.loading}</p>
         ) : infinite.isError ? (
           <p role="alert" className="text-destructive">
             Impossible de charger les groupes :{" "}
             {(infinite.error as Error).message}
           </p>
         ) : rows.length === 0 ? (
-          <p className="text-muted-foreground">
-            Aucun groupe ne correspond à cette recherche.
-          </p>
+          <p className="text-muted-foreground">{t.catalogue.noResult}</p>
         ) : (
           <VirtualInfiniteList
             items={rows}

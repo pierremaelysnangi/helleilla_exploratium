@@ -23,6 +23,7 @@ import { albumListItemSchema, type AlbumListItem } from "@/hooks/api/schemas";
 import { GenreSelect } from "@/components/genres/genreSelect";
 import { InfiniteGrid } from "@/components/shared/infiniteGrid";
 import { AlbumCard } from "./albumCard";
+import { useT } from "@/lib/i18n/client";
 
 const pageSchema = z.object({
   data: z.array(albumListItemSchema),
@@ -35,6 +36,7 @@ const pageSchema = z.object({
 });
 
 export function AlbumsList() {
+  const t = useT();
   const [filters, setFilters] = useQueryStates({
     q: parseAsString.withDefault(""),
     genre: parseAsString.withDefault(""),
@@ -70,16 +72,16 @@ export function AlbumsList() {
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
-          placeholder="Rechercher un album…"
+          placeholder={t.catalogue.searchAlbum}
           value={filters.q}
           onChange={(e) => setFilters({ q: e.target.value || null })}
-          aria-label="Rechercher un album"
+          aria-label={t.catalogue.searchAlbum}
           className="border-border bg-card focus:border-primary/50 w-full max-w-xs rounded-md border px-3 py-2 text-sm outline-none"
         />
         <GenreSelect
           value={filters.genre}
           onChange={(genre) => setFilters({ genre: genre || null })}
-          label="Filtrer les albums par genre"
+          label={t.catalogue.filterByGenre}
         />
         {total !== undefined && (
           <span className="text-muted-foreground text-sm">
@@ -89,13 +91,13 @@ export function AlbumsList() {
       </div>
 
       {infinite.isPending ? (
-        <p className="text-muted-foreground">Chargement des albums…</p>
+        <p className="text-muted-foreground">{t.catalogue.loading}</p>
       ) : infinite.isError ? (
         <p role="alert" className="text-destructive text-sm">
-          Impossible de charger les albums.
+          {t.common.error}
         </p>
       ) : rows.length === 0 ? (
-        <p className="text-muted-foreground">Aucun album trouvé.</p>
+        <p className="text-muted-foreground">{t.catalogue.noResult}</p>
       ) : (
         <InfiniteGrid
           items={rows}

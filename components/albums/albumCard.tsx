@@ -1,6 +1,11 @@
+"use client";
+
 /**
  * <AlbumCard> — carte d'album pour les grilles (discographie, sélections).
- * Composant serveur : pas d'état, pas d'interaction — il ne rend qu'un lien.
+ *
+ * Composant client pour une seule raison : le TYPE de sortie est un
+ * libellé traduit, et le dictionnaire descend par contexte. Le reste
+ * n'a ni état ni interaction.
  *
  * Carte haut/bas : pochette carrée puis titre, groupe éventuel, année et
  * type de sortie. Le repli visuel est le même que partout ailleurs quand
@@ -12,17 +17,7 @@ import Link from "next/link";
 import { CoverImage } from "./coverImage";
 // Type de ligne validée côté client
 import type { AlbumRow } from "@/hooks/api/schemas";
-
-/** Libellés français du type de sortie (enum PostgreSQL `album_type`). */
-const TYPE_LABELS: Record<AlbumRow["type"], string> = {
-  album: "Album",
-  ep: "EP",
-  single: "Single",
-  compilation: "Compilation",
-  live: "Live",
-  demo: "Démo",
-  split: "Split",
-};
+import { useT } from "@/lib/i18n/client";
 
 type AlbumCardProps = {
   album: AlbumRow;
@@ -55,6 +50,7 @@ export function AlbumCard({
   bandImageUrl,
   priority = false,
 }: AlbumCardProps) {
+  const t = useT();
   return (
     <Link
       href={`/bands/${bandSlug}/albums/${album.slug}`}
@@ -85,7 +81,7 @@ export function AlbumCard({
             <span className="font-mono">{album.releaseYear}</span>
           )}
           <span className="border-border rounded border px-1.5 py-0.5 tracking-wide uppercase">
-            {TYPE_LABELS[album.type]}
+            {t.releaseType[album.type]}
           </span>
         </p>
       </div>

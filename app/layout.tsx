@@ -81,7 +81,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <meta name="darkreader-lock" />
       </head>
       <body className="flex min-h-full flex-col">
-        <Providers>
+        <Providers locale={locale} dictionary={t}>
           <Header locale={locale} t={t} />
           {/* Avertissement anti-auto-XSS dans la console du navigateur */}
           <ConsoleWarning />

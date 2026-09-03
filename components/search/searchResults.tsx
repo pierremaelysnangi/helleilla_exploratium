@@ -18,6 +18,8 @@
 import { useGlobalSearch } from "@/hooks/use-search";
 import Link from "next/link";
 import { CoverImage } from "@/components/albums/coverImage";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type SearchResultsProps = {
   /** Terme brut saisi (le debounce est géré par le hook). */
@@ -37,6 +39,7 @@ function SectionHeader({ label, count }: { label: string; count: number }) {
 }
 
 export function SearchResults({ q }: SearchResultsProps) {
+  const t = useT();
   const trimmed = q.trim();
   const { data, isFetching, isPending } = useGlobalSearch({
     q: trimmed,
@@ -45,16 +48,13 @@ export function SearchResults({ q }: SearchResultsProps) {
   });
 
   if (!trimmed) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        Saisissez un terme pour lancer la recherche dans les groupes, albums et
-        pistes.
-      </p>
-    );
+    return <p className="text-muted-foreground text-sm">{t.search.prompt}</p>;
   }
 
   if (isPending) {
-    return <p className="text-muted-foreground text-sm">Recherche…</p>;
+    return (
+      <p className="text-muted-foreground text-sm">{t.search.searching}</p>
+    );
   }
 
   const empty =
@@ -66,7 +66,7 @@ export function SearchResults({ q }: SearchResultsProps) {
   if (empty && !isFetching) {
     return (
       <p className="text-muted-foreground text-sm">
-        Aucun résultat pour «&nbsp;{trimmed}&nbsp;».
+        {interpolate(t.search.noResultFor, { term: trimmed })}
       </p>
     );
   }
@@ -76,14 +76,14 @@ export function SearchResults({ q }: SearchResultsProps) {
       {/* Indicateur discret pendant les requêtes en arrière-plan */}
       {isFetching && (
         <p aria-live="polite" className="text-muted-foreground text-xs">
-          Actualisation…
+          {t.search.refreshing}
         </p>
       )}
 
       {/* Groupes */}
       {data && data.bands.length > 0 && (
         <section>
-          <SectionHeader label="Groupes" count={data.bands.length} />
+          <SectionHeader label={t.nav.bands} count={data.bands.length} />
           <ul className="mt-2 grid gap-2 sm:grid-cols-2">
             {data.bands.map((band) => (
               <li key={band.id}>
@@ -107,7 +107,7 @@ export function SearchResults({ q }: SearchResultsProps) {
       {/* Albums -> URL band-scopée, la seule qui désigne un album */}
       {data && data.albums.length > 0 && (
         <section>
-          <SectionHeader label="Albums" count={data.albums.length} />
+          <SectionHeader label={t.nav.albums} count={data.albums.length} />
           <ul className="3xl:grid-cols-8 mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {data.albums.map((album, index) => (
               <li key={album.id}>
@@ -154,7 +154,7 @@ export function SearchResults({ q }: SearchResultsProps) {
           sans rien ajouter. */}
       {data && data.tracks.length > 0 && (
         <section>
-          <SectionHeader label="Pistes" count={data.tracks.length} />
+          <SectionHeader label={t.album.tracklist} count={data.tracks.length} />
           <ul className="3xl:grid-cols-8 mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {data.tracks.map((track) => (
               <li key={track.id} className="metal-card overflow-hidden">

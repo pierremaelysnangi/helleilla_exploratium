@@ -24,14 +24,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ResilientImage } from "@/components/media/resilientImage";
 import type { BandMedia } from "@/hooks/api/schemas";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type GalleryImage = BandMedia["images"][number];
-
-/** Libellé de la nature d'un visuel. */
-const KIND_LABELS: Record<GalleryImage["kind"], string> = {
-  photo: "Photo",
-  logo: "Logo",
-};
 
 export function BandGallery({
   images,
@@ -40,8 +36,16 @@ export function BandGallery({
   images: GalleryImage[];
   bandName: string;
 }) {
+  const t = useT();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  /** Libellé de la nature d'un visuel, dans la langue du lecteur. */
+  const describe = (image: GalleryImage) =>
+    interpolate(
+      image.kind === "photo" ? t.band.photoCredit : t.band.logoCredit,
+      { band: bandName },
+    );
 
   // `showModal()` est impératif : c'est lui qui rend le fond inerte et
   // installe le piège de focus. Un simple attribut `open` ne le fait pas.
@@ -58,7 +62,7 @@ export function BandGallery({
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="metal-title text-sm">Galerie</h2>
+      <h2 className="metal-title text-sm">{t.band.gallery}</h2>
 
       <ul className="flex flex-wrap gap-3">
         {images.map((image, index) => (
@@ -66,12 +70,12 @@ export function BandGallery({
             <button
               type="button"
               onClick={() => setOpenIndex(index)}
-              aria-label={`Agrandir : ${KIND_LABELS[image.kind].toLowerCase()} de ${bandName}`}
+              aria-label={`${t.band.enlarge} — ${describe(image)}`}
               className="border-border hover:border-primary/50 group relative block h-32 w-44 overflow-hidden rounded-md border transition-colors"
             >
               <ResilientImage
                 src={image.url}
-                alt={`${KIND_LABELS[image.kind]} de ${bandName}`}
+                alt={describe(image)}
                 fill
                 sizes="176px"
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -81,10 +85,7 @@ export function BandGallery({
         ))}
       </ul>
 
-      <p className="text-muted-foreground text-xs">
-        Photos hébergées par leurs plateformes d&apos;origine. Auteur et licence
-        sur la page de chaque fichier.
-      </p>
+      <p className="text-muted-foreground text-xs">{t.band.galleryNotice}</p>
 
       <dialog
         ref={dialogRef}
@@ -104,7 +105,7 @@ export function BandGallery({
                   relance une requête vers l'amont. */}
               <ResilientImage
                 src={current.url}
-                alt={`${KIND_LABELS[current.kind]} de ${bandName}`}
+                alt={describe(current)}
                 fill
                 sizes="(max-width: 900px) 92vw, 56rem"
                 className="object-contain"
@@ -115,8 +116,8 @@ export function BandGallery({
               {/* Le crédit nomme l'auteur, sans redire ce que le bouton
                   voisin propose déjà d'ouvrir. */}
               <p className="text-muted-foreground text-xs">
-                {KIND_LABELS[current.kind]} de {bandName}
-                {current.author ? ` par ${current.author}` : ""}
+                {describe(current)}
+                {current.author ? ` ${t.band.by} ${current.author}` : ""}
                 {current.licence ? ` · ${current.licence}` : ""}
               </p>
 
@@ -128,7 +129,7 @@ export function BandGallery({
                     rel="noopener noreferrer"
                     className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs tracking-wide uppercase transition-colors"
                   >
-                    Voir la source ↗
+                    {t.band.viewSource} ↗
                   </a>
                 )}
                 <button
@@ -136,7 +137,7 @@ export function BandGallery({
                   onClick={() => setOpenIndex(null)}
                   className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs tracking-wide uppercase transition-colors"
                 >
-                  Fermer
+                  {t.band.close}
                 </button>
               </div>
             </div>

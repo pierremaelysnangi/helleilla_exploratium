@@ -51,15 +51,27 @@ const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
  * d'ouvrir la tracklist, et elle situe une sortie (EP ou double album)
  * mieux que le nombre de pistes seul.
  */
-function formatTotalDuration(tracks: AlbumDetail["tracks"]): string | null {
-  const total = tracks.reduce((sum, t) => sum + (t.durationMs ?? 0), 0);
-  if (total === 0) return null;
+function formatTotalDuration(
+  tracks: AlbumDetail["tracks"],
+): { label: string; partial: boolean } | null {
+  const timed = tracks.filter((t) => t.durationMs != null);
+  if (timed.length === 0) return null;
+
+  const total = timed.reduce((sum, t) => sum + (t.durationMs ?? 0), 0);
   const minutes = Math.round(total / 60000);
-  if (minutes < 60) return `${minutes} min`;
   const rest = minutes % 60;
-  return rest === 0
-    ? `${Math.floor(minutes / 60)} h`
-    : `${Math.floor(minutes / 60)} h ${String(rest).padStart(2, "0")} min`;
+  const label =
+    minutes < 60
+      ? `${minutes} min`
+      : rest === 0
+        ? `${Math.floor(minutes / 60)} h`
+        : `${Math.floor(minutes / 60)} h ${String(rest).padStart(2, "0")} min`;
+
+  // Une partie seulement des pistes est minutée : le total est un
+  // MINIMUM, et l'annoncer sec laisserait croire à un album plus court
+  // qu'il ne l'est. MusicBrainz ne renseigne pas les longueurs de
+  // certaines rééditions et de beaucoup d'enregistrements de répétition.
+  return { label, partial: timed.length < tracks.length };
 }
 
 /** Durée cumulée de la tracklist, au format ISO 8601 pour schema.org. */
@@ -205,7 +217,10 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
               </span>
             )}
             {totalDuration && (
-              <span className="text-foreground font-mono">{totalDuration}</span>
+              <span className="text-foreground font-mono">
+                {totalDuration.partial ? "≥ " : ""}
+                {totalDuration.label}
+              </span>
             )}
           </p>
         </div>
@@ -219,8 +234,16 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="metal-title text-lg">Tracklist</h2>
             {totalDuration && (
-              <span className="text-muted-foreground font-mono text-sm">
-                Durée totale : {totalDuration}
+              <span
+                className="text-muted-foreground font-mono text-sm"
+                title={
+                  totalDuration.partial
+                    ? "Certaines pistes ne sont pas minutées : ce total est un minimum."
+                    : undefined
+                }
+              >
+                Durée totale : {totalDuration.partial ? "≥ " : ""}
+                {totalDuration.label}
               </span>
             )}
           </div>

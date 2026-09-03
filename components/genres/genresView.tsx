@@ -16,8 +16,10 @@
 import { useGenreTaxonomy } from "@/hooks/use-genres";
 import { GenreCard } from "./genreCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 export function GenresView() {
+  const t = useT();
   const { families, isPending, isError } = useGenreTaxonomy();
 
   if (isPending) {
@@ -33,7 +35,7 @@ export function GenresView() {
   if (isError) {
     return (
       <p role="alert" className="text-destructive text-sm">
-        Impossible de charger les genres.
+        {t.common.error}
       </p>
     );
   }

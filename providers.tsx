@@ -6,6 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 // useState pour créer le QueryClient une seule fois par montage client
 import { useState } from "react";
+// Dictionnaire descendu aux composants clients
+import { I18nProvider } from "@/lib/i18n/client";
+import type { Locale } from "@/lib/i18n/locales";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Composant englobant tous les providers côté client de l'application.
@@ -20,7 +24,15 @@ import { useState } from "react";
  * @param children - L'arbre React (pages/layouts) à envelopper.
  * @returns Les providers imbriqués autour des enfants.
  */
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  locale,
+  dictionary,
+}: {
+  children: React.ReactNode;
+  locale: Locale;
+  dictionary: Dictionary;
+}) {
   // Création paresseuse : une seule instance de QueryClient par cycle de vie,
   // même en cas de re-rendus StrictMode.
   const [queryClient] = useState(
@@ -36,8 +48,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <NuqsAdapter>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </NuqsAdapter>
+    <I18nProvider locale={locale} t={dictionary}>
+      <NuqsAdapter>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </NuqsAdapter>
+    </I18nProvider>
   );
 }

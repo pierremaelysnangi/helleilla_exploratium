@@ -1,8 +1,15 @@
 /**
  * @file Festivals et salles de la scène metal — données de référence.
  *
- * Faits vérifiables uniquement : chaque entrée porte le site officiel de
- * l'organisateur ou de la salle, qui fait foi. Rien n'est inventé pour
+ * Faits vérifiables uniquement : chaque entrée porte l'adresse officielle
+ * de l'organisateur ou de la salle, qui fait foi. Quand un domaine propre
+ * a disparu, on pointe la page que la structure tient encore à jour —
+ * souvent son compte Facebook — plutôt que de laisser un lien mort.
+ *
+ * `pnpm check:venue-links` vérifie que chaque adresse répond. Quelques
+ * entrées n'en ont PAS : leur domaine a disparu, et deviner un compte de
+ * remplacement reviendrait à inventer un lien. Mieux vaut pas d'adresse
+ * qu'une fausse — un contributeur qui connaît le lieu la fournira. Rien n'est inventé pour
  * remplir la page, conformément à la règle du projet.
  *
  * Les capacités et fréquentations sont des ORDRES DE GRANDEUR annoncés
@@ -59,7 +66,7 @@ export const VENUES: SeedVenue[] = [
     countryCode: "DE",
     city: "Gelsenkirchen",
     foundedYear: 2003,
-    websiteUrl: "https://www.rockhardfestival.de",
+    websiteUrl: "https://www.rockhard.de",
     capacity: 8000,
     description:
       "Organisé par le magazine du même nom dans le parc Amphitheater, réputé pour une programmation resserrée et sans seconde scène.",
@@ -106,7 +113,6 @@ export const VENUES: SeedVenue[] = [
     kind: "venue",
     countryCode: "FR",
     city: "Paris",
-    websiteUrl: "https://www.leklub.net",
     capacity: 300,
     description:
       "Petite salle du centre de Paris, l'une des rares à programmer du metal extrême toute l'année.",
@@ -212,7 +218,6 @@ export const VENUES: SeedVenue[] = [
     countryCode: "SE",
     city: "Gävle",
     foundedYear: 2016,
-    websiteUrl: "https://www.geflemetalfestival.se",
   },
   {
     name: "Tuska Open Air",
@@ -252,7 +257,6 @@ export const VENUES: SeedVenue[] = [
     countryCode: "IS",
     city: "Neskaupstaður",
     foundedYear: 2005,
-    websiteUrl: "https://www.eistnaflug.is",
     description:
       "Dans un fjord de l'est islandais, à onze heures de route de Reykjavík.",
   },
@@ -338,7 +342,6 @@ export const VENUES: SeedVenue[] = [
     countryCode: "ES",
     city: "Madrid",
     foundedYear: 2019,
-    websiteUrl: "https://voaheavyrock.com",
   },
   {
     name: "Vagos Metal Fest",
@@ -421,6 +424,5 @@ export const VENUES: SeedVenue[] = [
     countryCode: "AU",
     city: "Sydney",
     foundedYear: 2011,
-    websiteUrl: "https://www.metalbattleaustralia.com",
   },
 ];

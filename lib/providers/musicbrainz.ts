@@ -171,12 +171,30 @@ export async function listReleaseGroupTracks(
     { minIntervalMs: 1100 },
   );
 
-  // Édition la plus ancienne ; celles sans date passent en dernier
-  const releases = [...result.releases].sort((a, b) =>
-    (a.date ?? "9999").localeCompare(b.date ?? "9999"),
+  // Choix de l'édition, par ordre d'importance décroissant :
+  //
+  // 1. celle dont le plus de pistes portent une DURÉE. Les rééditions et
+  //    les coffrets sont souvent catalogués sans longueurs, et retenir la
+  //    plus ancienne donnait des tracklists entières affichant « — » —
+  //    alors qu'une autre édition du même disque les renseigne ;
+  // 2. à égalité, la plus ancienne : c'est l'édition de référence, celle
+  //    dont l'ordre et le découpage font foi.
+  const candidates = result.releases.filter((r) =>
+    r.media.some((m) => m.tracks.length > 0),
   );
-  const chosen = releases.find((r) => r.media.some((m) => m.tracks.length > 0));
-  if (!chosen) return [];
+  if (candidates.length === 0) return [];
+
+  const withDurations = (release: (typeof candidates)[number]) =>
+    release.media.reduce(
+      (n, m) => n + m.tracks.filter((t) => t.length != null).length,
+      0,
+    );
+
+  const chosen = [...candidates].sort(
+    (a, b) =>
+      withDurations(b) - withDurations(a) ||
+      (a.date ?? "9999").localeCompare(b.date ?? "9999"),
+  )[0];
 
   return chosen.media.flatMap((medium, index) =>
     medium.tracks.map((track) => ({

@@ -21,6 +21,7 @@ import { BandMediaSection } from "@/components/bands/bandMediaSection";
 import { DiscographySections } from "@/components/bands/discographySections";
 // Chargement serveur de la discographie complète
 import { fetchDiscography } from "@/lib/api/discography";
+import { getTranslations } from "@/lib/i18n/server";
 
 /** Props App Router : params est une promesse en Next 15+. */
 type BandDetailPageProps = {
@@ -92,6 +93,7 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
   if (!band) notFound();
 
   const discography = await fetchDiscography(band.id);
+  const { t } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
@@ -120,6 +122,7 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
           </span>
         </div>
         <DiscographySections
+          t={t}
           albums={discography}
           bandSlug={band.slug}
           bandName={band.name}

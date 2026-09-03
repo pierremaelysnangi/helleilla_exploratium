@@ -13,8 +13,10 @@
 
 import { parseAsString, useQueryState } from "nuqs";
 import { SearchResults } from "./searchResults";
+import { useT } from "@/lib/i18n/client";
 
 export function SearchView() {
+  const t = useT();
   // `throttleMs` : l'historique n'est réécrit qu'après une pause de
   // frappe, sinon chaque caractère empilerait une entrée.
   const [query, setQuery] = useQueryState(
@@ -27,10 +29,10 @@ export function SearchView() {
       <input
         type="search"
         autoFocus
-        placeholder="Groupes, albums, pistes…"
+        placeholder={t.catalogue.searchPlaceholder}
         value={query}
         onChange={(e) => void setQuery(e.target.value || null)}
-        aria-label="Terme de recherche"
+        aria-label={t.search.title}
         className="border-border bg-card focus:border-primary/50 w-full rounded-lg border px-4 py-3 text-sm transition-colors outline-none"
       />
       <SearchResults q={query} />

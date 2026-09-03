@@ -32,9 +32,27 @@ describe("officialLinkLabel", () => {
     ).toBe("emperorhorde.com");
   });
 
-  it("garde le type de relation pour un domaine inconnu non officiel", () => {
+  it("nomme un domaine inconnu par son domaine, sans préfixe", () => {
+    // Régression : le type de relation MusicBrainz servait de préfixe et
+    // produisait « Achat / téléchargement · uk.7digital.com », qui
+    // débordait du bouton sans rien apprendre.
     expect(officialLinkLabel("https://label-obscur.test/x", "Label")).toBe(
-      "Label · label-obscur.test",
+      "label-obscur.test",
+    );
+  });
+
+  it("reconnaît les boutiques et réseaux que le repli nommait mal", () => {
+    expect(
+      officialLinkLabel("https://itunes.apple.com/gb/artist/id1", "Achat"),
+    ).toBe("iTunes");
+    expect(
+      officialLinkLabel("https://www.reverbnation.com/x", "Réseau social"),
+    ).toBe("ReverbNation");
+    expect(
+      officialLinkLabel("https://music.amazon.co.uk/artists/B1", "Écoute"),
+    ).toBe("Amazon Music");
+    expect(officialLinkLabel("https://uk.7digital.com/artist/x", "Achat")).toBe(
+      "7digital",
     );
   });
 

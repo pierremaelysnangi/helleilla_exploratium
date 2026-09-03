@@ -13,6 +13,7 @@
  */
 
 import { useGenreTaxonomy } from "@/hooks/use-genres";
+import { useT } from "@/lib/i18n/client";
 
 type GenreSelectProps = {
   /** Slug sélectionné, ou chaîne vide pour « tous les genres ». */
@@ -22,27 +23,25 @@ type GenreSelectProps = {
   label?: string;
 };
 
-export function GenreSelect({
-  value,
-  onChange,
-  label = "Filtrer par genre",
-}: GenreSelectProps) {
+export function GenreSelect({ value, onChange, label }: GenreSelectProps) {
+  const t = useT();
   const { families, isPending } = useGenreTaxonomy();
+  const accessibleLabel = label ?? t.catalogue.filterByGenre;
 
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      aria-label={label}
+      aria-label={accessibleLabel}
       disabled={isPending}
       className="border-border bg-card rounded-md border px-3 py-2 text-sm"
     >
-      <option value="">Tous les genres</option>
+      <option value="">{t.catalogue.allGenres}</option>
       {families.map(({ root, children }) => (
         <optgroup key={root.id} label={root.name}>
           {/* La famille elle-même reste sélectionnable : elle englobe
               alors ses sous-genres. */}
-          <option value={root.slug}>{root.name} (tout)</option>
+          <option value={root.slug}>{root.name}</option>
           {children.map((child) => (
             <option key={child.id} value={child.slug}>
               {child.name}

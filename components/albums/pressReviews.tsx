@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiJson } from "@/hooks/api/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 const pressReviewSchema = z.object({
   id: z.string(),
@@ -39,6 +40,7 @@ function year(value: string | null): string | null {
 }
 
 export function PressReviews({ albumId }: { albumId: string }) {
+  const t = useT();
   const press = useQuery({
     queryKey: ["press-reviews", albumId],
     queryFn: async ({ signal }) => {
@@ -56,11 +58,11 @@ export function PressReviews({ albumId }: { albumId: string }) {
       className="metal-card flex flex-col gap-4 p-4"
     >
       <div className="flex flex-wrap items-baseline gap-3">
-        <h3 className="metal-title text-base">Presse</h3>
+        <h3 className="metal-title text-base">{t.album.press}</h3>
         {press.data && (
           <p className="text-muted-foreground text-sm">
             {press.data.count === 0 ? (
-              "Aucune critique référencée"
+              t.album.noPressReview
             ) : (
               <>
                 <span className="text-foreground font-mono">
@@ -78,7 +80,7 @@ export function PressReviews({ albumId }: { albumId: string }) {
 
       {press.isError && (
         <p role="alert" className="text-destructive text-sm">
-          Critiques de presse indisponibles.
+          {t.common.unavailable}
         </p>
       )}
 
