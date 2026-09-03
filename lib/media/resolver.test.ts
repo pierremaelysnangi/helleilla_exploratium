@@ -66,7 +66,7 @@ vi.mock("@/lib/providers", () => ({
     name === "discogs" ? providersMock.discogsEnabled : true,
 }));
 
-const { resolveBandMedia } = await import("./resolver");
+const { resolveBandMedia, bandMediaCacheKey } = await import("./resolver");
 
 /** Bande minimale en base. */
 function stubBand() {
@@ -200,7 +200,7 @@ describe("resolveBandMedia", () => {
     expect(media.degraded).toBe(false);
 
     // Le résultat a été mis en cache
-    expect(redisStore.store.has("media:band:b1")).toBe(true);
+    expect(redisStore.store.has(bandMediaCacheKey("b1"))).toBe(true);
   });
 
   it("marque degraded si un provider tombe, sans échouer", async () => {
@@ -231,7 +231,7 @@ describe("resolveBandMedia", () => {
       links: [],
       degraded: false,
     };
-    redisStore.store.set("media:band:b1", JSON.stringify(cached));
+    redisStore.store.set(bandMediaCacheKey("b1"), JSON.stringify(cached));
 
     const media = await resolveBandMedia("b1");
 
@@ -247,7 +247,7 @@ describe("resolveBandMedia", () => {
     // précédente restent 24 h en cache : les servir ferait échouer le
     // parse et remonterait une 500 sur une page publique.
     redisStore.store.set(
-      "media:band:b1",
+      bandMediaCacheKey("b1"),
       JSON.stringify({ band: { id: "b1" }, info: {} }),
     );
     dbMock.getExternalRefs.mockResolvedValue([]);
@@ -260,9 +260,23 @@ describe("resolveBandMedia", () => {
 
 describe("invalidateBandMedia", () => {
   it("purge la clé de cache du groupe", async () => {
-    redisStore.store.set("media:band:b1", "{}");
+    redisStore.store.set(bandMediaCacheKey("b1"), "{}");
     const { invalidateBandMedia } = await import("./resolver");
     await invalidateBandMedia("b1");
-    expect(redisStore.store.has("media:band:b1")).toBe(false);
+    expect(redisStore.store.has(bandMediaCacheKey("b1"))).toBe(false);
+  });
+});
+
+describe("clé de cache", () => {
+  it("porte une version, pour invalider en changeant les règles", () => {
+    // Le contrôle de forme ne rattrape qu'un champ ajouté ou retiré,
+    // jamais une valeur produite autrement. Après correction des
+    // libellés de liens, le cache a servi les anciens vingt-quatre
+    // heures durant alors que le code était juste.
+    expect(bandMediaCacheKey("b1")).toMatch(/^media:band:v\d+:b1$/);
+  });
+
+  it("distingue deux groupes", () => {
+    expect(bandMediaCacheKey("b1")).not.toBe(bandMediaCacheKey("b2"));
   });
 });

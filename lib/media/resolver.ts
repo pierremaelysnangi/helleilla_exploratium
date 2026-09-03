@@ -69,9 +69,26 @@ const OFFICIAL_LINK_LABELS: Record<string, string> = {
  */
 const EXCLUDED_LINK_HOSTS = ["qobuz.com"];
 
+/**
+ * Version de la construction du DTO média.
+ *
+ * À INCRÉMENTER dès qu'on change la façon dont ce module fabrique ses
+ * valeurs — libellés de liens, ordre de tri, contenu de la galerie.
+ *
+ * Le contrôle de forme (`safeParse`) ne suffit pas : il rattrape un
+ * champ ajouté ou retiré, jamais une valeur produite autrement. Après
+ * avoir corrigé les libellés « Réseau social · reverbnation.com » en
+ * « ReverbNation », le cache a continué de servir les anciens pendant
+ * vingt-quatre heures, alors que le code était juste.
+ *
+ * Changer la version invalide toutes les entrées d'un coup, sans purge
+ * manuelle et sans dépendre de la mémoire de qui déploie.
+ */
+const MEDIA_DTO_VERSION = 2;
+
 /** Clé Redis du DTO média d'un groupe. */
 export function bandMediaCacheKey(bandId: string): string {
-  return `media:band:${bandId}`;
+  return `media:band:v${MEDIA_DTO_VERSION}:${bandId}`;
 }
 
 /** Sortie typée du resolver — contrat partagé avec le front. */
