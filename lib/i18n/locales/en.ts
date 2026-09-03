@@ -203,6 +203,44 @@ export const en: Dictionary = {
     noAccount: "No account yet?",
     alreadyRegistered: "Already registered?",
   },
+  pages: {
+    aboutTitle: "About Helleilla Exploratium",
+    aboutLead:
+      "A metal encyclopedia, written by the people who listen to it. Bands, discographies, genres — from the first self-released demo to the albums everybody knows.",
+    whyTitle: "Why this site",
+    whyBody:
+      "Information about metal is scattered: a 1991 split only exists on a forum, a demo never had cover art, a band changed line-up six times without anyone writing it down. We gather it in one place, free, ad-free, and with no account needed to read.",
+    ruleTitle: "Nothing invented, nothing generated",
+    ruleBody1:
+      "No image, sound or video made by an artificial intelligence gets in here. The covers and photographs you see come from the platforms and archives that publish them, and are displayed from their own servers.",
+    ruleBody2:
+      "The text is written by contributors. A band made up out of thin air does not get through the door: it would have to produce a verifiable reference, and it has none.",
+    howTitle: "How to contribute",
+    howBody:
+      "Submit an entry with at least two sources, one of them official. A moderator reads it, then publishes it or asks you to fill the gaps. That is all — no committee, no endless wait.",
+    startTitle: "Start here",
+    creditsTitle: "Credits and rights",
+    creditsLead:
+      "Where the covers, photographs and information on this site come from, and who they belong to.",
+    imagesTitle: "The images are not ours",
+    imagesBody1:
+      "Cover art, live photographs, logos: all of it belongs to the artists, photographers, labels and publishers. Nothing is copied onto our servers. We store an address, and your browser fetches the image from its own home — if it is taken down there, it disappears from here too.",
+    imagesBody2:
+      "They illustrate an encyclopedia entry; they promote nothing and earn nothing. When a photograph comes from Wikimedia Commons, its author is named below the image and the source page is one click away.",
+    musicTitle: "No music here",
+    musicBody:
+      "There is no player: to listen, the links take you to whoever streams it. That is where music belongs, and where artists get paid.",
+    moneyTitle: "No monetisation",
+    moneyBody:
+      "No advertising, no subscription, no affiliate commission, no data resale. Outgoing links are even stripped of the tracking parameters platforms add to them.",
+    dataTitle: "Where the data comes from",
+    takedownTitle: "Requesting a takedown",
+    takedownBody:
+      "You hold the rights and want an image or a reference gone? Say so, with the address of the page: it is removed, with no argument and no procedure. Since nothing is hosted here, removal is immediate.",
+    takedownNote:
+      "An entry that looks wrong or unverifiable can also be reported by any reader: it goes back into review.",
+    furtherTitle: "Further reading",
+  },
   footer: {
     about: "About",
     credits: "Credits and rights",

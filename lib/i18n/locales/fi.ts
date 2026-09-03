@@ -202,6 +202,44 @@ export const fi: Dictionary = {
     noAccount: "Eikö sinulla ole vielä tiliä?",
     alreadyRegistered: "Onko sinulla jo tili?",
   },
+  pages: {
+    aboutTitle: "Tietoa Helleilla Exploratiumista",
+    aboutLead:
+      "Metallin tietosanakirja, jonka kirjoittavat sen kuuntelijat. Yhtyeet, diskografiat, tyylilajit — ensimmäisestä omakustannedemosta albumeihin, jotka kaikki tuntevat.",
+    whyTitle: "Miksi tämä sivusto",
+    whyBody:
+      "Tieto metallista on hajallaan: vuoden 1991 split on olemassa vain foorumilla, demolle ei koskaan tehty kansikuvaa, yhtye vaihtoi kokoonpanoa kuudesti eikä kukaan kirjannut sitä. Kokoamme sen yhteen paikkaan: maksutta, ilman mainoksia ja ilman tiliä lukemiseen.",
+    ruleTitle: "Ei keksittyä, ei koneellista",
+    ruleBody1:
+      "Tänne ei päästetä yhtään tekoälyn tuottamaa kuvaa, ääntä tai videota. Näkemäsi kannet ja valokuvat tulevat niiltä alustoilta ja arkistoilta, jotka ne julkaisevat, ja näytetään sieltä käsin.",
+    ruleBody2:
+      "Tekstit kirjoittavat avustajat. Tyhjästä keksitty yhtye ei pääse ovesta: sen pitäisi esittää tarkistettava lähde, eikä sillä ole yhtään.",
+    howTitle: "Miten osallistut",
+    howBody:
+      "Ehdota artikkelia ja liitä siihen vähintään kaksi lähdettä, joista yksi virallinen. Tarkistaja lukee sen ja julkaisee — tai pyytää täydentämään. Siinä kaikki: ei toimikuntaa eikä loputonta odotusta.",
+    startTitle: "Aloita",
+    creditsTitle: "Lähteet ja oikeudet",
+    creditsLead:
+      "Mistä sivuston kannet, valokuvat ja tiedot ovat peräisin ja kenelle ne kuuluvat.",
+    imagesTitle: "Kuvat eivät ole meidän",
+    imagesBody1:
+      "Kannet, keikkakuvat, logot: kaikki kuuluu artisteille, valokuvaajille, levy-yhtiöille ja kustantajille. Mitään ei kopioida palvelimillemme. Tallennamme osoitteen, ja selaimesi hakee kuvan sen lähteestä — jos se poistetaan sieltä, se katoaa myös täältä.",
+    imagesBody2:
+      "Ne havainnollistavat tietosanakirja-artikkelia: eivät mainosta mitään eivätkä tuota mitään. Kun kuva on Wikimedia Commonsista, tekijä mainitaan kuvan alla ja lähdesivu on yhden napsautuksen päässä.",
+    musicTitle: "Täällä ei ole musiikkia",
+    musicBody:
+      "Soitinta ei ole: kuunnellaksesi linkit vievät sinut sen jakelijalle. Sinne musiikki kuuluu, ja siellä artistit saavat palkkansa.",
+    moneyTitle: "Ei ansaintaa",
+    moneyBody:
+      "Ei mainoksia, ei tilausmaksuja, ei kumppanuuspalkkioita, ei tietojen myyntiä. Lähtevistä linkeistä poistetaan jopa alustojen lisäämät seurantaparametrit.",
+    dataTitle: "Mistä tiedot tulevat",
+    takedownTitle: "Poistopyyntö",
+    takedownBody:
+      "Oletko oikeudenhaltija ja haluat, että kuva tai viittaus katoaa? Sano se ja liitä sivun osoite: se poistetaan ilman väittelyä ja ilman menettelyä. Koska täällä ei säilytetä mitään, poisto on välitön.",
+    takedownNote:
+      "Kuka tahansa lukija voi lisäksi ilmoittaa artikkelista, joka vaikuttaa virheelliseltä tai tarkistamattomalta: se palaa silloin tarkistukseen.",
+    furtherTitle: "Lue lisää",
+  },
   footer: {
     about: "Tietoa hankkeesta",
     credits: "Lähteet ja oikeudet",

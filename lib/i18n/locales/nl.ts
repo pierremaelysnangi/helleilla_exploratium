@@ -200,6 +200,44 @@ export const nl: Dictionary = {
     noAccount: "Nog geen account?",
     alreadyRegistered: "Al geregistreerd?",
   },
+  pages: {
+    aboutTitle: "Over Helleilla Exploratium",
+    aboutLead:
+      "Een metalencyclopedie, geschreven door wie ernaar luistert. Bands, discografieën, genres — van de eerste demo in eigen beheer tot de albums die iedereen kent.",
+    whyTitle: "Waarom deze site",
+    whyBody:
+      "Kennis over metal ligt verspreid: een split uit 1991 bestaat alleen op een forum, een demo kreeg nooit een hoes, een band wisselde zes keer van bezetting zonder dat iemand het opschreef. Wij brengen dat samen op één plek: gratis, zonder reclame en zonder account om te lezen.",
+    ruleTitle: "Niets verzonnen, niets gegenereerd",
+    ruleBody1:
+      "Geen enkele afbeelding, geluid of video gemaakt door kunstmatige intelligentie komt hier binnen. De hoezen en foto's die je ziet komen van de platforms en archieven die ze publiceren, en worden vandaar getoond.",
+    ruleBody2:
+      "De teksten schrijven de bijdragers. Een verzonnen band komt er niet door: die zou een controleerbare bron moeten aandragen, en heeft er geen.",
+    howTitle: "Hoe bij te dragen",
+    howBody:
+      "Dien een artikel in met minstens twee bronnen, waarvan één officiële. Een beoordelaar leest het en plaatst het, of vraagt je aan te vullen. Meer niet — geen commissie, geen eindeloos wachten.",
+    startTitle: "Beginnen",
+    creditsTitle: "Bronnen en rechten",
+    creditsLead:
+      "Waar de hoezen, foto's en gegevens op deze site vandaan komen, en van wie ze zijn.",
+    imagesTitle: "De afbeeldingen zijn niet van ons",
+    imagesBody1:
+      "Hoezen, concertfoto's, logo's: alles is van de artiesten, fotografen, labels en uitgevers. Niets wordt naar onze servers gekopieerd. Wij bewaren een adres, en jouw browser haalt de afbeelding bij de bron — wordt ze daar weggehaald, dan verdwijnt ze ook hier.",
+    imagesBody2:
+      "Ze illustreren een encyclopedisch artikel: ze maken nergens reclame voor en leveren niets op. Komt een foto van Wikimedia Commons, dan staat de maker onder de afbeelding en is de bronpagina één klik weg.",
+    musicTitle: "Hier staat geen muziek",
+    musicBody:
+      "Er is geen speler: om te luisteren brengen de links je naar wie de muziek aanbiedt. Daar hoort ze thuis, en daar worden de artiesten betaald.",
+    moneyTitle: "Geen verdienmodel",
+    moneyBody:
+      "Geen advertenties, geen abonnement, geen affiliatievergoeding, geen doorverkoop van gegevens. Uitgaande links worden zelfs ontdaan van de volgparameters die platforms eraan toevoegen.",
+    dataTitle: "Waar de gegevens vandaan komen",
+    takedownTitle: "Verwijdering vragen",
+    takedownBody:
+      "Ben je rechthebbende en wil je dat een afbeelding of verwijzing verdwijnt? Zeg het, met het adres van de pagina: het wordt weggehaald, zonder discussie en zonder procedure. Omdat hier niets gehost wordt, werkt dat meteen.",
+    takedownNote:
+      "Elke lezer kan bovendien een artikel melden dat onjuist of oncontroleerbaar lijkt: het gaat dan terug in beoordeling.",
+    furtherTitle: "Verder lezen",
+  },
   footer: {
     about: "Over het project",
     credits: "Bronnen en rechten",

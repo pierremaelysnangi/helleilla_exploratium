@@ -203,6 +203,44 @@ export const fr = {
     noAccount: "Pas encore de compte ?",
     alreadyRegistered: "Déjà inscrit ?",
   },
+  pages: {
+    aboutTitle: "À propos d'Helleilla Exploratium",
+    aboutLead:
+      "Une encyclopédie du metal, écrite par ceux qui l'écoutent. Groupes, discographies, genres — de la première démo autoproduite aux albums que tout le monde connaît.",
+    whyTitle: "Pourquoi ce site",
+    whyBody:
+      "Les informations sur le metal sont éparpillées : un split de 1991 n'existe que sur un forum, une démo n'a jamais eu de pochette, un groupe a changé six fois de line-up sans que personne ne l'écrive nulle part. On rassemble tout ça au même endroit, gratuitement, sans publicité et sans compte obligatoire pour lire.",
+    ruleTitle: "Rien d'inventé, rien de généré",
+    ruleBody1:
+      "Aucune image, aucun son et aucune vidéo produits par une intelligence artificielle n'entrent ici. Les pochettes et les photos que vous voyez viennent des plateformes et des archives qui les publient, et s'affichent depuis chez elles.",
+    ruleBody2:
+      "Les textes, eux, sont écrits par les contributeurs. Un groupe inventé de toutes pièces ne franchit pas la porte : il lui faudrait produire une référence vérifiable, et il n'en a aucune.",
+    howTitle: "Comment contribuer",
+    howBody:
+      "Proposez une fiche, accompagnée d'au moins deux sources dont une officielle. Un modérateur la relit, puis la publie ou vous demande de compléter. C'est tout — pas de comité, pas d'attente interminable.",
+    startTitle: "Commencer",
+    creditsTitle: "Crédits et droits",
+    creditsLead:
+      "D'où viennent les pochettes, les photos et les informations affichées sur ce site, et à qui elles appartiennent.",
+    imagesTitle: "Les images ne sont pas à nous",
+    imagesBody1:
+      "Pochettes, photos de concert, logos : tout appartient aux artistes, aux photographes, aux labels et aux éditeurs. Rien n'est copié sur nos serveurs. On enregistre une adresse, et c'est votre navigateur qui va chercher l'image chez elle — si elle la retire, elle disparaît d'ici aussi.",
+    imagesBody2:
+      "Elles servent à illustrer une fiche encyclopédique, pas à faire la promotion de quoi que ce soit et encore moins à rapporter de l'argent. Quand une photo vient de Wikimedia Commons, son auteur est nommé sous l'image et la page d'origine est à un clic.",
+    musicTitle: "Pas de musique ici",
+    musicBody:
+      "Il n'y a pas de lecteur : pour écouter, les liens vous emmènent chez le diffuseur. C'est sa place, et c'est là que les artistes sont payés.",
+    moneyTitle: "Aucune monétisation",
+    moneyBody:
+      "Pas de publicité, pas d'abonnement, pas de commission d'affiliation, pas de revente de données. Les liens sortants sont même nettoyés des paramètres de suivi que les plateformes y ajoutent.",
+    dataTitle: "D'où viennent les données",
+    takedownTitle: "Demander un retrait",
+    takedownBody:
+      "Vous êtes ayant droit et vous voulez qu'une image ou une référence disparaisse ? Dites-le, avec l'adresse de la page : c'est retiré, sans discussion et sans procédure. Comme rien n'est hébergé ici, le retrait est immédiat.",
+    takedownNote:
+      "Une fiche qui vous paraît fausse ou invérifiable peut aussi être signalée par n'importe quel lecteur : elle repasse alors en relecture.",
+    furtherTitle: "Aller plus loin",
+  },
   footer: {
     about: "À propos",
     credits: "Crédits et droits",

@@ -202,6 +202,44 @@ export const de: Dictionary = {
     noAccount: "Noch kein Konto?",
     alreadyRegistered: "Schon registriert?",
   },
+  pages: {
+    aboutTitle: "Über Helleilla Exploratium",
+    aboutLead:
+      "Eine Metal-Enzyklopädie, geschrieben von denen, die Metal hören. Bands, Diskografien, Genres — vom ersten Demo im Eigenverlag bis zu den Alben, die jeder kennt.",
+    whyTitle: "Warum es diese Seite gibt",
+    whyBody:
+      "Wissen über Metal liegt verstreut: ein Split von 1991 existiert nur in einem Forum, ein Demo hatte nie ein Cover, eine Band wechselte sechsmal die Besetzung, ohne dass es jemand festgehalten hätte. Wir sammeln das an einem Ort — kostenlos, werbefrei, und zum Lesen braucht es kein Konto.",
+    ruleTitle: "Nichts erfunden, nichts generiert",
+    ruleBody1:
+      "Kein Bild, kein Ton und kein Video aus künstlicher Intelligenz kommt hier hinein. Die Cover und Fotos stammen von den Plattformen und Archiven, die sie veröffentlichen, und werden von dort angezeigt.",
+    ruleBody2:
+      "Die Texte schreiben die Beitragenden. Eine frei erfundene Band kommt nicht durch: sie müsste einen überprüfbaren Beleg vorlegen, und sie hat keinen.",
+    howTitle: "Wie man mitschreibt",
+    howBody:
+      "Reiche einen Eintrag mit mindestens zwei Quellen ein, davon eine offizielle. Jemand prüft ihn und veröffentlicht ihn — oder bittet um Ergänzung. Mehr nicht: kein Gremium, kein endloses Warten.",
+    startTitle: "Anfangen",
+    creditsTitle: "Nachweise und Rechte",
+    creditsLead:
+      "Woher die Cover, Fotos und Angaben dieser Seite stammen, und wem sie gehören.",
+    imagesTitle: "Die Bilder gehören uns nicht",
+    imagesBody1:
+      "Cover, Konzertfotos, Logos: alles gehört den Künstlerinnen und Künstlern, den Fotografen, den Labels und Verlagen. Nichts wird auf unsere Server kopiert. Wir speichern eine Adresse, und dein Browser holt das Bild bei der Quelle — wird es dort entfernt, verschwindet es auch hier.",
+    imagesBody2:
+      "Sie illustrieren einen Lexikoneintrag; sie bewerben nichts und bringen nichts ein. Stammt ein Foto von Wikimedia Commons, steht sein Urheber unter dem Bild und die Herkunftsseite ist einen Klick entfernt.",
+    musicTitle: "Hier gibt es keine Musik",
+    musicBody:
+      "Es gibt keinen Player: zum Hören führen die Links zum jeweiligen Anbieter. Dorthin gehört Musik, und dort werden die Künstler bezahlt.",
+    moneyTitle: "Keine Monetarisierung",
+    moneyBody:
+      "Keine Werbung, kein Abonnement, keine Provision, kein Datenverkauf. Ausgehende Links werden sogar von den Verfolgungsparametern befreit, die Plattformen anhängen.",
+    dataTitle: "Woher die Daten stammen",
+    takedownTitle: "Entfernung verlangen",
+    takedownBody:
+      "Du hältst die Rechte und möchtest ein Bild oder einen Verweis entfernt sehen? Sag es, mit der Adresse der Seite: es wird entfernt, ohne Diskussion und ohne Verfahren. Da hier nichts gespeichert ist, wirkt das sofort.",
+    takedownNote:
+      "Einen Eintrag, der falsch oder nicht überprüfbar wirkt, kann außerdem jede lesende Person melden: er geht zurück in die Prüfung.",
+    furtherTitle: "Weiterlesen",
+  },
   footer: {
     about: "Über das Projekt",
     credits: "Nachweise und Rechte",

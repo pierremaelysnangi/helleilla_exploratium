@@ -201,6 +201,44 @@ export const es: Dictionary = {
     noAccount: "¿Aún no tienes cuenta?",
     alreadyRegistered: "¿Ya estás registrado?",
   },
+  pages: {
+    aboutTitle: "Acerca de Helleilla Exploratium",
+    aboutLead:
+      "Una enciclopedia del metal, escrita por quienes lo escuchan. Grupos, discografías, géneros — desde la primera maqueta autoeditada hasta los álbumes que todo el mundo conoce.",
+    whyTitle: "Por qué este sitio",
+    whyBody:
+      "La información sobre metal está dispersa: un split de 1991 solo existe en un foro, una maqueta nunca tuvo portada, un grupo cambió seis veces de formación sin que nadie lo anotara. Lo reunimos en un mismo lugar, gratis, sin publicidad y sin necesidad de cuenta para leer.",
+    ruleTitle: "Nada inventado, nada generado",
+    ruleBody1:
+      "Aquí no entra ninguna imagen, sonido ni vídeo producido por una inteligencia artificial. Las portadas y fotos que ves proceden de las plataformas y archivos que las publican, y se muestran desde allí.",
+    ruleBody2:
+      "Los textos los escriben quienes colaboran. Un grupo inventado no pasa la puerta: tendría que aportar una referencia verificable, y no tiene ninguna.",
+    howTitle: "Cómo colaborar",
+    howBody:
+      "Propón una ficha con al menos dos fuentes, una de ellas oficial. Un moderador la revisa y la publica, o te pide completarla. Nada más: ni comité, ni esperas interminables.",
+    startTitle: "Empezar",
+    creditsTitle: "Créditos y derechos",
+    creditsLead:
+      "De dónde vienen las portadas, las fotos y la información de este sitio, y a quién pertenecen.",
+    imagesTitle: "Las imágenes no son nuestras",
+    imagesBody1:
+      "Portadas, fotos de concierto, logotipos: todo pertenece a los artistas, fotógrafos, sellos y editoriales. Nada se copia en nuestros servidores. Guardamos una dirección, y es tu navegador el que va a buscar la imagen a su origen — si allí la retiran, aquí también desaparece.",
+    imagesBody2:
+      "Sirven para ilustrar una ficha enciclopédica; no promocionan nada ni generan ingresos. Cuando una foto viene de Wikimedia Commons, su autor figura bajo la imagen y la página de origen está a un clic.",
+    musicTitle: "Aquí no hay música",
+    musicBody:
+      "No hay reproductor: para escuchar, los enlaces te llevan a quien la difunde. Ese es su sitio, y ahí es donde cobran los artistas.",
+    moneyTitle: "Ninguna monetización",
+    moneyBody:
+      "Sin publicidad, sin suscripción, sin comisión de afiliación, sin venta de datos. Los enlaces salientes se limpian incluso de los parámetros de seguimiento que añaden las plataformas.",
+    dataTitle: "De dónde vienen los datos",
+    takedownTitle: "Pedir una retirada",
+    takedownBody:
+      "¿Eres titular de derechos y quieres que desaparezca una imagen o una referencia? Dilo, con la dirección de la página: se retira, sin discusión y sin trámite. Como aquí no se aloja nada, la retirada es inmediata.",
+    takedownNote:
+      "Cualquier lector puede señalar además una ficha que le parezca falsa o no verificable: vuelve entonces a revisión.",
+    furtherTitle: "Seguir leyendo",
+  },
   footer: {
     about: "Acerca del proyecto",
     credits: "Créditos y derechos",

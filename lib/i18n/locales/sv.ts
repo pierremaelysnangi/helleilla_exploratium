@@ -198,6 +198,44 @@ export const sv: Dictionary = {
     noAccount: "Inget konto än?",
     alreadyRegistered: "Redan registrerad?",
   },
+  pages: {
+    aboutTitle: "Om Helleilla Exploratium",
+    aboutLead:
+      "Ett uppslagsverk om metal, skrivet av dem som lyssnar på den. Band, diskografier, genrer — från den första demon i egen regi till albumen alla känner till.",
+    whyTitle: "Varför den här sidan",
+    whyBody:
+      "Kunskapen om metal ligger utspridd: en split från 1991 finns bara i ett forum, en demo fick aldrig något omslag, ett band bytte sättning sex gånger utan att någon skrev ned det. Vi samlar det på ett ställe — gratis, utan reklam och utan konto för att läsa.",
+    ruleTitle: "Inget påhittat, inget genererat",
+    ruleBody1:
+      "Ingen bild, inget ljud och ingen video skapad av artificiell intelligens släpps in här. Omslagen och fotografierna kommer från de plattformar och arkiv som publicerar dem, och visas därifrån.",
+    ruleBody2:
+      "Texterna skrivs av dem som bidrar. Ett påhittat band kommer inte in: det skulle behöva lägga fram en kontrollerbar källa, och har ingen.",
+    howTitle: "Så bidrar du",
+    howBody:
+      "Skicka in en artikel med minst två källor, varav en officiell. En granskare läser den och publicerar — eller ber dig komplettera. Mer är det inte: ingen kommitté, ingen ändlös väntan.",
+    startTitle: "Börja här",
+    creditsTitle: "Källor och rättigheter",
+    creditsLead:
+      "Varifrån omslagen, fotografierna och uppgifterna på sidan kommer, och vem de tillhör.",
+    imagesTitle: "Bilderna är inte våra",
+    imagesBody1:
+      "Omslag, konsertbilder, logotyper: allt tillhör artisterna, fotograferna, bolagen och förlagen. Ingenting kopieras till våra servrar. Vi sparar en adress, och din webbläsare hämtar bilden vid källan — tas den bort där försvinner den också här.",
+    imagesBody2:
+      "De illustrerar en uppslagsartikel; de gör reklam för ingenting och ger inga intäkter. Kommer ett foto från Wikimedia Commons står upphovspersonen under bilden och källsidan är ett klick bort.",
+    musicTitle: "Här finns ingen musik",
+    musicBody:
+      "Det finns ingen spelare: för att lyssna leder länkarna till den som tillhandahåller musiken. Där hör den hemma, och där får artisterna betalt.",
+    moneyTitle: "Ingen kommersialisering",
+    moneyBody:
+      "Ingen reklam, inga abonnemang, inga provisioner, ingen försäljning av uppgifter. Utgående länkar rensas till och med från de spårningsparametrar plattformarna lägger till.",
+    dataTitle: "Varifrån uppgifterna kommer",
+    takedownTitle: "Begära borttagning",
+    takedownBody:
+      "Är du rättighetshavare och vill att en bild eller en hänvisning försvinner? Säg till, med sidans adress: den tas bort, utan diskussion och utan formaliteter. Eftersom ingenting lagras här sker det omedelbart.",
+    takedownNote:
+      "Vem som helst kan dessutom anmäla en artikel som verkar felaktig eller okontrollerbar: den går då tillbaka till granskning.",
+    furtherTitle: "Läsa vidare",
+  },
   footer: {
     about: "Om projektet",
     credits: "Källor och rättigheter",

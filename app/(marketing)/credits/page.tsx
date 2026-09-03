@@ -9,6 +9,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "@/lib/i18n/server";
 
 /** URL de base absolue (cohérente avec le layout racine). */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -73,62 +74,43 @@ const DATA_SOURCES = [
   },
 ];
 
-export default function CreditsPage() {
+export default async function CreditsPage() {
+  const { t } = await getTranslations();
   return (
     <article className="flex max-w-3xl flex-col gap-8">
       <header>
-        <h1 className="metal-title text-3xl sm:text-4xl">Crédits et droits</h1>
+        <h1 className="metal-title text-3xl sm:text-4xl">
+          {t.pages.creditsTitle}
+        </h1>
         <div className="metal-rule mt-2 w-48" />
-        <p className="mt-4 text-sm leading-relaxed">
-          D&apos;où viennent les pochettes, les photos et les informations
-          affichées sur ce site, et à qui elles appartiennent.
-        </p>
+        <p className="mt-4 text-sm leading-relaxed">{t.pages.creditsLead}</p>
       </header>
 
       <section aria-labelledby="medias" className="flex flex-col gap-3">
         <h2 id="medias" className="metal-title text-lg">
-          Les images ne sont pas à nous
+          {t.pages.imagesTitle}
         </h2>
-        <p className="text-sm leading-relaxed">
-          Pochettes, photos de concert, logos : tout appartient aux artistes,
-          aux photographes, aux labels et aux éditeurs. Rien n&apos;est copié
-          sur nos serveurs. On enregistre une adresse, et c&apos;est votre
-          navigateur qui va chercher l&apos;image chez elle — si elle la retire,
-          elle disparaît d&apos;ici aussi.
-        </p>
-        <p className="text-sm leading-relaxed">
-          Elles servent à illustrer une fiche encyclopédique, pas à faire la
-          promotion de quoi que ce soit et encore moins à rapporter de
-          l&apos;argent. Quand une photo vient de Wikimedia Commons, son auteur
-          est nommé sous l&apos;image et la page d&apos;origine est à un clic.
-        </p>
+        <p className="text-sm leading-relaxed">{t.pages.imagesBody1}</p>
+        <p className="text-sm leading-relaxed">{t.pages.imagesBody2}</p>
       </section>
 
       <section aria-labelledby="musique" className="flex flex-col gap-3">
         <h2 id="musique" className="metal-title text-lg">
-          Pas de musique ici
+          {t.pages.musicTitle}
         </h2>
-        <p className="text-sm leading-relaxed">
-          Il n&apos;y a pas de lecteur : pour écouter, les liens vous emmènent
-          chez le diffuseur. C&apos;est sa place, et c&apos;est là que les
-          artistes sont payés.
-        </p>
+        <p className="text-sm leading-relaxed">{t.pages.musicBody}</p>
       </section>
 
       <section aria-labelledby="argent" className="flex flex-col gap-3">
         <h2 id="argent" className="metal-title text-lg">
-          Aucune monétisation
+          {t.pages.moneyTitle}
         </h2>
-        <p className="text-sm leading-relaxed">
-          Pas de publicité, pas d&apos;abonnement, pas de commission
-          d&apos;affiliation, pas de revente de données. Les liens sortants sont
-          même nettoyés des paramètres de suivi que les plateformes y ajoutent.
-        </p>
+        <p className="text-sm leading-relaxed">{t.pages.moneyBody}</p>
       </section>
 
       <section aria-labelledby="sources" className="flex flex-col gap-3">
         <h2 id="sources" className="metal-title text-lg">
-          D&apos;où viennent les données
+          {t.pages.dataTitle}
         </h2>
         <ul className="flex flex-col gap-2">
           {DATA_SOURCES.map((source) => (
@@ -152,24 +134,17 @@ export default function CreditsPage() {
 
       <section aria-labelledby="retrait" className="flex flex-col gap-3">
         <h2 id="retrait" className="metal-title text-lg">
-          Demander un retrait
+          {t.pages.takedownTitle}
         </h2>
-        <p className="text-sm leading-relaxed">
-          Vous êtes ayant droit et vous voulez qu&apos;une image ou une
-          référence disparaisse ? Dites-le, avec l&apos;adresse de la page :
-          c&apos;est retiré, sans discussion et sans procédure. Comme rien
-          n&apos;est hébergé ici, le retrait est immédiat.
-        </p>
+        <p className="text-sm leading-relaxed">{t.pages.takedownBody}</p>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Une fiche qui vous paraît fausse ou invérifiable peut aussi être
-          signalée par n&apos;importe quel lecteur : elle repasse alors en
-          relecture.
+          {t.pages.takedownNote}
         </p>
       </section>
 
       <section aria-labelledby="explorer" className="flex flex-col gap-3">
         <h2 id="explorer" className="metal-title text-lg">
-          Aller plus loin
+          {t.pages.furtherTitle}
         </h2>
         <ul className="flex flex-wrap gap-2">
           {[

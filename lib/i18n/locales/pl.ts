@@ -201,6 +201,44 @@ export const pl: Dictionary = {
     noAccount: "Nie masz jeszcze konta?",
     alreadyRegistered: "Masz już konto?",
   },
+  pages: {
+    aboutTitle: "O Helleilla Exploratium",
+    aboutLead:
+      "Encyklopedia metalu pisana przez tych, którzy go słuchają. Zespoły, dyskografie, gatunki — od pierwszego dema wydanego własnym sumptem po albumy, które znają wszyscy.",
+    whyTitle: "Po co ta strona",
+    whyBody:
+      "Wiedza o metalu jest rozproszona: split z 1991 roku istnieje tylko na forum, demo nigdy nie miało okładki, zespół sześć razy zmienił skład i nikt tego nie zapisał. Zbieramy to w jednym miejscu: za darmo, bez reklam i bez konta do czytania.",
+    ruleTitle: "Nic zmyślonego, nic wygenerowanego",
+    ruleBody1:
+      "Nie trafia tu żaden obraz, dźwięk ani film stworzony przez sztuczną inteligencję. Okładki i zdjęcia pochodzą z platform i archiwów, które je publikują, i stamtąd są wyświetlane.",
+    ruleBody2:
+      "Teksty piszą współtwórcy. Zmyślony zespół nie przejdzie: musiałby przedstawić sprawdzalne źródło, a żadnego nie ma.",
+    howTitle: "Jak współtworzyć",
+    howBody:
+      "Zgłoś hasło z co najmniej dwoma źródłami, w tym jednym oficjalnym. Weryfikator je czyta i publikuje albo prosi o uzupełnienie. Tyle: żadnej komisji, żadnego czekania bez końca.",
+    startTitle: "Zacznij tutaj",
+    creditsTitle: "Źródła i prawa",
+    creditsLead:
+      "Skąd pochodzą okładki, zdjęcia i informacje na tej stronie i do kogo należą.",
+    imagesTitle: "Zdjęcia nie należą do nas",
+    imagesBody1:
+      "Okładki, zdjęcia koncertowe, logotypy: wszystko należy do artystów, fotografów, wytwórni i wydawców. Nic nie jest kopiowane na nasze serwery. Zapisujemy adres, a obraz pobiera twoja przeglądarka u źródła — jeśli tam zniknie, zniknie i tutaj.",
+    imagesBody2:
+      "Ilustrują hasło encyklopedyczne: niczego nie reklamują i nic nie przynoszą. Gdy zdjęcie pochodzi z Wikimedia Commons, autor jest podany pod obrazem, a strona źródłowa o jedno kliknięcie.",
+    musicTitle: "Tu nie ma muzyki",
+    musicBody:
+      "Nie ma odtwarzacza: żeby posłuchać, odnośniki prowadzą do tego, kto ją udostępnia. Tam jest jej miejsce i tam artyści dostają zapłatę.",
+    moneyTitle: "Żadnego zarobku",
+    moneyBody:
+      "Bez reklam, bez abonamentu, bez prowizji partnerskich, bez odsprzedaży danych. Z odnośników wychodzących usuwamy nawet parametry śledzące dokładane przez platformy.",
+    dataTitle: "Skąd pochodzą dane",
+    takedownTitle: "Prośba o usunięcie",
+    takedownBody:
+      "Masz prawa i chcesz, by obraz albo odnośnik zniknął? Napisz, podając adres strony: zostanie usunięty, bez dyskusji i bez procedury. Ponieważ nic tu nie jest przechowywane, usunięcie działa natychmiast.",
+    takedownNote:
+      "Każdy czytelnik może też zgłosić hasło, które wydaje mu się fałszywe albo niesprawdzalne: wraca ono wtedy do weryfikacji.",
+    furtherTitle: "Czytaj dalej",
+  },
   footer: {
     about: "O projekcie",
     credits: "Źródła i prawa",
