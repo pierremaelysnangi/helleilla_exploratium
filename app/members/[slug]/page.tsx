@@ -13,6 +13,10 @@ import Link from "next/link";
 import { getMemberBySlug } from "@/db/queries/members";
 import { EmptyState } from "@/components/shared/emptyState";
 import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
+import { SITE_NAME } from "@/lib/site";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { externalLabel } from "@/lib/media/externalLabel";
 
 type MemberPageProps = {
   params: Promise<{ slug: string }>;
@@ -21,22 +25,36 @@ type MemberPageProps = {
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /** Formate une période d'activité (« 1991 – 2001 » ou « 1991 – … »). */
-function period(joinedYear: number | null, leftYear: number | null): string {
-  if (!joinedYear && !leftYear) return "période inconnue";
-  return `${joinedYear ?? "?"} – ${leftYear ?? "…"}`;
+function period(
+  t: Dictionary,
+  joinedYear: number | null,
+  leftYear: number | null,
+): string {
+  if (!joinedYear && !leftYear) return t.member.unknownPeriod;
+  return interpolate(t.band.period, {
+    from: joinedYear ?? t.band.unknownYear,
+    to: leftYear ?? t.band.ongoing,
+  });
 }
 
 export async function generateMetadata({
   params,
 }: MemberPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const member = await getMemberBySlug(slug);
-  if (!member) return { title: "Membre introuvable", robots: { index: false } };
+  const [member, { t }] = await Promise.all([
+    getMemberBySlug(slug),
+    getTranslations(),
+  ]);
+  if (!member)
+    return { title: t.meta.memberNotFound, robots: { index: false } };
 
   const bandNames = member.bands.map((b) => b.name).join(", ");
   const description = bandNames
     ? `${member.name} : ${bandNames}.`
-    : `${member.name} dans l'encyclopédie Helleilla Exploratium.`;
+    : interpolate(t.meta.memberDescription, {
+        member: member.name,
+        site: SITE_NAME,
+      });
 
   return {
     title: member.name,
@@ -96,18 +114,18 @@ export default async function MemberPage({ params }: MemberPageProps) {
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground underline"
             >
-              Fiche MusicBrainz ↗
+              {externalLabel(t.member.musicbrainzEntry)}
             </a>
           </p>
         )}
       </header>
 
-      <section aria-label="Groupes" className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Groupes</h2>
+      <section aria-label={t.nav.bands} className="flex flex-col gap-3">
+        <h2 className="metal-title text-lg">{t.nav.bands}</h2>
         {member.bands.length === 0 ? (
           <EmptyState
             title={t.app.noBandListed}
-            description="Aucune appartenance n'a encore été documentée pour cette personne."
+            description={t.member.noBandDocumented}
           />
         ) : (
           <ul className="flex flex-col gap-2">
@@ -120,7 +138,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
                   <span className="text-sm font-medium">{band.name}</span>
                   <span className="text-muted-foreground text-xs">
                     {band.role ? `${band.role} · ` : ""}
-                    {period(band.joinedYear, band.leftYear)}
+                    {period(t, band.joinedYear, band.leftYear)}
                   </span>
                 </Link>
               </li>
@@ -130,7 +148,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
       </section>
 
       {member.albums.length > 0 && (
-        <section aria-label="Albums" className="flex flex-col gap-3">
+        <section aria-label={t.nav.albums} className="flex flex-col gap-3">
           <h2 className="metal-title text-lg">{t.app.appearsOn}</h2>
           <ul className="divide-border border-border divide-y rounded-lg border">
             {member.albums.map((album) => (
@@ -140,7 +158,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
                   className="hover:bg-accent/30 flex items-center gap-3 px-4 py-2.5"
                 >
                   <span className="text-muted-foreground w-12 shrink-0 font-mono text-sm">
-                    {album.releaseYear ?? "—"}
+                    {album.releaseYear ?? t.band.unknownYear}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">

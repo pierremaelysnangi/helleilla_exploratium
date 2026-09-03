@@ -1,5 +1,13 @@
+"use client";
+
 /**
  * Squelettes de chargement partagés par les `loading.tsx`.
+ *
+ * Composants CLIENTS bien qu'ils n'aient aucun état : leur libellé
+ * accessible doit être traduit, et un `loading.tsx` ne peut pas résoudre
+ * la langue lui-même — lire le cookie depuis un repli de Suspense
+ * rendrait dynamique la route entière, ce que ce repli existe justement
+ * pour éviter. Le dictionnaire descend donc par le contexte.
  *
  * Les six fichiers de segment rendaient chacun leur propre balisage, à peu
  * près identique : une correction d'accessibilité devait alors être
@@ -9,6 +17,7 @@
 
 // Squelette shadcn
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 type LoadingSkeletonProps = {
   /** Nombre de blocs à afficher. */
@@ -21,10 +30,11 @@ export function LoadingSkeleton({
   count = 6,
   height = 96,
 }: LoadingSkeletonProps) {
+  const t = useT();
   return (
     <div
       role="status"
-      aria-label="Chargement en cours"
+      aria-label={t.common.loadingInProgress}
       className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
     >
       {Array.from({ length: count }).map((_, index) => (
@@ -43,10 +53,11 @@ export function LoadingSkeleton({
  * sentiment d'attente, il le déplace.
  */
 export function DetailSkeleton() {
+  const t = useT();
   return (
     <div
       role="status"
-      aria-label="Chargement en cours"
+      aria-label={t.common.loadingInProgress}
       className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-4 sm:flex-row">

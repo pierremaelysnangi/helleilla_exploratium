@@ -14,10 +14,10 @@ import { getAdminStats } from "@/db/queries/stats";
 import { AccessNotice } from "@/components/contributions/accessNotice";
 import { getTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Administration",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { title: t.admin.title, robots: { index: false, follow: false } };
+}
 
 /** Une tuile de compteur. */
 function StatTile({ label, value }: { label: string; value: number }) {
@@ -38,10 +38,10 @@ export default async function AdminPage() {
   if (!session) {
     return (
       <section className="flex max-w-3xl flex-col gap-6">
-        <h1 className="metal-title text-3xl">Administration</h1>
+        <h1 className="metal-title text-3xl">{t.admin.title}</h1>
         <AccessNotice
           title={t.app.adminRequired}
-          description="Cet espace est réservé aux administrateurs. Les modérateurs disposent de la file de relecture des contributions."
+          description={t.admin.accessNotice}
         />
       </section>
     );
@@ -52,30 +52,33 @@ export default async function AdminPage() {
   return (
     <section className="flex flex-col gap-8">
       <header>
-        <h1 className="metal-title text-3xl">Administration</h1>
+        <h1 className="metal-title text-3xl">{t.admin.title}</h1>
         <div className="metal-rule mt-2 w-48" />
       </header>
 
-      <section aria-label="{t.app.keyFigures}" className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Catalogue</h2>
+      <section aria-label={t.app.keyFigures} className="flex flex-col gap-3">
+        <h2 className="metal-title text-lg">{t.admin.catalogue}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatTile label="Groupes" value={stats.bands} />
-          <StatTile label="Albums" value={stats.albums} />
-          <StatTile label="Pistes" value={stats.tracks} />
-          <StatTile label="Genres" value={stats.genres} />
+          <StatTile label={t.nav.bands} value={stats.bands} />
+          <StatTile label={t.nav.albums} value={stats.albums} />
+          <StatTile label={t.app.tracks} value={stats.tracks} />
+          <StatTile label={t.nav.genres} value={stats.genres} />
         </div>
       </section>
 
       <section aria-label={t.app.community} className="flex flex-col gap-3">
         <h2 className="metal-title text-lg">{t.app.community}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <StatTile label="Comptes" value={stats.users} />
-          <StatTile label="Administrateurs" value={stats.admins} />
-          <StatTile label="Dossiers à relire" value={stats.openContributions} />
+          <StatTile label={t.admin.accounts} value={stats.users} />
+          <StatTile label={t.admin.administrators} value={stats.admins} />
+          <StatTile
+            label={t.admin.pendingSubmissions}
+            value={stats.openContributions}
+          />
         </div>
       </section>
 
-      <nav aria-label="Actions" className="flex flex-wrap gap-2">
+      <nav aria-label={t.app.actions} className="flex flex-wrap gap-2">
         <Link
           href="/admin/utilisateurs"
           className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase hover:opacity-90"
@@ -86,14 +89,14 @@ export default async function AdminPage() {
           href="/contributions/relecture"
           className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
         >
-          File de relecture
+          {t.admin.reviewQueue}
           {stats.openContributions > 0 && ` (${stats.openContributions})`}
         </Link>
         <Link
           href="/api/docs"
           className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
         >
-          Documentation API
+          {t.admin.apiDocs}
         </Link>
       </nav>
     </section>

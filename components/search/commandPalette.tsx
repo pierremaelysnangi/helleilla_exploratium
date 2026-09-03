@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 // Recherche globale debouncée
 import { useGlobalSearch } from "@/hooks/use-search";
 import { useT } from "@/lib/i18n/client";
+import { rich } from "@/lib/i18n/rich";
 
 export function CommandPalette() {
   const t = useT();
@@ -45,7 +46,7 @@ export function CommandPalette() {
     <Command.Dialog
       open={open}
       onOpenChange={setOpen}
-      label="Recherche rapide"
+      label={t.app.quickSearch}
       shouldFilter={false} // filtrage serveur (Meilisearch), pas local
       className="border-border bg-card fixed inset-x-0 top-[15%] z-50 mx-auto max-w-xl overflow-hidden rounded-lg border shadow-2xl"
     >
@@ -62,7 +63,7 @@ export function CommandPalette() {
 
         {data && data.bands.length > 0 && (
           <Command.Group
-            heading="Groupes"
+            heading={t.nav.bands}
             className="[&_[cmdk-group-heading]]:metal-title text-muted-foreground px-1 py-1 text-xs tracking-wide uppercase"
           >
             {data.bands.map((band) => (
@@ -80,7 +81,7 @@ export function CommandPalette() {
 
         {data && data.albums.length > 0 && (
           <Command.Group
-            heading="Albums"
+            heading={t.nav.albums}
             className="text-muted-foreground px-1 py-1 text-xs tracking-wide uppercase"
           >
             {data.albums.map((album) => (
@@ -94,7 +95,7 @@ export function CommandPalette() {
               >
                 {album.title}{" "}
                 <span className="text-muted-foreground ml-1 text-xs">
-                  {album.bandName} · {album.type}
+                  {`${album.bandName} · ${t.releaseType[album.type]}`}
                 </span>
               </Command.Item>
             ))}
@@ -103,7 +104,7 @@ export function CommandPalette() {
 
         {data && data.tracks.length > 0 && (
           <Command.Group
-            heading="Pistes"
+            heading={t.app.tracks}
             className="text-muted-foreground px-1 py-1 text-xs tracking-wide uppercase"
           >
             {data.tracks.map((track) => (
@@ -120,7 +121,7 @@ export function CommandPalette() {
               >
                 {track.title}{" "}
                 <span className="text-muted-foreground ml-1 text-xs">
-                  {track.bandName} · {track.albumTitle}
+                  {`${track.bandName} · ${track.albumTitle}`}
                 </span>
               </Command.Item>
             ))}
@@ -130,8 +131,14 @@ export function CommandPalette() {
 
       {/* Astuce raccourci */}
       <div className="border-border text-muted-foreground border-t px-4 py-2 text-xs">
-        <kbd>Ctrl</kbd>+<kbd>K</kbd> pour ouvrir · <kbd>{t.app.escape}</kbd>{" "}
-        pour fermer
+        {rich(t.app.paletteHint, {
+          open: (
+            <>
+              <kbd>{t.app.ctrlKey}</kbd>+<kbd>{t.app.searchKey}</kbd>
+            </>
+          ),
+          close: <kbd>{t.app.escape}</kbd>,
+        })}
       </div>
     </Command.Dialog>
   );

@@ -4,15 +4,16 @@
  * la décision d'envoi appartient entièrement au serveur.
  */
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ForgotPasswordForm } from "@/components/auth/forgotPasswordForm";
 import { AuthHeading } from "@/components/auth/authHeading";
 import { getTranslations } from "@/lib/i18n/server";
 
-export const metadata = {
-  robots: { index: false },
-  title: "Mot de passe oublié",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { robots: { index: false }, title: t.account.forgotTitle };
+}
 
 export default async function ForgotPasswordPage() {
   const { t } = await getTranslations();

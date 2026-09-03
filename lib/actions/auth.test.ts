@@ -31,7 +31,12 @@ vi.mock("next/navigation", () => ({ redirect: nav.redirect }));
 // En-têtes pilotables : signUpAction appelle headers() deux fois, un
 // mockResolvedValueOnce ne viserait que le premier appel.
 const req = vi.hoisted(() => ({ headers: new Headers() }));
-vi.mock("next/headers", () => ({ headers: vi.fn(async () => req.headers) }));
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => req.headers),
+  // La résolution de langue lit le cookie avant l'en-tête : sans ce
+  // substitut, toute action qui traduit un message échouerait ici.
+  cookies: vi.fn(async () => ({ get: () => undefined })),
+}));
 
 // API Better Auth : chaque test pilote le succès ou l'échec voulu
 const api = vi.hoisted(() => ({

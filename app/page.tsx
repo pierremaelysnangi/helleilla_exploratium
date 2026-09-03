@@ -15,33 +15,45 @@ import {
 import { RecentAlbums } from "@/components/widgets/recentAlbums";
 import { RecentBands } from "@/components/widgets/recentBands";
 import { TopRatedAlbums } from "@/components/widgets/topRatedAlbums";
+import { SITE_NAME } from "@/lib/site";
 import { getTranslations } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = {
-  title: "Accueil",
-  description:
-    "L'encyclopédie collaborative du metal : groupes, discographies et genres, sources à l'appui.",
-};
+/** Salut de la scène, universel : ne se traduit pas. */
+const METAL_HORNS = "\\m/";
 
-/** Entrées d'accès rapide vers les sections principales. */
-const SECTIONS = [
-  {
-    href: "/bands",
-    title: "Groupes",
-    description:
-      "Catalogue des groupes : pays, périodes d'activité, membres et discographies.",
-  },
-  {
-    href: "/albums",
-    title: "Albums",
-    description: "Albums, EP, singles, lives et démos triés par année.",
-  },
-  {
-    href: "/genres",
-    title: "Genres",
-    description: "La taxonomie complète, du black metal au doom.",
-  },
-] as const;
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { title: t.nav.home, description: t.meta.homeDescription };
+}
+
+/**
+ * Entrées d'accès rapide vers les sections principales.
+ *
+ * Construites à partir du dictionnaire plutôt que figées : ce sont trois
+ * libellés et trois phrases affichés à l'écran, au même titre que le
+ * reste de la page.
+ */
+function sectionsOf(t: Dictionary) {
+  return [
+    {
+      href: "/bands",
+      title: t.nav.bands,
+      description: t.home.bandsSection,
+    },
+    {
+      href: "/albums",
+      title: t.nav.albums,
+      description: t.home.albumsSection,
+    },
+    {
+      href: "/genres",
+      title: t.nav.genres,
+      description: t.home.genresSection,
+    },
+  ];
+}
 
 /** Rafraîchit les widgets sans redéploiement, sans requêter à chaque vue. */
 export const revalidate = 300;
@@ -66,18 +78,18 @@ async function loadWidgets() {
 
 export default async function HomePage() {
   const { recentBands, recentAlbums, topRated } = await loadWidgets();
-  const { t } = await getTranslations();
+  const { t, n } = await getTranslations();
+  const sections = sectionsOf(t);
 
   return (
     <div className="flex flex-col gap-10">
       {/* Héro */}
       <section className="flex flex-col items-center gap-4 py-10 text-center">
-        <h1 className="metal-title text-4xl sm:text-5xl">
-          Helleilla Exploratium
-        </h1>
+        {/* Nom du site : marque, jamais traduite. */}
+        <h1 className="metal-title text-4xl sm:text-5xl">{SITE_NAME}</h1>
         <p className="text-muted-foreground max-w-xl">
           {t.home.tagline}
-          {" \\m/"}
+          {` ${METAL_HORNS}`}
         </p>
         <Link
           href="/bands"
@@ -86,7 +98,16 @@ export default async function HomePage() {
           {t.home.explore}
         </Link>
         <p className="text-muted-foreground text-xs">
-          Astuce : <kbd>Ctrl</kbd>+<kbd>K</kbd> pour la recherche rapide
+          {/* Le raccourci est inséré DANS la phrase : les langues ne le
+              placent pas au même endroit, et le découper en morceaux
+              imposerait l'ordre des mots du français. */}
+          {rich(t.home.shortcutHint, {
+            keys: (
+              <>
+                <kbd>{t.app.ctrlKey}</kbd>+<kbd>{t.app.searchKey}</kbd>
+              </>
+            ),
+          })}
         </p>
       </section>
 
@@ -96,10 +117,10 @@ export default async function HomePage() {
           En dessous, la navigation est repliée derrière le burger : ces
           cartes redeviennent le chemin le plus court. */}
       <section
-        aria-label="Sections"
+        aria-label={t.home.sections}
         className="grid gap-4 sm:grid-cols-3 lg:hidden"
       >
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <Link
             key={section.href}
             href={section.href}
@@ -117,7 +138,7 @@ export default async function HomePage() {
       {/* Widgets : chacun disparaît si le catalogue n'a rien à montrer,
           plutôt que d'afficher une section vide. */}
       <RecentAlbums albums={recentAlbums} title={t.home.recentAlbums} />
-      <TopRatedAlbums albums={topRated} title={t.home.topRated} />
+      <TopRatedAlbums albums={topRated} t={t} n={n} />
       <RecentBands bands={recentBands} title={t.home.recentBands} />
     </div>
   );

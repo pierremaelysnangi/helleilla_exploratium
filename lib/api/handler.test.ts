@@ -20,7 +20,10 @@ vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: () => mockGetSession() } },
 }));
 // Mocks des modules Next.js et du rate limiting (no-op)
-vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
+vi.mock("next/headers", () => ({
+  headers: async () => new Headers(),
+  cookies: async () => ({ get: () => undefined }),
+}));
 vi.mock("./rate-limit", () => ({
   rateLimit: async () => null,
   clientIp: () => "127.0.0.1",

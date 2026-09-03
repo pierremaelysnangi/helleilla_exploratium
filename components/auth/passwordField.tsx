@@ -9,16 +9,15 @@
  */
 
 // Génération CSPRNG + évaluation zxcvbn
-import {
-  generatePassword,
-  entropyBits,
-  MIN_ENTROPY_BITS,
-} from "@/hooks/use-password-generator";
+import { generatePassword } from "@/hooks/use-password-generator";
 import { usePasswordStrength } from "@/hooks/use-password-strength";
 // État local du champ et de la visibilité
 import { useState } from "react";
 // Classes de champ partagées avec les autres formulaires d'authentification
 import { FIELD_CLASS } from "./authField";
+import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /** Props du champ. */
 type PasswordFieldProps = {
@@ -44,23 +43,32 @@ export const MIN_SCORE = 3 as const;
  * et le score zxcvbn, eux, mesurent la résistance réelle.
  */
 const REQUIREMENTS: {
-  label: string;
+  label: (t: Dictionary) => string;
   test: (value: string, score: number | null) => boolean;
 }[] = [
   {
-    label: `Au moins ${MIN_LENGTH} caractères — la longueur compte plus que la complexité`,
+    label: (t) =>
+      interpolate(t.password.requirementLength, { min: MIN_LENGTH }),
     test: (value) => value.length >= MIN_LENGTH,
   },
   {
-    label:
-      "Difficile à deviner : ni mot du dictionnaire, ni suite de touches, ni date",
+    label: (t) => t.password.requirementGuess,
     test: (_value, score) => score !== null && score >= MIN_SCORE,
   },
   {
-    label: "Sans rapport avec votre nom ni votre adresse e-mail",
+    label: (t) => t.password.requirementPersonal,
     test: (value, score) => value.length > 0 && score !== null && score >= 2,
   },
 ];
+
+/** Nom de chaque palier zxcvbn, du plus faible au plus fort. */
+const STRENGTH_KEYS = [
+  "strength0",
+  "strength1",
+  "strength2",
+  "strength3",
+  "strength4",
+] as const;
 
 /**
  * Champ contrôlé : expose via `onChange` la valeur ; le parent lit la
@@ -71,8 +79,9 @@ export function PasswordField({
   value,
   onChange,
   userInputs = [],
-  label = "Mot de passe",
+  label,
 }: PasswordFieldProps) {
+  const t = useT();
   const [visible, setVisible] = useState(false);
   const [generatedLength, setGeneratedLength] = useState(20);
   const strength = usePasswordStrength(value, userInputs);
@@ -99,7 +108,7 @@ export function PasswordField({
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor="password" className="text-sm font-medium">
-        {label}
+        {label ?? t.password.label}
       </label>
 
       <div className="flex gap-2">
@@ -122,13 +131,17 @@ export function PasswordField({
       <div className="flex flex-wrap gap-2">
         {[
           {
-            label: visible ? "Masquer" : "Afficher",
+            label: visible ? t.password.hide : t.password.show,
             onClick: () => setVisible((v) => !v),
             disabled: false,
           },
-          { label: "Générer", onClick: handleGenerate, disabled: false },
           {
-            label: "Copier",
+            label: t.password.generate,
+            onClick: handleGenerate,
+            disabled: false,
+          },
+          {
+            label: t.password.copy,
             onClick: () => void handleCopy(),
             disabled: !value,
           },
@@ -150,8 +163,9 @@ export function PasswordField({
       <ul className="text-muted-foreground flex flex-col gap-1 text-xs">
         {REQUIREMENTS.map((requirement) => {
           const met = requirement.test(value, strength?.score ?? null);
+          const text = requirement.label(t);
           return (
-            <li key={requirement.label} className="flex items-start gap-2">
+            <li key={text} className="flex items-start gap-2">
               <span
                 aria-hidden
                 className={met ? "text-emerald-500" : "text-muted-foreground"}
@@ -159,12 +173,12 @@ export function PasswordField({
                 {met ? "✓" : "○"}
               </span>
               <span className={met ? "text-foreground" : undefined}>
-                {requirement.label}
+                {text}
               </span>
               {/* Doublon textuel pour les lecteurs d'écran : la coche
                   seule n'est pas annoncée. */}
               <span className="sr-only">
-                {met ? "(satisfait)" : "(non satisfait)"}
+                {met ? t.password.met : t.password.notMet}
               </span>
             </li>
           );
@@ -173,7 +187,11 @@ export function PasswordField({
 
       {/* Longueur générée souhaitée */}
       <label className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-        <span>Longueur générée : {generatedLength}</span>
+        <span>
+          {interpolate(t.password.generatedLength, {
+            length: generatedLength,
+          })}
+        </span>
         <input
           type="range"
           min={16}
@@ -182,23 +200,16 @@ export function PasswordField({
           onChange={(e) => setGeneratedLength(Number(e.target.value))}
           className="accent-primary flex-1"
         />
-        <span>
-          ~
-          {entropyBits(generatedLength, [
-            "lowercase",
-            "uppercase",
-            "digits",
-            "symbols",
-          ])}{" "}
-          bits (cible ≥ {MIN_ENTROPY_BITS})
-        </span>
       </label>
 
       {/* Jauge zxcvbn */}
       {strength && (
         <div className="flex flex-col gap-1.5">
           <span aria-live="polite" className="text-muted-foreground text-xs">
-            Force : {strength.label} ({strength.score}/4)
+            {interpolate(t.password.strength, {
+              label: t.password[STRENGTH_KEYS[strength.score]],
+              score: strength.score,
+            })}
           </span>
           {/* Largeur proportionnelle au score, et non plus une barre
               pleine dont seule la couleur changeait : la progression se
@@ -223,16 +234,13 @@ export function PasswordField({
           </div>
           {!meetsLength && (
             <p className="text-muted-foreground text-xs">
-              Au moins {MIN_LENGTH} caractères requis.
+              {interpolate(t.password.minLengthNotice, { min: MIN_LENGTH })}
             </p>
           )}
-          {strength.feedback.suggestions.length > 0 && (
-            <ul className="text-muted-foreground list-disc pl-4 text-xs">
-              {strength.feedback.suggestions.map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          )}
+          {/* Les suggestions brutes de zxcvbn ne sont PAS affichées :
+              la bibliothèque les produit en anglais, et la liste
+              d'exigences ci-dessus dit déjà, dans la langue du visiteur,
+              ce qu'il faut corriger. */}
         </div>
       )}
 

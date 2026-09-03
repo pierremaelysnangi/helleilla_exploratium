@@ -6,6 +6,7 @@
 
 // ActionError : erreur métier levée par les gardes RBAC (session/permission)
 import { ActionError } from "@/lib/rbac/guards";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Type de résultat unifié pour toutes les Server Actions.
@@ -25,11 +26,14 @@ export type ActionResult<T> =
  * @returns Un objet `{ success: false, error }` : message de l'ActionError
  *          si applicable, sinon message générique après log serveur.
  */
-export function handleActionError(err: unknown): {
+export async function handleActionError(err: unknown): Promise<{
   success: false;
   error: string;
-} {
+}> {
   if (err instanceof ActionError) return { success: false, error: err.message };
   console.error("[action]", err);
-  return { success: false, error: "Erreur serveur inattendue." };
+  // Le message générique est lu, donc traduit. Le détail de l'erreur,
+  // lui, ne quitte jamais les journaux du serveur.
+  const { t } = await getTranslations();
+  return { success: false, error: t.errors.unexpected };
 }

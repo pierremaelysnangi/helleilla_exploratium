@@ -15,7 +15,6 @@ import { useActionState, useState } from "react";
 import {
   PasswordField,
   passwordMeetsPolicy,
-  MIN_LENGTH,
 } from "@/components/auth/passwordField";
 import { usePasswordStrength } from "@/hooks/use-password-strength";
 import { useT } from "@/lib/i18n/client";
@@ -43,7 +42,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       <PasswordField
         value={password}
         onChange={setPassword}
-        label="Nouveau mot de passe"
+        label={t.account.newPassword}
       />
 
       {state.error && (
@@ -69,14 +68,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             disabled={isPending || !policyOk}
             className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-widest uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {isPending ? "Mise à jour…" : "Définir le mot de passe"}
+            {isPending ? t.account.updating : t.account.setPassword}
           </button>
-          {!policyOk && (
-            <small className="text-muted-foreground">
-              Requis : {MIN_LENGTH} caractères minimum et score de force
-              suffisant (utilisez « Générer »).
-            </small>
-          )}
         </>
       )}
     </form>

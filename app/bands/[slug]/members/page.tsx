@@ -21,7 +21,12 @@ import { fetchPublicOrNull } from "@/lib/api/client";
 import { bandMediaSchema } from "@/hooks/api/schemas";
 import { listMembersByBandId } from "@/db/queries/members";
 import { EmptyState } from "@/components/shared/emptyState";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { externalLabel } from "@/lib/media/externalLabel";
+import { MUSICBRAINZ } from "@/lib/brands";
 
 type MembersPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,16 +36,22 @@ export async function generateMetadata({
   params,
 }: MembersPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
-  if (!band) return { title: "Groupe introuvable", robots: { index: false } };
+  const [band, { t, n }] = await Promise.all([
+    fetchBandBySlug(slug),
+    getTranslations(),
+  ]);
+  if (!band) return { title: t.meta.bandNotFound, robots: { index: false } };
 
   const documented = await listMembersByBandId(band.id);
 
   return {
-    title: `Membres de ${band.name}`,
+    title: interpolate(t.member.title, { band: band.name }),
     description: documented.length
-      ? `Formation de ${band.name} : ${documented.length} membre${documented.length > 1 ? "s" : ""} référencé${documented.length > 1 ? "s" : ""}.`
-      : `Formation de ${band.name} d'après MusicBrainz.`,
+      ? interpolate(t.meta.membersDescription, {
+          band: band.name,
+          count: n(t.count.members, documented.length),
+        })
+      : interpolate(t.meta.membersFromMusicbrainz, { band: band.name }),
     // Indexable seulement quand la formation est documentée chez nous ;
     // le repli MusicBrainz reste du contenu externe non maîtrisé.
     robots: { index: documented.length > 0, follow: true },
@@ -48,7 +59,7 @@ export async function generateMetadata({
 }
 
 export default async function BandMembersPage({ params }: MembersPageProps) {
-  const { t } = await getTranslations();
+  const { t, n } = await getTranslations();
   const { slug } = await params;
   const band = await fetchBandBySlug(slug);
 
@@ -76,27 +87,24 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
 
   return (
     <article className="flex flex-col gap-8">
-      <nav aria-label="Fil d'Ariane" className="text-muted-foreground text-sm">
-        <Link href="/bands" className="hover:text-foreground">
-          Groupes
-        </Link>
-        <span aria-hidden> / </span>
-        <Link href={`/bands/${band.slug}`} className="hover:text-foreground">
-          {band.name}
-        </Link>
-        <span aria-hidden> / </span>
-        <span className="text-foreground">Membres</span>
-      </nav>
+      <Breadcrumb
+        label={t.app.breadcrumb}
+        items={[
+          { href: "/bands", label: t.nav.bands },
+          { href: `/bands/${band.slug}`, label: band.name },
+          { label: t.band.members },
+        ]}
+      />
 
       <header>
         <h1 className="metal-title text-3xl sm:text-4xl">
-          Membres de {band.name}
+          {interpolate(t.member.title, { band: band.name })}
         </h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm">
           {documented.length > 0
-            ? "Formation documentée dans l'encyclopédie. Chaque membre dispose de sa propre fiche."
-            : "Aucune formation n'est encore documentée ici : les noms ci-dessous sont lus à la demande depuis MusicBrainz et ne sont pas conservés."}
+            ? t.member.documentedLead
+            : t.member.externalLead}
         </p>
       </header>
 
@@ -105,8 +113,7 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
           role="status"
           className="border-border text-muted-foreground rounded-md border px-4 py-2 text-sm"
         >
-          Certaines sources externes n&apos;ont pas répondu : la liste peut être
-          incomplète.
+          {t.member.partialSources}
         </p>
       )}
 
@@ -121,7 +128,10 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
                 <span className="text-sm font-medium">{member.name}</span>
                 <span className="text-muted-foreground text-xs">
                   {member.role ? `${member.role} · ` : ""}
-                  {member.joinedYear ?? "?"} – {member.leftYear ?? "…"}
+                  {interpolate(t.band.period, {
+                    from: member.joinedYear ?? t.band.unknownYear,
+                    to: member.leftYear ?? t.band.ongoing,
+                  })}
                 </span>
               </Link>
             </li>
@@ -130,18 +140,20 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
       ) : external.length === 0 ? (
         <EmptyState
           title={t.app.noMemberListed}
-          description={`La formation de ${band.name} n'est pas encore documentée, et MusicBrainz n'en fournit aucune.`}
+          description={interpolate(t.member.noneDescription, {
+            band: band.name,
+          })}
           ctaHref={`/bands/${band.slug}`}
-          ctaLabel="Retour à la fiche du groupe"
+          ctaLabel={t.member.backToBand}
         />
       ) : (
         <div className="flex flex-col gap-6">
           {externalActive.length > 0 && (
             <section>
-              <h2 className="metal-title text-sm">Formation actuelle</h2>
+              <h2 className="metal-title text-sm">{t.member.currentLineup}</h2>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {externalActive.map((member) => (
-                  <ExternalMemberRow key={member.id} member={member} />
+                  <ExternalMemberRow key={member.id} member={member} t={t} />
                 ))}
               </ul>
             </section>
@@ -152,11 +164,11 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
           {externalPast.length > 0 && (
             <details className="metal-card px-4 py-3">
               <summary className="cursor-pointer text-sm font-medium">
-                Anciens membres ({externalPast.length})
+                {n(t.count.formerMembers, externalPast.length)}
               </summary>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {externalPast.map((member) => (
-                  <ExternalMemberRow key={member.id} member={member} />
+                  <ExternalMemberRow key={member.id} member={member} t={t} />
                 ))}
               </ul>
             </details>
@@ -173,6 +185,7 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
  */
 function ExternalMemberRow({
   member,
+  t,
 }: {
   member: {
     id: string;
@@ -181,9 +194,13 @@ function ExternalMemberRow({
     endYear: number | null;
     roles: string[];
   };
+  t: Dictionary;
 }) {
   const period = [member.beginYear, member.endYear].some((y) => y !== null)
-    ? `${member.beginYear ?? "?"} – ${member.endYear ?? "…"}`
+    ? interpolate(t.band.period, {
+        from: member.beginYear ?? t.band.unknownYear,
+        to: member.endYear ?? t.band.ongoing,
+      })
     : null;
 
   return (
@@ -205,7 +222,7 @@ function ExternalMemberRow({
           )}
         </span>
         <span className="text-muted-foreground shrink-0 text-xs tracking-wide uppercase">
-          MusicBrainz ↗
+          {externalLabel(MUSICBRAINZ)}
         </span>
       </a>
     </li>

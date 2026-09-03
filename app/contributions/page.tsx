@@ -13,14 +13,17 @@ import { requirePagePermission } from "@/lib/rbac/page";
 import { ContributionForm } from "@/components/contributions/contributionForm";
 import { AccessNotice } from "@/components/contributions/accessNotice";
 import { getTranslations } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
 
-export const metadata: Metadata = {
-  title: "Proposer un groupe",
-  description:
-    "Soumettre un groupe à l'encyclopédie, preuves officielles à l'appui.",
-  // Page d'action derrière authentification : sans intérêt pour le crawl
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    title: t.contributions.proposeBand,
+    description: t.meta.contributeDescription,
+    // Page d'action derrière authentification : sans intérêt pour le crawl
+    robots: { index: false, follow: true },
+  };
+}
 
 export default async function ContributionsPage() {
   const { t } = await getTranslations();
@@ -36,12 +39,13 @@ export default async function ContributionsPage() {
         <h1 className="metal-title text-3xl">{t.contributions.proposeBand}</h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-          Chaque fiche doit pouvoir être vérifiée : deux preuves minimum, dont
-          une source officielle.{" "}
-          <Link href="/about" className="hover:text-foreground underline">
-            {t.contributions.whyRequired}
-          </Link>
-          .
+          {rich(t.contributions.submitLead, {
+            link: (
+              <Link href="/about" className="hover:text-foreground underline">
+                {t.contributions.whyRequired}
+              </Link>
+            ),
+          })}
         </p>
       </header>
 
@@ -50,7 +54,7 @@ export default async function ContributionsPage() {
       ) : (
         <AccessNotice
           title={t.contributions.contributorRequired}
-          description="Votre compte n'a pas encore le rôle contributeur, nécessaire pour soumettre un dossier. Il est attribué par un administrateur ; en attendant, vous pouvez parcourir l'encyclopédie et suivre vos éventuels dossiers existants."
+          description={t.contributions.contributorRequiredNotice}
         />
       )}
     </section>

@@ -20,11 +20,16 @@ import { auth } from "@/lib/auth";
 // Barrières pré-validation
 import { verifyTurnstileToken } from "@/lib/auth/turnstile";
 import { isPasswordDenylisted } from "@/lib/auth/password-policy";
+import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
 
 /** État retourné aux formulaires clients. */
 export type ResetFormState = { error?: string; success?: string };
 
 /** Schéma de la demande de réinitialisation. */
+/** Longueur minimale du mot de passe, alignée sur `<PasswordField>`. */
+const MIN_PASSWORD_LENGTH = 12;
+
 const requestSchema = z.object({
   email: z.string().trim().email().max(200),
 });
@@ -40,9 +45,10 @@ export async function requestPasswordResetAction(
   const parsed = requestSchema.safeParse({
     email: formData.get("email"),
   });
+  const { t } = await getTranslations();
   if (!parsed.success) {
     // Message identique au succès : aucune information exploitable
-    return { success: "Si un compte existe, un email a été envoyé." };
+    return { success: t.errors.resetRequested };
   }
 
   // CAPTCHA invisible (fail-closed si configuré)
@@ -56,7 +62,7 @@ export async function requestPasswordResetAction(
     ip,
   );
   if (!captchaOk) {
-    return { error: "Vérification anti-robot échouée, réessayez" };
+    return { error: t.errors.captchaFailed };
   }
 
   try {
@@ -72,13 +78,13 @@ export async function requestPasswordResetAction(
     console.warn("[forgot-password]", err instanceof Error ? err.message : err);
   }
 
-  return { success: "Si un compte existe, un email a été envoyé." };
+  return { success: t.errors.resetRequested };
 }
 
 /** Schéma du nouveau mot de passe (aligné sur l'inscription). */
 const resetSchema = z.object({
   token: z.string().min(10).max(200),
-  password: z.string().min(12).max(128),
+  password: z.string().min(MIN_PASSWORD_LENGTH).max(128),
 });
 
 /**
@@ -93,15 +99,19 @@ export async function resetPasswordAction(
     token: formData.get("token"),
     password: formData.get("password"),
   });
+  const { t } = await getTranslations();
   if (!parsed.success) {
-    return { error: "Mot de passe invalide (12 caractères minimum)" };
+    return {
+      // Ce formulaire ne porte qu'un champ : nommer le mot de passe
+      // plutôt que « le formulaire » dit à la personne quoi corriger.
+      error: interpolate(t.errors.passwordTooShort, {
+        min: MIN_PASSWORD_LENGTH,
+      }),
+    };
   }
 
   if (isPasswordDenylisted(parsed.data.password)) {
-    return {
-      error:
-        "Ce mot de passe figure dans des fuites connues, choisissez-en un autre",
-    };
+    return { error: t.errors.passwordLeaked };
   }
 
   try {
@@ -111,8 +121,8 @@ export async function resetPasswordAction(
     });
   } catch {
     // Token expiré/invalide : message unique, pas de détail technique
-    return { error: "Lien invalide ou expiré — refaites une demande" };
+    return { error: t.errors.resetLinkInvalid };
   }
 
-  return { success: "Mot de passe mis à jour. Vous pouvez vous connecter." };
+  return { success: t.errors.passwordUpdated };
 }

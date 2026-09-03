@@ -94,7 +94,7 @@ export function SearchResults({ q }: SearchResultsProps) {
                   <span className="font-medium">{band.name}</span>
                   {band.formedYear && (
                     <span className="text-muted-foreground ml-2 text-xs">
-                      depuis {band.formedYear}
+                      {interpolate(t.festival.since, { year: band.formedYear })}
                     </span>
                   )}
                 </Link>
@@ -176,7 +176,7 @@ export function SearchResults({ q }: SearchResultsProps) {
                       {track.title}
                     </span>
                     <span className="text-muted-foreground truncate text-xs">
-                      {track.bandName} · {track.albumTitle}
+                      {`${track.bandName} · ${track.albumTitle}`}
                     </span>
                   </span>
                 </Link>

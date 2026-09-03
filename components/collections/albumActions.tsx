@@ -18,7 +18,9 @@ import { z } from "zod";
 import { apiJson, type ApiClientError } from "@/hooks/api/client";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
+import { rich } from "@/lib/i18n/rich";
 
 /** Agrégat renvoyé par /api/albums/:id/ratings. */
 const ratingSummarySchema = z.object({
@@ -41,8 +43,12 @@ type AlbumActionsProps = {
   albumId: string;
 };
 
+/** Les deux états d'une entrée de collection, dans l'ordre d'affichage. */
+const COLLECTION_STATUSES = ["owned", "wanted"] as const;
+
 export function AlbumActions({ albumId }: AlbumActionsProps) {
   const t = useT();
+  const n = usePlural();
   const qc = useQueryClient();
   const { data: session } = useSession();
 
@@ -107,21 +113,21 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
 
   return (
     <section
-      aria-label="Critiques et collection"
+      aria-label={t.album.listenersAndCollection}
       className="metal-card flex flex-col gap-4 p-4"
     >
       <div className="flex flex-wrap items-baseline gap-3">
-        <h3 className="metal-title text-base">Auditeurs</h3>
+        <h3 className="metal-title text-base">{t.album.listeners}</h3>
         {summary && (
           <p className="text-muted-foreground text-sm">
             {summary.count === 0 ? (
-              "Aucune note pour l'instant"
+              t.album.noRating
             ) : (
               <>
                 <span className="text-foreground font-mono">
-                  {summary.average}/5
+                  {`${summary.average}/5`}
                 </span>{" "}
-                · {summary.count} vote{summary.count > 1 ? "s" : ""}
+                · {n(t.count.votes, summary.count)}
               </>
             )}
           </p>
@@ -153,7 +159,7 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
             ))}
             {mine !== null && (
               <span className="text-muted-foreground text-xs">
-                votre note : {mine}/5
+                {interpolate(t.album.yourRatingValue, { score: mine })}
               </span>
             )}
           </div>
@@ -165,8 +171,10 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
           )}
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-muted-foreground text-xs">Ma liste :</span>
-            {(["owned", "wanted"] as const).map((status) => (
+            <span className="text-muted-foreground text-xs">
+              {t.collection.myList}
+            </span>
+            {COLLECTION_STATUSES.map((status) => (
               <button
                 key={status}
                 type="button"
@@ -179,7 +187,7 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
                     : "border-border hover:bg-accent/30 rounded-md border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase"
                 }
               >
-                {status === "owned" ? "Je l'ai" : "Je le veux"}
+                {status === "owned" ? t.collection.owned : t.collection.wanted}
               </button>
             ))}
             {entry && (
@@ -189,17 +197,20 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
                 onClick={() => remove.mutate()}
                 className="text-muted-foreground hover:text-destructive text-xs underline"
               >
-                Retirer
+                {t.collection.remove}
               </button>
             )}
           </div>
         </div>
       ) : (
         <p className="text-muted-foreground text-sm">
-          <Link href="/sign-in" className="hover:text-foreground underline">
-            Connectez-vous
-          </Link>{" "}
-          pour noter cet album et l&apos;ajouter à votre liste.
+          {rich(t.collection.signInToRate, {
+            link: (
+              <Link href="/sign-in" className="hover:text-foreground underline">
+                {t.auth.signIn}
+              </Link>
+            ),
+          })}
         </p>
       )}
     </section>

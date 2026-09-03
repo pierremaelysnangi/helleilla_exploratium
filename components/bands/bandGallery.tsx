@@ -26,6 +26,7 @@ import { ResilientImage } from "@/components/media/resilientImage";
 import type { BandMedia } from "@/hooks/api/schemas";
 import { useT } from "@/lib/i18n/client";
 import { interpolate } from "@/lib/i18n/format";
+import { externalLabel } from "@/lib/media/externalLabel";
 
 type GalleryImage = BandMedia["images"][number];
 
@@ -129,7 +130,7 @@ export function BandGallery({
                     rel="noopener noreferrer"
                     className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs tracking-wide uppercase transition-colors"
                   >
-                    {t.band.viewSource} ↗
+                    {externalLabel(t.band.viewSource)}
                   </a>
                 )}
                 <button
@@ -137,7 +138,7 @@ export function BandGallery({
                   onClick={() => setOpenIndex(null)}
                   className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs tracking-wide uppercase transition-colors"
                 >
-                  {t.band.close}
+                  {t.common.close}
                 </button>
               </div>
             </div>

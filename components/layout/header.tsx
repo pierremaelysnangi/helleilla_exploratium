@@ -18,6 +18,7 @@ import { MobileNav } from "./mobileNav";
 import { UserMenu } from "./userMenu";
 import { LanguageSwitcher } from "./languageSwitcher";
 import Link from "next/link";
+import { SITE_SHORT_NAME } from "@/lib/site";
 import type { Locale } from "@/lib/i18n/locales";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
@@ -32,7 +33,7 @@ export function Header({ locale, t }: HeaderProps) {
       <div className="site-container flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 sm:gap-x-4">
         {/* Titre du site, toujours à gauche */}
         <Link href="/" className="metal-title text-lg sm:text-xl">
-          Helleilla
+          {SITE_SHORT_NAME}
         </Link>
 
         {/* Navigation centrale (grand écran) */}

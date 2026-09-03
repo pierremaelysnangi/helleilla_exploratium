@@ -19,16 +19,22 @@ import {
   type EvidenceItem,
   type EvidenceKind,
 } from "@/lib/validations/contribution";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /** Libellés français des types de preuve, ordre = du plus probant au moins. */
-const KIND_LABELS: Record<EvidenceKind, string> = {
-  musicbrainz: "MusicBrainz",
-  discogs: "Discogs",
-  label: "Label / maison de disques",
-  "official-site": "Site officiel du groupe",
-  press: "Article de presse",
-  other: "Autre source",
+/** Exemple d'adresse attendue : une URL, identique dans toutes les langues. */
+const EVIDENCE_URL_EXAMPLE = "https://musicbrainz.org/artist/…";
+
+const KIND_LABELS: Record<EvidenceKind, (t: Dictionary) => string> = {
+  // Deux noms propres : les bases de données s'appellent ainsi partout.
+  musicbrainz: () => "MusicBrainz",
+  discogs: () => "Discogs",
+  label: (t) => t.evidenceKind.label,
+  "official-site": (t) => t.evidenceKind.officialSite,
+  press: (t) => t.evidenceKind.press,
+  other: (t) => t.evidenceKind.other,
 };
 
 /** Ordre d'affichage : les sources officielles en tête. */
@@ -85,6 +91,7 @@ export function EvidenceFields({
   disabled = false,
 }: EvidenceFieldsProps) {
   const t = useT();
+  const n = usePlural();
   const { items, enough, official } = evidenceDiagnostics(value);
 
   /** Remplace une ligne à l'index donné. */
@@ -94,11 +101,12 @@ export function EvidenceFields({
 
   return (
     <fieldset className="flex flex-col gap-3" disabled={disabled}>
-      <legend className="metal-title text-base">Preuves</legend>
+      <legend className="metal-title text-base">
+        {t.contributions.evidence}
+      </legend>
 
       <p className="text-muted-foreground text-sm">
-        Deux preuves minimum, dont au moins une source officielle. C&apos;est ce
-        qui garantit qu&apos;une fiche renvoie à un groupe réel et vérifiable.
+        {t.contributions.evidenceRule}
       </p>
 
       <ul className="flex flex-col gap-3">
@@ -107,7 +115,7 @@ export function EvidenceFields({
             <div className="flex flex-col gap-2 sm:flex-row">
               <label className="sm:w-56">
                 <span className="text-muted-foreground mb-1 block text-xs">
-                  Type de source
+                  {t.contributions.sourceKind}
                 </span>
                 <select
                   value={draft.kind}
@@ -118,7 +126,7 @@ export function EvidenceFields({
                 >
                   {KIND_ORDER.map((kind) => (
                     <option key={kind} value={kind}>
-                      {KIND_LABELS[kind]}
+                      {KIND_LABELS[kind](t)}
                     </option>
                   ))}
                 </select>
@@ -131,7 +139,7 @@ export function EvidenceFields({
                 <input
                   type="url"
                   inputMode="url"
-                  placeholder="https://musicbrainz.org/artist/…"
+                  placeholder={EVIDENCE_URL_EXAMPLE}
                   value={draft.url}
                   maxLength={500}
                   onChange={(e) => update(index, { url: e.target.value })}
@@ -142,7 +150,7 @@ export function EvidenceFields({
 
             <label>
               <span className="text-muted-foreground mb-1 block text-xs">
-                Note (facultatif)
+                {t.contributions.optionalNote}
               </span>
               <input
                 type="text"
@@ -178,15 +186,20 @@ export function EvidenceFields({
       {/* État courant de la règle, annoncé aux lecteurs d'écran */}
       <ul aria-live="polite" className="flex flex-col gap-1 text-xs">
         <li className={enough ? "text-muted-foreground" : "text-destructive"}>
-          {enough ? "✓" : "•"} {items.length} preuve
-          {items.length > 1 ? "s" : ""} renseignée
-          {items.length > 1 ? "s" : ""} sur {MIN_EVIDENCE_COUNT} minimum
+          {`${enough ? "✓" : "•"} ${interpolate(
+            t.contributions.evidenceProgress,
+            {
+              provided: n(t.count.evidence, items.length),
+              min: MIN_EVIDENCE_COUNT,
+            },
+          )}`}
         </li>
         <li className={official ? "text-muted-foreground" : "text-destructive"}>
-          {official ? "✓" : "•"} source officielle
-          {official
-            ? " fournie"
-            : " manquante (MusicBrainz, Discogs, label ou site officiel)"}
+          {`${official ? "✓" : "•"} ${
+            official
+              ? t.contributions.officialSourceProvided
+              : t.contributions.officialSourceMissing
+          }`}
         </li>
       </ul>
     </fieldset>

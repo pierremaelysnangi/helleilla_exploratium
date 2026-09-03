@@ -8,34 +8,45 @@
 
 import { Badge } from "@/components/ui/badge";
 import type { ContributionStatus } from "@/hooks/api/schemas";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-/** Libellé et intention visuelle de chaque statut. */
-const STATUS_META: Record<
+/**
+ * Intention visuelle de chaque statut.
+ *
+ * Un seul est destructif : le rendu doit distinguer « preuves
+ * demandées », qui ouvre un dialogue, de « rejeté », qui le clôt.
+ */
+const STATUS_VARIANTS: Record<
   ContributionStatus,
-  {
-    label: string;
-    variant: "default" | "secondary" | "outline" | "destructive";
-  }
+  "default" | "secondary" | "outline" | "destructive"
 > = {
-  pending: { label: "En attente de relecture", variant: "secondary" },
-  evidence_requested: { label: "Preuves demandées", variant: "outline" },
-  approved: { label: "Approuvé", variant: "default" },
-  expired: { label: "Expiré", variant: "outline" },
-  rejected: { label: "Rejeté", variant: "destructive" },
+  pending: "secondary",
+  evidence_requested: "outline",
+  approved: "default",
+  expired: "outline",
+  rejected: "destructive",
 };
 
 type ContributionStatusBadgeProps = {
+  t: Dictionary;
   status: ContributionStatus;
 };
 
 export function ContributionStatusBadge({
+  t,
   status,
 }: ContributionStatusBadgeProps) {
-  const meta = STATUS_META[status];
-  return <Badge variant={meta.variant}>{meta.label}</Badge>;
+  return (
+    <Badge variant={STATUS_VARIANTS[status]}>
+      {contributionStatusLabel(t, status)}
+    </Badge>
+  );
 }
 
 /** Libellé seul, pour les contextes sans badge (titres, aria-label). */
-export function contributionStatusLabel(status: ContributionStatus): string {
-  return STATUS_META[status].label;
+export function contributionStatusLabel(
+  t: Dictionary,
+  status: ContributionStatus,
+): string {
+  return t.contributionStatus[status];
 }

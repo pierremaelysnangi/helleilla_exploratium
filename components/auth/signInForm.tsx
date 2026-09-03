@@ -12,8 +12,10 @@
 import { signInAction, type AuthFormState } from "@/lib/actions/auth";
 import { useActionState } from "react";
 import { AuthField, AuthSubmit, AuthError } from "./authField";
+import { useT } from "@/lib/i18n/client";
 
 export function SignInForm() {
+  const t = useT();
   const [state, formAction, isPending] = useActionState<
     AuthFormState,
     FormData
@@ -25,7 +27,7 @@ export function SignInForm() {
         id="email"
         name="email"
         type="email"
-        label="Adresse e-mail"
+        label={t.account.emailLabel}
         required
         maxLength={200}
         autoComplete="email"
@@ -35,7 +37,7 @@ export function SignInForm() {
         id="password"
         name="password"
         type="password"
-        label="Mot de passe"
+        label={t.password.label}
         required
         autoComplete="current-password"
       />
@@ -46,7 +48,7 @@ export function SignInForm() {
       {state.error && <AuthError>{state.error}</AuthError>}
 
       <AuthSubmit pending={isPending}>
-        {isPending ? "Connexion…" : "Se connecter"}
+        {isPending ? t.account.signingIn : t.auth.signIn}
       </AuthSubmit>
     </form>
   );

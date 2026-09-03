@@ -12,12 +12,16 @@ import Link from "next/link";
 import { requirePageSession } from "@/lib/rbac/page";
 import { MyContributions } from "@/components/contributions/myContributions";
 import { getTranslations } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
 
-export const metadata: Metadata = {
-  title: "Mes dossiers",
-  description: "Suivi de vos contributions à l'encyclopédie.",
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    title: t.contributions.mySubmissions,
+    description: t.meta.mySubmissionsDescription,
+    robots: { index: false, follow: true },
+  };
+}
 
 export default async function MyContributionsPage() {
   const { t } = await getTranslations();
@@ -26,18 +30,21 @@ export default async function MyContributionsPage() {
   return (
     <section className="flex max-w-3xl flex-col gap-6">
       <header>
-        <h1 className="metal-title text-3xl">Mes dossiers</h1>
+        <h1 className="metal-title text-3xl">
+          {t.contributions.mySubmissions}
+        </h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm">
-          Suivez l&apos;avancement de vos contributions et répondez aux demandes
-          de preuves.{" "}
-          <Link
-            href="/contributions"
-            className="hover:text-foreground underline"
-          >
-            {t.contributions.proposeBand}
-          </Link>
-          .
+          {rich(t.contributions.mySubmissionsLead, {
+            link: (
+              <Link
+                href="/contributions"
+                className="hover:text-foreground underline"
+              >
+                {t.contributions.proposeBand}
+              </Link>
+            ),
+          })}
         </p>
       </header>
 

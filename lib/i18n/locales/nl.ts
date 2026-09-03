@@ -8,6 +8,21 @@
 import type { Dictionary } from "./fr";
 
 export const nl: Dictionary = {
+  count: {
+    bands: { one: "{n} band", other: "{n} bands" },
+    subgenres: { one: "{n} subgenre", other: "{n} subgenres" },
+    votes: { one: "{n} stem", other: "{n} stemmen" },
+    pressReviews: { one: "{n} recensie", other: "{n} recensies" },
+    accounts: { one: "{n} account", other: "{n} accounts" },
+    evidence: { one: "{n} bron", other: "{n} bronnen" },
+    formerMembers: { one: "{n} oud-lid", other: "{n} oud-leden" },
+    venues: { one: "{n} locatie", other: "{n} locaties" },
+    countries: { one: "{n} land", other: "{n} landen" },
+    people: { one: "~{n} persoon", other: "~{n} personen" },
+    releases: { one: "{n} uitgave", other: "{n} uitgaven" },
+    tracks: { one: "{n} nummer", other: "{n} nummers" },
+    members: { one: "{n} lid", other: "{n} leden" },
+  },
   nav: {
     home: "Start",
     bands: "Bands",
@@ -38,6 +53,12 @@ export const nl: Dictionary = {
     recentBands: "Onlangs toegevoegde bands",
     recentAlbums: "Laatst opgenomen uitgaven",
     topRated: "Best beoordeeld",
+    sections: "Onderdelen",
+    bandsSection:
+      "De bandencatalogus: landen, actieve jaren, bezettingen en discografieën.",
+    albumsSection:
+      "Albums, ep's, singles, livealbums en demo's, op jaar gesorteerd.",
+    genresSection: "De volledige indeling, van black metal tot doom.",
   },
   band: {
     country: "Land",
@@ -56,16 +77,18 @@ export const nl: Dictionary = {
     logoCredit: "Logo van {band}",
     by: "door",
     viewSource: "Bron bekijken",
-    close: "Sluiten",
     enlarge: "Vergroten",
     galleryNotice:
       "Deze foto's illustreren een encyclopedisch artikel. Ze blijven van hun makers, en hier wordt niets verkocht of te gelde gemaakt.",
+    period: "{from} – {to}",
+    unknownYear: "?",
+    ongoing: "…",
+    discographyOf: "Discografie van {band}",
+    noDiscographyYet: "De discografie van {band} is nog niet vastgelegd.",
   },
   album: {
     tracklist: "Nummers",
     totalDuration: "Totale speelduur",
-    tracks: "nummers",
-    track: "nummer",
     noTracks: "Geen nummers opgenomen voor deze uitgave.",
     reviews: "Recensies",
     press: "Pers",
@@ -74,6 +97,16 @@ export const nl: Dictionary = {
     noRating: "Nog geen beoordelingen",
     listenAt: "Luisteren bij de bron",
     linksFor: "Links voor {track}",
+    pressNotice:
+      "Persrecensies worden vastgelegd door wie bijdraagt, met een link naar het oorspronkelijke artikel. Hier wordt geen tekst overgenomen.",
+    listenersAndCollection: "Recensies en verzameling",
+    yourRatingValue: "jouw cijfer: {score}/5",
+    sourceNotice:
+      "Hoes en gegevens komen van de bronnen die bij deze band staan vermeld. {link}.",
+    seeBandPage: "Bekijk de pagina van {band}",
+    ambiguousTitle: "Meerdere albums met de titel “{slug}”",
+    ambiguousLead:
+      "Deze titel wordt gebruikt door {bands}. Kies degene die je zoekt.",
   },
   releaseType: {
     album: "Album",
@@ -93,6 +126,45 @@ export const nl: Dictionary = {
     demo: "Demo's",
     split: "Splits",
   },
+  genre: {
+    subgenres: "Subgenres",
+    emptyDescription:
+      "Dit genre staat in de indeling, maar er is nog geen band aan gekoppeld.",
+    browseCatalogue: "Door de catalogus bladeren",
+  },
+  member: {
+    title: "Leden van {band}",
+    documentedLead:
+      "Bezetting vastgelegd in de encyclopedie. Elk lid heeft een eigen pagina.",
+    externalLead:
+      "Hier is nog geen bezetting vastgelegd: de namen hieronder worden zo nodig bij MusicBrainz opgehaald en niet bewaard.",
+    partialSources:
+      "Sommige externe bronnen gaven geen antwoord: de lijst kan onvolledig zijn.",
+    currentLineup: "Huidige bezetting",
+    noneDescription:
+      "De bezetting van {band} is nog niet vastgelegd, en MusicBrainz heeft er ook geen.",
+    backToBand: "Terug naar de bandpagina",
+    unknownPeriod: "periode onbekend",
+    musicbrainzEntry: "MusicBrainz-pagina",
+    noBandDocumented: "Voor deze persoon is nog geen lidmaatschap vastgelegd.",
+  },
+  festival: {
+    title: "Festivals en zalen",
+    lead: "Waar de scene samenkomt: {venues} in {countries}. Data en kaartverkoop liggen bij de organisatie — deze pagina brengt ze alleen in kaart.",
+    since: "sinds {year}",
+    until: "tot {year}",
+    festival: "Festival",
+    venue: "Zaal",
+    officialSite: "Officiële site",
+  },
+  collection: {
+    myList: "Mijn lijst:",
+    owned: "Heb ik",
+    wanted: "Wil ik",
+    remove: "Verwijderen",
+    signInToRate:
+      "{link} om dit album te beoordelen en aan je lijst toe te voegen.",
+  },
   catalogue: {
     allGenres: "Alle genres",
     filterByGenre: "Filteren op genre",
@@ -107,8 +179,7 @@ export const nl: Dictionary = {
     descending: "Aflopend",
     loading: "Laden…",
     noResult: "Geen resultaten.",
-    releases: "uitgaven",
-    release: "uitgave",
+    bandsLoadFailed: "De bands konden niet worden geladen: {reason}",
   },
   search: {
     title: "Zoeken",
@@ -124,6 +195,13 @@ export const nl: Dictionary = {
     noVisual: "Geen afbeelding beschikbaar van {name}",
     noCoverFor: "Geen hoes van {title} — afbeelding van {band}",
     coverOf: "Hoes van {title}",
+    close: "Sluiten",
+    loadingInProgress: "Bezig met laden",
+    errorTitle: "Er is iets misgegaan",
+    errorBody:
+      "De inhoud kon niet worden geladen. Probeer het opnieuw; blijft het misgaan, dan ligt het aan onze servers en niet aan je browser.",
+    errorReference: "Referentie: {digest}",
+    cannotDisplay: "{scope} kan niet worden getoond",
   },
   contributions: {
     howItWorks: "Zo werken bijdragen",
@@ -151,6 +229,58 @@ export const nl: Dictionary = {
     contributorRequired: "Rol bijdrager vereist",
     moderatorRequired: "Rol beoordelaar vereist",
     whyRequired: "Waarom wij dit vragen",
+    submitLead:
+      "Elk item moet controleerbaar zijn: minstens twee bronnen, waarvan één officiële. {link}.",
+    contributorRequiredNotice:
+      "Je account heeft nog niet de rol van bijdrager, die nodig is om een item in te dienen. Een beheerder kent die toe; ondertussen kun je de encyclopedie doorbladeren en je bestaande inzendingen volgen.",
+    mySubmissions: "Mijn inzendingen",
+    mySubmissionsLead:
+      "Volg je bijdragen en beantwoord verzoeken om bronnen. {link}.",
+    reviewTitle: "Beoordeling van bijdragen",
+    reviewLead:
+      "Controleer de bronnen voordat je goedkeurt: goedkeuring maakt de bandpagina echt aan. Vraag bij twijfel om bronnen in plaats van af te wijzen — {link}.",
+    reviewLeadLink: "het proces kiest voor overleg",
+    moderatorRequiredNotice:
+      "De beoordelingslijst is voorbehouden aan moderatie en beheer. Heb je zelf iets ingediend, dan volg je dat bij je eigen inzendingen.",
+    submitted: "Inzending verstuurd",
+    submittedNotice:
+      "Je bijdrage gaat naar de beoordeling. Een moderator publiceert die of vraagt om aanvullende bronnen — de voortgang zie je bij je inzendingen.",
+    name: "Naam",
+    urlIdentifier: "URL-aanduiding",
+    countryIso: "Land (ISO)",
+    biography: "Biografie",
+    submit: "Inzending versturen",
+    evidence: "Bronnen",
+    evidenceRule:
+      "Minstens twee bronnen, waarvan ten minste één officiële. Dat waarborgt dat een item naar een echte, controleerbare band verwijst.",
+    sourceKind: "Soort bron",
+    optionalNote: "Notitie (optioneel)",
+    evidenceProgress: "{provided} van de {min} vereiste",
+    officialSourceProvided: "officiële bron aanwezig",
+    officialSourceMissing:
+      "officiële bron ontbreekt (MusicBrainz, Discogs, label of officiële site)",
+    noSubmission: "Geen inzending",
+    noSubmissionDescription: "Je hebt nog geen band voorgesteld.",
+    untitledSubmission: "Inzending zonder naam",
+    typeBandCreate: "nieuwe band",
+    typeBandEnrich: "aanvulling",
+    submittedOn: "Ingediend op {date}",
+    deadlineNotice: "Aan te vullen vóór {date} — herinnering {reminder} van 2.",
+    expiredNotice:
+      "Deze inzending is verlopen bij gebrek aan aanvullende bronnen. Je kunt een nieuwe versturen.",
+    sendEvidence: "Deze bronnen versturen",
+    filterOpen: "Open inzendingen",
+    filterPending: "In afwachting",
+    filterApproved: "Goedgekeurd",
+    filterExpired: "Verlopen",
+    noMatchingSubmission: "Geen inzending komt overeen met dit filter.",
+    evidenceProvided: "Aangeleverde bronnen",
+    approvedNotice: "Inzending goedgekeurd — {link}",
+    sendRequest: "Verzoek versturen",
+    requestMinLength:
+      "Minstens tien tekens: een vaag verzoek kost een hele extra ronde.",
+    processing: "Bezig met verwerken…",
+    approve: "Goedkeuren",
   },
   app: {
     community: "Gemeenschap",
@@ -166,7 +296,6 @@ export const nl: Dictionary = {
     displayName: "Weergavenaam",
     displayNameHint: "Deze naam staat als auteur bij je bijdragen.",
     profileSaved: "Profiel opgeslagen.",
-    mutedByDefault: "Standaard gedempt",
     yourRating: "Jouw beoordeling",
     appearsOn: "Werkte mee aan",
     noBandInGenre: "Geen band in dit genre",
@@ -181,6 +310,123 @@ export const nl: Dictionary = {
     searchEverything: "Zoek een band, album of nummer…",
     escape: "Esc",
     goToSignIn: "Naar inloggen",
+    notFoundTitle: "404 — Pagina niet gevonden",
+    breadcrumb: "Kruimelpad",
+    pagination: "Paginering",
+    actions: "Acties",
+    filter: "Filteren",
+    quickSearch: "Snelzoeken",
+    pageOf: "Pagina {page} van {total}",
+    cancel: "Annuleren",
+    delete: "Verwijderen",
+    save: "Opslaan",
+    saving: "Opslaan…",
+    sending: "Versturen…",
+    tracks: "Nummers",
+    ctrlKey: "Ctrl",
+    searchKey: "K",
+    paletteHint: "{open} om te openen · {close} om te sluiten",
+  },
+  password: {
+    label: "Wachtwoord",
+    show: "Tonen",
+    hide: "Verbergen",
+    generate: "Genereren",
+    copy: "Kopiëren",
+    requirementLength:
+      "Minstens {min} tekens — lengte telt zwaarder dan complexiteit",
+    requirementGuess:
+      "Moeilijk te raden: geen woordenboekwoord, geen toetsenreeks, geen datum",
+    requirementPersonal: "Zonder verband met je naam of je e-mailadres",
+    met: "(voldaan)",
+    notMet: "(niet voldaan)",
+    generatedLength: "Gegenereerde lengte: {length}",
+    strength: "Sterkte: {label} ({score}/4)",
+    strength0: "Zeer zwak",
+    strength1: "Zwak",
+    strength2: "Redelijk",
+    strength3: "Sterk",
+    strength4: "Zeer sterk",
+    minLengthNotice: "Minstens {min} tekens vereist.",
+  },
+  profile: {
+    title: "Mijn profiel",
+    publicProfile: "Openbaar profiel",
+    currentRole: "Huidige rol: {role}.",
+    contributorHint:
+      "De rol van bijdrager, nodig om een band voor te stellen, wordt door een beheerder toegekend.",
+  },
+  role: {
+    user: "Gebruiker",
+    contributor: "Bijdrager",
+    moderator: "Moderator",
+    admin: "Beheerder",
+  },
+  admin: {
+    title: "Beheer",
+    accessNotice:
+      "Dit gedeelte is voorbehouden aan beheerders. Moderatoren beschikken over de beoordelingslijst van bijdragen.",
+    catalogue: "Catalogus",
+    accounts: "Accounts",
+    administrators: "Beheerders",
+    pendingSubmissions: "Te beoordelen inzendingen",
+    reviewQueue: "Beoordelingslijst",
+    apiDocs: "API-documentatie",
+    accountsAccessNotice: "Accountbeheer is voorbehouden aan beheerders.",
+    accountsLead:
+      "De rol van bijdrager wordt hier toegekend: dat is de enige weg, registreren geeft die niet. Het laatste beheerdersaccount kan niet worden verlaagd of verwijderd.",
+    searchAccount: "Zoeken (naam of e-mail)",
+    role: "Rol",
+    noAccount: "Geen account",
+    noAccountDescription: "Geen account voldoet aan deze criteria.",
+    you: "(jij)",
+    emailUnverified: "e-mail niet geverifieerd",
+    registeredOn: "aangemeld op {date}",
+    banned: "Geblokkeerd",
+    banReason: "Reden: {reason}",
+    ban: "Blokkeren",
+    unban: "Deblokkeren",
+    banDefaultReason: "Beslissing van het beheer",
+    typeNameToConfirm: "Typ “{name}”",
+    deletionWarning:
+      "Verwijderen wist de identiteit en het openbare profiel. Al ingediende bijdragen blijven bestaan maar worden anoniem. Onomkeerbaar.",
+  },
+  contributionStatus: {
+    pending: "Wacht op beoordeling",
+    evidence_requested: "Bronnen gevraagd",
+    approved: "Goedgekeurd",
+    expired: "Verlopen",
+    rejected: "Afgewezen",
+  },
+  evidenceKind: {
+    label: "Label / platenmaatschappij",
+    officialSite: "Officiële site van de band",
+    press: "Persartikel",
+    other: "Andere bron",
+  },
+  theme: {
+    alienation: "Vervreemding",
+    art: "Kunst",
+    chaos: "Chaos",
+    counterculture: "Tegencultuur",
+    death: "Dood",
+    decadence: "Decadentie",
+    despair: "Wanhoop",
+    existentialism: "Existentialisme",
+    introspection: "Introspectie",
+    loss: "Verlies",
+    lostLove: "Verloren liefde",
+    melancholy: "Melancholie",
+    misanthropy: "Misantropie",
+    mourning: "Rouw",
+    mythology: "Mythologie",
+    norseMythology: "Noordse mythologie",
+    nature: "Natuur",
+    occultism: "Occultisme",
+    philosophy: "Filosofie",
+    religion: "Religie",
+    satanism: "Satanisme",
+    winter: "Winter",
   },
   account: {
     signInSubtitle:
@@ -199,6 +445,15 @@ export const nl: Dictionary = {
       "Kies een lang wachtwoord: de generator maakt een geldig exemplaar.",
     noAccount: "Nog geen account?",
     alreadyRegistered: "Al geregistreerd?",
+    emailLabel: "E-mailadres",
+    accountEmailLabel: "E-mailadres van het account",
+    newPassword: "Nieuw wachtwoord",
+    signingIn: "Bezig met aanmelden…",
+    creating: "Bezig met aanmaken…",
+    updating: "Bezig met bijwerken…",
+    setPassword: "Wachtwoord instellen",
+    receiveLink: "Stuur mij de link",
+    incompleteLink: "Onvolledige link. {link} om een nieuwe te ontvangen.",
   },
   pages: {
     aboutTitle: "Over Helleilla Exploratium",
@@ -237,6 +492,74 @@ export const nl: Dictionary = {
     takedownNote:
       "Elke lezer kan bovendien een artikel melden dat onjuist of oncontroleerbaar lijkt: het gaat dan terug in beoordeling.",
     furtherTitle: "Verder lezen",
+  },
+  meta: {
+    siteDescription:
+      "De gezamenlijke metalencyclopedie: bands, discografieën en genres.",
+    homeDescription:
+      "De gezamenlijke metalencyclopedie: bands, discografieën en genres, met bronnen erbij.",
+    bandsDescription:
+      "Catalogus van metalbands: zoeken, sorteren op naam of jaar, actieve periode en land.",
+    albumsDescription:
+      "Catalogus van albums, ep's, singles en demo's uit de metalwereld.",
+    genresDescription: "Indeling van metalgenres en -subgenres.",
+    searchDescription:
+      "Doorzoek de bands, albums en nummers van de metalcatalogus.",
+    festivalsDescription:
+      "De festivals en zalen van de metalscene, land per land, met een link naar elke organisator.",
+    contributeDescription:
+      "Een band bij de encyclopedie indienen, met officiële bronnen.",
+    mySubmissionsDescription: "Overzicht van je bijdragen aan de encyclopedie.",
+    reviewDescription: "Moderatielijst van de ingediende items.",
+    bandNotFound: "Band niet gevonden",
+    bandFallbackDescription:
+      "{band}: actief {from} – {to}, genres en officiële media.",
+    albumNotFound: "Album niet gevonden",
+    albumDescription: "{type} van {band}, tracklijst en officiële bronnen.",
+    albumDescriptionDated:
+      "{type} van {band} uit {year}, tracklijst en officiële bronnen.",
+    discographyDescription:
+      "Alle vastgelegde uitgaven van {band}: albums, ep's, singles, livealbums en demo's.",
+    genreNotFound: "Genre niet gevonden",
+    genreDescription: "{bands} onder {genre}{parent}.",
+    genreSubgenreOf: ", subgenre van {parent}",
+    genreEmptyDescription: "Het genre {genre} in de encyclopedie {site}.",
+    memberNotFound: "Lid niet gevonden",
+    memberDescription: "{member} in de encyclopedie {site}.",
+    membersDescription: "Bezetting van {band}: {count} vastgelegd.",
+    membersFromMusicbrainz: "Bezetting van {band} volgens MusicBrainz.",
+  },
+  console: {
+    title: "Even wachten.",
+    body: "Als iemand je heeft gevraagd hier code te plakken, probeert die persoon je account over te nemen.\nPlak in deze console nooit code die je niet begrijpt.\n\nDe console blijft voor iedereen open: het project is vrije software en de code is in te zien.",
+  },
+  errors: {
+    unauthenticated: "Niet aangemeld.",
+    forbidden: "Geen toestemming.",
+    unexpected: "Onverwachte serverfout.",
+    bandNotFound: "Band niet gevonden.",
+    albumNotFound: "Album niet gevonden.",
+    trackNotFound: "Nummer niet gevonden.",
+    genreNotFound: "Genre niet gevonden.",
+    formInvalid:
+      "Ongeldig formulier (minstens {min} tekens voor het wachtwoord)",
+    captchaFailed: "Botcontrole mislukt, probeer het opnieuw",
+    passwordLeaked:
+      "Dit wachtwoord staat in bekende datalekken, kies een ander",
+    signUpRefused: "Aanmelden met deze gegevens lukt niet",
+    badCredentials: "E-mail of wachtwoord onjuist",
+    resetRequested: "Als er een account bestaat, is er een e-mail verstuurd.",
+    resetLinkInvalid: "Ongeldige of verlopen link — vraag een nieuwe aan",
+    passwordUpdated: "Wachtwoord bijgewerkt. Je kunt inloggen.",
+    passwordTooShort: "Ongeldig wachtwoord (minstens {min} tekens)",
+  },
+  mail: {
+    resetSubject: "Je wachtwoord opnieuw instellen — {site}",
+    greeting: "Hallo,",
+    resetIntro: "Je hebt gevraagd je wachtwoord opnieuw in te stellen.",
+    resetAction: "Volg de link hieronder (een uur geldig):",
+    resetIgnore: "Heb je dit niet aangevraagd, negeer dan deze e-mail.",
+    signature: "— {site}",
   },
   footer: {
     about: "Over het project",

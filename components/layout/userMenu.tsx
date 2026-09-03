@@ -47,7 +47,7 @@ export function UserMenu({ stacked = false }: UserMenuProps) {
 
   // État pendant le chargement de session : placeholder stable
   if (isPending) {
-    return <span className="text-muted-foreground text-sm">…</span>;
+    return <span className="text-muted-foreground text-sm">{"…"}</span>;
   }
 
   if (!session) {

@@ -6,20 +6,24 @@
 
 import type { Metadata } from "next";
 import { SearchView } from "@/components/search/searchView";
+import { getTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  // La recherche est une interface, pas du contenu indexable
-  robots: { index: false },
-  title: "Recherche",
-  description:
-    "Recherchez parmi les groupes, albums et pistes du catalogue metal.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    // La recherche est une interface, pas du contenu indexable
+    robots: { index: false },
+    title: t.nav.search,
+    description: t.meta.searchDescription,
+  };
+}
 
-export default function SearchPage() {
+export default async function SearchPage() {
+  const { t } = await getTranslations();
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="metal-title text-2xl">Recherche</h1>
+        <h1 className="metal-title text-2xl">{t.nav.search}</h1>
         <div className="metal-rule mt-2 w-40" />
       </header>
       <SearchView />

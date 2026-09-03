@@ -10,6 +10,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "@/lib/i18n/server";
+import { externalLabel } from "@/lib/media/externalLabel";
 
 /** URL de base absolue (cohérente avec le layout racine). */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -76,6 +77,14 @@ const DATA_SOURCES = [
 
 export default async function CreditsPage() {
   const { t } = await getTranslations();
+  /* Raccourcis de fin de page, construits hors du rendu : ce sont des
+     adresses, pas du texte. */
+  const shortcuts = [
+    { href: "/about", label: t.footer.about },
+    { href: "/contributions", label: t.auth.contribute },
+    { href: "/bands", label: t.nav.bands },
+  ];
+
   return (
     <article className="flex max-w-3xl flex-col gap-8">
       <header>
@@ -121,7 +130,7 @@ export default async function CreditsPage() {
                 rel="noopener noreferrer"
                 className="text-sm font-semibold hover:underline"
               >
-                {source.name} ↗
+                {externalLabel(source.name)}
               </a>
               <span className="text-muted-foreground mt-1 block text-xs">
                 {source.licence}
@@ -147,11 +156,7 @@ export default async function CreditsPage() {
           {t.pages.furtherTitle}
         </h2>
         <ul className="flex flex-wrap gap-2">
-          {[
-            { href: "/about", label: "À propos" },
-            { href: "/contributions", label: "Contribuer" },
-            { href: "/bands", label: "Groupes" },
-          ].map((link) => (
+          {shortcuts.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}

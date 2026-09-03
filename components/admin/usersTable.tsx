@@ -23,7 +23,8 @@ import type { AdminUserRow, UserRole } from "@/hooks/api/schemas";
 import { RoleBadge, ROLE_ORDER, roleLabel } from "./roleBadge";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type UsersTableProps = {
   /** Identifiant de l'administrateur connecté, pour l'auto-protection. */
@@ -41,6 +42,7 @@ function formatDate(iso: string): string {
 
 export function UsersTable({ currentUserId }: UsersTableProps) {
   const t = useT();
+  const n = usePlural();
   const [q, setQ] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
   const [page, setPage] = useState(1);
@@ -57,7 +59,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
       <div className="flex flex-wrap items-end gap-3">
         <label className="min-w-0 flex-1 sm:max-w-xs">
           <span className="text-muted-foreground mb-1 block text-xs">
-            Rechercher (nom ou email)
+            {t.admin.searchAccount}
           </span>
           <input
             type="search"
@@ -71,7 +73,9 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
         </label>
 
         <label className="sm:w-52">
-          <span className="text-muted-foreground mb-1 block text-xs">Rôle</span>
+          <span className="text-muted-foreground mb-1 block text-xs">
+            {t.admin.role}
+          </span>
           <select
             value={role}
             onChange={(e) => {
@@ -83,7 +87,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             <option value="">{t.app.allRoles}</option>
             {ROLE_ORDER.map((r) => (
               <option key={r} value={r}>
-                {roleLabel(r)}
+                {roleLabel(t, r)}
               </option>
             ))}
           </select>
@@ -106,8 +110,8 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
 
       {users.isSuccess && users.data.data.length === 0 && (
         <EmptyState
-          title="Aucun compte"
-          description="Aucun compte ne correspond à ces critères."
+          title={t.admin.noAccount}
+          description={t.admin.noAccountDescription}
         />
       )}
 
@@ -121,7 +125,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
 
       {users.isSuccess && users.data.meta.totalPages > 1 && (
         <nav
-          aria-label="Pagination"
+          aria-label={t.app.pagination}
           className="flex items-center justify-between gap-3 text-sm"
         >
           <button
@@ -133,8 +137,10 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             {t.app.previous}
           </button>
           <span className="text-muted-foreground text-xs">
-            Page {users.data.meta.page} sur {users.data.meta.totalPages} ·{" "}
-            {users.data.meta.total} comptes
+            {`${interpolate(t.app.pageOf, {
+              page: users.data.meta.page,
+              total: users.data.meta.totalPages,
+            })} · ${n(t.count.accounts, users.data.meta.total)}`}
           </span>
           <button
             type="button"
@@ -142,7 +148,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             onClick={() => setPage((p) => p + 1)}
             className="border-border hover:bg-accent/30 rounded-md border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase disabled:opacity-40"
           >
-            Suivant
+            {t.app.next}
           </button>
         </nav>
       )}
@@ -178,30 +184,31 @@ function UserRow({
             {account.name}
             {isSelf && (
               <span className="text-muted-foreground ml-2 text-xs font-normal">
-                (vous)
+                {t.admin.you}
               </span>
             )}
           </h3>
           <p className="text-muted-foreground truncate text-xs">
             {account.email}
-            {!account.emailVerified && " · email non vérifié"}
-            {" · inscrit le "}
-            {formatDate(account.createdAt)}
+            {!account.emailVerified && ` · ${t.admin.emailUnverified}`}
+            {` · ${interpolate(t.admin.registeredOn, {
+              date: formatDate(account.createdAt),
+            })}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {account.banned && (
             <span className="border-destructive/40 text-destructive rounded-full border px-2 py-0.5 text-xs uppercase">
-              Banni
+              {t.admin.banned}
             </span>
           )}
-          <RoleBadge role={account.role} />
+          <RoleBadge t={t} role={account.role} />
         </div>
       </header>
 
       {account.banned && account.banReason && (
         <p className="text-muted-foreground text-xs">
-          Motif : {account.banReason}
+          {interpolate(t.admin.banReason, { reason: account.banReason })}
         </p>
       )}
 
@@ -213,7 +220,7 @@ function UserRow({
 
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Rôle</span>
+          <span className="text-muted-foreground">{t.admin.role}</span>
           <select
             value={account.role}
             disabled={busy || isSelf}
@@ -227,7 +234,7 @@ function UserRow({
           >
             {ROLE_ORDER.map((r) => (
               <option key={r} value={r}>
-                {roleLabel(r)}
+                {roleLabel(t, r)}
               </option>
             ))}
           </select>
@@ -245,19 +252,21 @@ function UserRow({
                   banned: !account.banned,
                   ...(account.banned
                     ? {}
-                    : { banReason: "Décision d'administration" }),
+                    : { banReason: t.admin.banDefaultReason }),
                 })
               }
               className="border-border hover:bg-accent/30 rounded-md border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase disabled:opacity-50"
             >
-              {account.banned ? "Réhabiliter" : "Bannir"}
+              {account.banned ? t.admin.unban : t.admin.ban}
             </button>
 
             {confirming ? (
               <span className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  placeholder={`Saisir « ${account.name} »`}
+                  placeholder={interpolate(t.admin.typeNameToConfirm, {
+                    name: account.name,
+                  })}
                   value={confirmName}
                   onChange={(e) => setConfirmName(e.target.value)}
                   className="border-destructive/40 bg-card rounded-md border px-2 py-1 text-xs outline-none"
@@ -278,7 +287,7 @@ function UserRow({
                   }}
                   className="text-muted-foreground text-xs underline"
                 >
-                  Annuler
+                  {t.app.cancel}
                 </button>
               </span>
             ) : (
@@ -288,7 +297,7 @@ function UserRow({
                 onClick={() => setConfirming(true)}
                 className="text-muted-foreground hover:text-destructive text-xs underline disabled:opacity-50"
               >
-                Supprimer
+                {t.app.delete}
               </button>
             )}
           </>
@@ -297,9 +306,7 @@ function UserRow({
 
       {confirming && (
         <p className="text-muted-foreground text-xs">
-          La suppression efface l&apos;identité et son profil public. Les
-          contributions déjà soumises sont conservées mais deviennent anonymes.
-          Action irréversible.
+          {t.admin.deletionWarning}
         </p>
       )}
     </article>

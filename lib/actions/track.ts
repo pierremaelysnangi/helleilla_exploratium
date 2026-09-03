@@ -22,6 +22,7 @@ import { getAlbumById } from "@/db/queries/albums";
 import { handleActionError, type ActionResult } from "./utils";
 // File BullMQ : indexation / suppression dans Meilisearch
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Crée une piste à partir d'un FormData.
@@ -48,7 +49,8 @@ export async function createTrackAction(
     // Vérifier que l'album existe
     const album = await getAlbumById(parsed.data.albumId);
     if (!album) {
-      return { success: false, error: "Album introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.albumNotFound };
     }
 
     const track = await createTrack(parsed.data);
@@ -60,7 +62,7 @@ export async function createTrackAction(
     revalidatePath("/albums");
     return { success: true, data: track };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -88,7 +90,8 @@ export async function updateTrackAction(
 
     const existing = await getTrackWithAlbum(parsed.data.id);
     if (!existing) {
-      return { success: false, error: "Piste introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.trackNotFound };
     }
 
     const { id, ...data } = parsed.data;
@@ -101,7 +104,7 @@ export async function updateTrackAction(
     revalidatePath("/albums");
     return { success: true, data: track };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -123,7 +126,8 @@ export async function deleteTrackAction(
 
     const existing = await getTrackWithAlbum(id);
     if (!existing) {
-      return { success: false, error: "Piste introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.trackNotFound };
     }
 
     await deleteTrack(id);
@@ -135,6 +139,6 @@ export async function deleteTrackAction(
     revalidatePath("/albums");
     return { success: true, data: { id } };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }

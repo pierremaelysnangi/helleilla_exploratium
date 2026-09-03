@@ -16,7 +16,12 @@ import {
 
 // En-têtes pilotables (extraction d'IP transmise au CAPTCHA)
 const req = vi.hoisted(() => ({ headers: new Headers() }));
-vi.mock("next/headers", () => ({ headers: vi.fn(async () => req.headers) }));
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => req.headers),
+  // La résolution de langue lit le cookie avant l'en-tête : sans ce
+  // substitut, toute action qui traduit un message échouerait ici.
+  cookies: vi.fn(async () => ({ get: () => undefined })),
+}));
 
 // API Better Auth
 const api = vi.hoisted(() => ({

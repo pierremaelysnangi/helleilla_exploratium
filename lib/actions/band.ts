@@ -29,6 +29,7 @@ import { listTrackIdsByAlbumIds } from "@/db/queries/tracks";
 // Files BullMQ des entités enfants (désindexation en cascade)
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Crée un groupe à partir d'un FormData.
@@ -66,7 +67,7 @@ export async function createBandAction(
     revalidatePath("/bands");
     return { success: true, data: band };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -94,7 +95,8 @@ export async function updateBandAction(
 
     const existing = await getBandById(parsed.data.id);
     if (!existing) {
-      return { success: false, error: "Groupe introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.bandNotFound };
     }
 
     let imageUrl = existing.imageUrl;
@@ -114,7 +116,7 @@ export async function updateBandAction(
     revalidatePath(`/bands/${band.slug}`);
     return { success: true, data: band };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -140,7 +142,8 @@ export async function deleteBandAction(
 
     const existing = await getBandById(id);
     if (!existing) {
-      return { success: false, error: "Groupe introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.bandNotFound };
     }
 
     if (existing.imageUrl) await deleteImage(existing.imageUrl);
@@ -157,6 +160,6 @@ export async function deleteBandAction(
     revalidatePath(`/bands/${existing.slug}`);
     return { success: true, data: { id } };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }

@@ -17,6 +17,7 @@ import { trackSearchLinks } from "@/lib/media/platformLinks";
 import { formatTrackDuration } from "@/lib/media/duration";
 import { useT } from "@/lib/i18n/client";
 import { interpolate } from "@/lib/i18n/format";
+import { externalLabel } from "@/lib/media/externalLabel";
 
 type AlbumTracklistProps = {
   tracks: TrackRow[];
@@ -77,7 +78,7 @@ export function AlbumTracklist({ tracks, artistName }: AlbumTracklistProps) {
                         rel="noopener noreferrer"
                         className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase transition-colors"
                       >
-                        {link.label} ↗
+                        {externalLabel(link.label)}
                       </a>
                     </li>
                   ))}

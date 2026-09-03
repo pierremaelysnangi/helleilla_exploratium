@@ -12,6 +12,7 @@
  */
 
 import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 type ErrorFallbackProps = {
   error: Error & { digest?: string };
@@ -28,17 +29,18 @@ export function ErrorFallback({ error, reset, scope }: ErrorFallbackProps) {
       className="metal-card flex flex-col items-start gap-3 p-6"
     >
       <h2 className="metal-title text-lg">
-        {scope ? `Impossible d'afficher ${scope}` : "Une erreur est survenue"}
+        {scope
+          ? interpolate(t.common.cannotDisplay, { scope })
+          : t.common.errorTitle}
       </h2>
       <p className="text-muted-foreground max-w-prose text-sm">
-        Le contenu n&apos;a pas pu être chargé. Réessayez ; si le problème
-        persiste, il vient de nos serveurs et non de votre navigateur.
+        {t.common.errorBody}
       </p>
 
       {/* Identifiant corrélable aux journaux, sans détail technique */}
       {error.digest && (
         <p className="text-muted-foreground font-mono text-xs">
-          Référence : {error.digest}
+          {interpolate(t.common.errorReference, { digest: error.digest })}
         </p>
       )}
 

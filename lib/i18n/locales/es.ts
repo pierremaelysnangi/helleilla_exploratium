@@ -10,6 +10,24 @@
 import type { Dictionary } from "./fr";
 
 export const es: Dictionary = {
+  count: {
+    bands: { one: "{n} grupo", other: "{n} grupos" },
+    subgenres: { one: "{n} subgénero", other: "{n} subgéneros" },
+    votes: { one: "{n} voto", other: "{n} votos" },
+    pressReviews: { one: "{n} crítica", other: "{n} críticas" },
+    accounts: { one: "{n} cuenta", other: "{n} cuentas" },
+    evidence: { one: "{n} fuente", other: "{n} fuentes" },
+    formerMembers: {
+      one: "{n} antiguo miembro",
+      other: "{n} antiguos miembros",
+    },
+    venues: { one: "{n} sala", other: "{n} salas" },
+    countries: { one: "{n} país", other: "{n} países" },
+    people: { one: "~{n} persona", other: "~{n} personas" },
+    releases: { one: "{n} lanzamiento", other: "{n} lanzamientos" },
+    tracks: { one: "{n} pista", other: "{n} pistas" },
+    members: { one: "{n} miembro", other: "{n} miembros" },
+  },
   nav: {
     home: "Inicio",
     bands: "Grupos",
@@ -40,6 +58,12 @@ export const es: Dictionary = {
     recentBands: "Últimos grupos añadidos",
     recentAlbums: "Últimas ediciones registradas",
     topRated: "Mejor valorados",
+    sections: "Secciones",
+    bandsSection:
+      "Catálogo de grupos: países, años de actividad, formaciones y discografías.",
+    albumsSection:
+      "Álbumes, EP, sencillos, directos y maquetas ordenados por año.",
+    genresSection: "La taxonomía completa, del black metal al doom.",
   },
   band: {
     country: "País",
@@ -58,16 +82,18 @@ export const es: Dictionary = {
     logoCredit: "Logotipo de {band}",
     by: "por",
     viewSource: "Ver la fuente",
-    close: "Cerrar",
     enlarge: "Ampliar",
     galleryNotice:
       "Estas fotos ilustran una ficha enciclopédica. Siguen perteneciendo a sus autores, y aquí no se vende ni se monetiza nada.",
+    period: "{from} – {to}",
+    unknownYear: "?",
+    ongoing: "…",
+    discographyOf: "Discografía de {band}",
+    noDiscographyYet: "La discografía de {band} aún no está documentada.",
   },
   album: {
     tracklist: "Lista de canciones",
     totalDuration: "Duración total",
-    tracks: "pistas",
-    track: "pista",
     noTracks: "No hay pistas registradas para esta edición.",
     reviews: "Críticas",
     press: "Prensa",
@@ -76,6 +102,16 @@ export const es: Dictionary = {
     noRating: "Aún sin valoraciones",
     listenAt: "Escuchar en la fuente",
     linksFor: "Enlaces de {track}",
+    pressNotice:
+      "Las críticas de prensa las documentan las personas que contribuyen, con enlace al artículo original. Aquí no se reproduce ningún texto.",
+    listenersAndCollection: "Críticas y colección",
+    yourRatingValue: "tu nota: {score}/5",
+    sourceNotice:
+      "La portada y los datos proceden de las fuentes citadas para este grupo. {link}.",
+    seeBandPage: "Ver la ficha de {band}",
+    ambiguousTitle: "Varios álbumes titulados «{slug}»",
+    ambiguousLead:
+      "Este título de lanzamiento lo usan {bands}. Elige el que buscas.",
   },
   releaseType: {
     album: "Álbum",
@@ -95,6 +131,45 @@ export const es: Dictionary = {
     demo: "Maquetas",
     split: "Splits",
   },
+  genre: {
+    subgenres: "Subgéneros",
+    emptyDescription:
+      "Este género existe en la taxonomía pero aún no tiene ningún grupo asociado.",
+    browseCatalogue: "Recorrer el catálogo",
+  },
+  member: {
+    title: "Miembros de {band}",
+    documentedLead:
+      "Formación documentada en la enciclopedia. Cada miembro tiene su propia ficha.",
+    externalLead:
+      "Aquí todavía no hay ninguna formación documentada: los nombres siguientes se leen de MusicBrainz cuando hacen falta y no se conservan.",
+    partialSources:
+      "Algunas fuentes externas no han respondido: la lista puede estar incompleta.",
+    currentLineup: "Formación actual",
+    noneDescription:
+      "La formación de {band} aún no está documentada, y MusicBrainz tampoco aporta ninguna.",
+    backToBand: "Volver a la ficha del grupo",
+    unknownPeriod: "periodo desconocido",
+    musicbrainzEntry: "Ficha de MusicBrainz",
+    noBandDocumented:
+      "Todavía no se ha documentado ninguna pertenencia para esta persona.",
+  },
+  festival: {
+    title: "Festivales y salas",
+    lead: "Donde se reúne la escena: {venues} en {countries}. Fechas y entradas en manos de quien organiza — esta página solo los recoge.",
+    since: "desde {year}",
+    until: "hasta {year}",
+    festival: "Festival",
+    venue: "Sala",
+    officialSite: "Web oficial",
+  },
+  collection: {
+    myList: "Mi lista:",
+    owned: "Lo tengo",
+    wanted: "Lo quiero",
+    remove: "Quitar",
+    signInToRate: "{link} para puntuar este álbum y añadirlo a tu lista.",
+  },
   catalogue: {
     allGenres: "Todos los géneros",
     filterByGenre: "Filtrar por género",
@@ -109,8 +184,7 @@ export const es: Dictionary = {
     descending: "Descendente",
     loading: "Cargando…",
     noResult: "Sin resultados.",
-    releases: "ediciones",
-    release: "edición",
+    bandsLoadFailed: "No se pudieron cargar los grupos: {reason}",
   },
   search: {
     title: "Búsqueda",
@@ -126,6 +200,13 @@ export const es: Dictionary = {
     noVisual: "No hay imagen disponible de {name}",
     noCoverFor: "Sin portada de {title} — imagen de {band}",
     coverOf: "Portada de {title}",
+    close: "Cerrar",
+    loadingInProgress: "Cargando",
+    errorTitle: "Se ha producido un error",
+    errorBody:
+      "No se pudo cargar el contenido. Inténtalo de nuevo; si el problema persiste, viene de nuestros servidores y no de tu navegador.",
+    errorReference: "Referencia: {digest}",
+    cannotDisplay: "No se puede mostrar {scope}",
   },
   contributions: {
     howItWorks: "Cómo funcionan las aportaciones",
@@ -153,6 +234,59 @@ export const es: Dictionary = {
     contributorRequired: "Se requiere el rol de colaborador",
     moderatorRequired: "Se requiere el rol de moderador",
     whyRequired: "Por qué lo exigimos",
+    submitLead:
+      "Cada ficha debe poder verificarse: dos fuentes como mínimo, una de ellas oficial. {link}.",
+    contributorRequiredNotice:
+      "Tu cuenta todavía no tiene el rol de colaborador, necesario para enviar una propuesta. Lo concede un administrador; mientras tanto puedes recorrer la enciclopedia y seguir tus propuestas anteriores.",
+    mySubmissions: "Mis propuestas",
+    mySubmissionsLead:
+      "Sigue el avance de tus aportaciones y responde a las peticiones de fuentes. {link}.",
+    reviewTitle: "Revisión de aportaciones",
+    reviewLead:
+      "Comprueba las fuentes antes de aprobar: la aprobación crea realmente la ficha del grupo. Ante la duda, pide fuentes en lugar de rechazar — {link}.",
+    reviewLeadLink: "el proceso prioriza el diálogo",
+    moderatorRequiredNotice:
+      "La cola de revisión está reservada a la moderación y la administración. Si has enviado una propuesta, puedes seguirla desde tus propuestas.",
+    submitted: "Propuesta enviada",
+    submittedNotice:
+      "Tu aportación pasa a revisión. Alguien de moderación la publicará o te pedirá más fuentes; podrás seguir su avance desde tus propuestas.",
+    name: "Nombre",
+    urlIdentifier: "Identificador de URL",
+    countryIso: "País (ISO)",
+    biography: "Biografía",
+    submit: "Enviar la propuesta",
+    evidence: "Fuentes",
+    evidenceRule:
+      "Dos fuentes como mínimo, al menos una oficial. Es lo que garantiza que una ficha remite a un grupo real y verificable.",
+    sourceKind: "Tipo de fuente",
+    optionalNote: "Nota (opcional)",
+    evidenceProgress: "{provided} de {min} exigidas",
+    officialSourceProvided: "fuente oficial aportada",
+    officialSourceMissing:
+      "falta la fuente oficial (MusicBrainz, Discogs, sello o web oficial)",
+    noSubmission: "Ninguna propuesta",
+    noSubmissionDescription: "Todavía no has propuesto ningún grupo.",
+    untitledSubmission: "Propuesta sin nombre",
+    typeBandCreate: "grupo nuevo",
+    typeBandEnrich: "ampliación",
+    submittedOn: "Enviada el {date}",
+    deadlineNotice:
+      "Debe completarse antes del {date} — aviso {reminder} de 2.",
+    expiredNotice:
+      "Esta propuesta ha caducado por falta de fuentes adicionales. Puedes enviar otra.",
+    sendEvidence: "Enviar estas fuentes",
+    filterOpen: "Propuestas abiertas",
+    filterPending: "Pendientes",
+    filterApproved: "Aprobadas",
+    filterExpired: "Caducadas",
+    noMatchingSubmission: "Ninguna propuesta coincide con este filtro.",
+    evidenceProvided: "Fuentes aportadas",
+    approvedNotice: "Propuesta aprobada — {link}",
+    sendRequest: "Enviar la petición",
+    requestMinLength:
+      "Diez caracteres como mínimo: una petición vaga cuesta una ida y vuelta entera.",
+    processing: "Procesando…",
+    approve: "Aprobar",
   },
   app: {
     community: "Comunidad",
@@ -168,7 +302,6 @@ export const es: Dictionary = {
     displayName: "Nombre visible",
     displayNameHint: "Este nombre figura como autor de tus aportaciones.",
     profileSaved: "Perfil guardado.",
-    mutedByDefault: "Silenciar por defecto",
     yourRating: "Tu valoración",
     appearsOn: "Participa en",
     noBandInGenre: "Ningún grupo en este género",
@@ -183,6 +316,125 @@ export const es: Dictionary = {
     searchEverything: "Buscar un grupo, un álbum, una pista…",
     escape: "Esc",
     goToSignIn: "Ir a iniciar sesión",
+    notFoundTitle: "404 — Página no encontrada",
+    breadcrumb: "Ruta de navegación",
+    pagination: "Paginación",
+    actions: "Acciones",
+    filter: "Filtrar",
+    quickSearch: "Búsqueda rápida",
+    pageOf: "Página {page} de {total}",
+    cancel: "Cancelar",
+    delete: "Eliminar",
+    save: "Guardar",
+    saving: "Guardando…",
+    sending: "Enviando…",
+    tracks: "Pistas",
+    ctrlKey: "Ctrl",
+    searchKey: "K",
+    paletteHint: "{open} para abrir · {close} para cerrar",
+  },
+  password: {
+    label: "Contraseña",
+    show: "Mostrar",
+    hide: "Ocultar",
+    generate: "Generar",
+    copy: "Copiar",
+    requirementLength:
+      "Al menos {min} caracteres — la longitud importa más que la complejidad",
+    requirementGuess:
+      "Difícil de adivinar: ni palabra del diccionario, ni serie de teclas, ni fecha",
+    requirementPersonal:
+      "Sin relación con tu nombre ni con tu correo electrónico",
+    met: "(cumplido)",
+    notMet: "(sin cumplir)",
+    generatedLength: "Longitud generada: {length}",
+    strength: "Fuerza: {label} ({score}/4)",
+    strength0: "Muy débil",
+    strength1: "Débil",
+    strength2: "Media",
+    strength3: "Fuerte",
+    strength4: "Muy fuerte",
+    minLengthNotice: "Se exigen al menos {min} caracteres.",
+  },
+  profile: {
+    title: "Mi perfil",
+    publicProfile: "Perfil público",
+    currentRole: "Rol actual: {role}.",
+    contributorHint:
+      "El rol de colaborador, necesario para proponer un grupo, lo concede un administrador.",
+  },
+  role: {
+    user: "Usuario",
+    contributor: "Colaborador",
+    moderator: "Moderador",
+    admin: "Administrador",
+  },
+  admin: {
+    title: "Administración",
+    accessNotice:
+      "Este espacio está reservado a la administración. La moderación dispone de la cola de revisión de aportaciones.",
+    catalogue: "Catálogo",
+    accounts: "Cuentas",
+    administrators: "Administradores",
+    pendingSubmissions: "Propuestas por revisar",
+    reviewQueue: "Cola de revisión",
+    apiDocs: "Documentación de la API",
+    accountsAccessNotice:
+      "La gestión de cuentas está reservada a la administración.",
+    accountsLead:
+      "El rol de colaborador se concede aquí: es la única vía, el registro no lo otorga. La última cuenta de administración no puede degradarse ni eliminarse.",
+    searchAccount: "Buscar (nombre o correo)",
+    role: "Rol",
+    noAccount: "Ninguna cuenta",
+    noAccountDescription: "Ninguna cuenta coincide con estos criterios.",
+    you: "(tú)",
+    emailUnverified: "correo sin verificar",
+    registeredOn: "registrado el {date}",
+    banned: "Vetado",
+    banReason: "Motivo: {reason}",
+    ban: "Vetar",
+    unban: "Rehabilitar",
+    banDefaultReason: "Decisión de administración",
+    typeNameToConfirm: "Escribe «{name}»",
+    deletionWarning:
+      "La eliminación borra la identidad y su perfil público. Las aportaciones ya enviadas se conservan pero pasan a ser anónimas. Es irreversible.",
+  },
+  contributionStatus: {
+    pending: "Pendiente de revisión",
+    evidence_requested: "Fuentes solicitadas",
+    approved: "Aprobada",
+    expired: "Caducada",
+    rejected: "Rechazada",
+  },
+  evidenceKind: {
+    label: "Sello / discográfica",
+    officialSite: "Web oficial del grupo",
+    press: "Artículo de prensa",
+    other: "Otra fuente",
+  },
+  theme: {
+    alienation: "Alienación",
+    art: "Arte",
+    chaos: "Caos",
+    counterculture: "Contracultura",
+    death: "Muerte",
+    decadence: "Decadencia",
+    despair: "Desesperación",
+    existentialism: "Existencialismo",
+    introspection: "Introspección",
+    loss: "Pérdida",
+    lostLove: "Amor perdido",
+    melancholy: "Melancolía",
+    misanthropy: "Misantropía",
+    mourning: "Duelo",
+    mythology: "Mitología",
+    norseMythology: "Mitología nórdica",
+    nature: "Naturaleza",
+    occultism: "Ocultismo",
+    philosophy: "Filosofía",
+    religion: "Religión",
+    satanism: "Satanismo",
+    winter: "Invierno",
   },
   account: {
     signInSubtitle: "Para aportar, valorar álbumes y llevar tu lista.",
@@ -200,6 +452,15 @@ export const es: Dictionary = {
       "Elige una contraseña larga: el generador produce una válida.",
     noAccount: "¿Aún no tienes cuenta?",
     alreadyRegistered: "¿Ya estás registrado?",
+    emailLabel: "Correo electrónico",
+    accountEmailLabel: "Correo electrónico de la cuenta",
+    newPassword: "Nueva contraseña",
+    signingIn: "Iniciando sesión…",
+    creating: "Creando…",
+    updating: "Actualizando…",
+    setPassword: "Establecer la contraseña",
+    receiveLink: "Enviarme el enlace",
+    incompleteLink: "Enlace incompleto. {link} para recibir uno nuevo.",
   },
   pages: {
     aboutTitle: "Acerca de Helleilla Exploratium",
@@ -238,6 +499,75 @@ export const es: Dictionary = {
     takedownNote:
       "Cualquier lector puede señalar además una ficha que le parezca falsa o no verificable: vuelve entonces a revisión.",
     furtherTitle: "Seguir leyendo",
+  },
+  meta: {
+    siteDescription:
+      "La enciclopedia colaborativa del metal: grupos, discografías y géneros.",
+    homeDescription:
+      "La enciclopedia colaborativa del metal: grupos, discografías y géneros, con las fuentes a la vista.",
+    bandsDescription:
+      "Catálogo de grupos de metal: búsqueda, orden por nombre o año, periodo de actividad y país.",
+    albumsDescription:
+      "Catálogo de álbumes, EP, sencillos y maquetas del mundo del metal.",
+    genresDescription: "Taxonomía de los géneros y subgéneros del metal.",
+    searchDescription:
+      "Busca entre los grupos, álbumes y pistas del catálogo de metal.",
+    festivalsDescription:
+      "Los festivales y las salas de la escena metal, país por país, con enlace a cada organizador.",
+    contributeDescription:
+      "Proponer un grupo a la enciclopedia, con fuentes oficiales.",
+    mySubmissionsDescription:
+      "Seguimiento de tus aportaciones a la enciclopedia.",
+    reviewDescription: "Cola de moderación de las propuestas enviadas.",
+    bandNotFound: "Grupo no encontrado",
+    bandFallbackDescription:
+      "{band}: actividad {from} – {to}, géneros y medios oficiales.",
+    albumNotFound: "Álbum no encontrado",
+    albumDescription: "{type} de {band}, lista de pistas y fuentes oficiales.",
+    albumDescriptionDated:
+      "{type} de {band} publicado en {year}, lista de pistas y fuentes oficiales.",
+    discographyDescription:
+      "Todos los lanzamientos documentados de {band}: álbumes, EP, sencillos, directos y maquetas.",
+    genreNotFound: "Género no encontrado",
+    genreDescription: "{bands} en {genre}{parent}.",
+    genreSubgenreOf: ", subgénero de {parent}",
+    genreEmptyDescription: "El género {genre} en la enciclopedia {site}.",
+    memberNotFound: "Miembro no encontrado",
+    memberDescription: "{member} en la enciclopedia {site}.",
+    membersDescription: "Formación de {band}: {count} documentados.",
+    membersFromMusicbrainz: "Formación de {band} según MusicBrainz.",
+  },
+  console: {
+    title: "Un momento.",
+    body: "Si alguien te ha pedido que pegues código aquí, busca hacerse con tu cuenta.\nNunca pegues en esta consola código que no entiendas.\n\nLa consola sigue abierta para todos: el proyecto es libre y su código se puede consultar.",
+  },
+  errors: {
+    unauthenticated: "Sin sesión iniciada.",
+    forbidden: "Permiso denegado.",
+    unexpected: "Error inesperado del servidor.",
+    bandNotFound: "Grupo no encontrado.",
+    albumNotFound: "Álbum no encontrado.",
+    trackNotFound: "Pista no encontrada.",
+    genreNotFound: "Género no encontrado.",
+    formInvalid:
+      "Formulario no válido ({min} caracteres como mínimo para la contraseña)",
+    captchaFailed: "La verificación antirrobot ha fallado, inténtalo de nuevo",
+    passwordLeaked:
+      "Esta contraseña aparece en filtraciones conocidas, elige otra",
+    signUpRefused: "No se puede registrar con estos datos",
+    badCredentials: "Correo o contraseña incorrectos",
+    resetRequested: "Si existe una cuenta, se ha enviado un correo.",
+    resetLinkInvalid: "Enlace no válido o caducado — solicita otro",
+    passwordUpdated: "Contraseña actualizada. Ya puedes iniciar sesión.",
+    passwordTooShort: "Contraseña no válida ({min} caracteres como mínimo)",
+  },
+  mail: {
+    resetSubject: "Restablecer tu contraseña — {site}",
+    greeting: "Hola:",
+    resetIntro: "Has pedido restablecer tu contraseña.",
+    resetAction: "Sigue el enlace de abajo (válido una hora):",
+    resetIgnore: "Si no has sido tú, ignora este correo.",
+    signature: "— {site}",
   },
   footer: {
     about: "Acerca del proyecto",

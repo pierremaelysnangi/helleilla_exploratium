@@ -22,15 +22,22 @@ import { auth } from "@/lib/auth";
 // Barrières pré-authentification
 import { verifyTurnstileToken } from "@/lib/auth/turnstile";
 import { isPasswordDenylisted } from "@/lib/auth/password-policy";
+import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
 
 /** État retourné aux formulaires client (useActionState). */
 export type AuthFormState = { error?: string };
 
 /** Schéma commun email/mot de passe. */
+/** Longueur minimale du mot de passe, alignée sur `<PasswordField>`. */
+const MIN_PASSWORD_LENGTH = 12;
+
+// Les messages zod ne sont jamais rendus tels quels : l'action renvoie
+// un message unique et traduit, volontairement peu bavard.
 const credentialsSchema = z.object({
-  name: z.string().trim().min(1, "Nom requis").max(100),
-  email: z.string().trim().email("Email invalide").max(200),
-  password: z.string().min(12).max(128),
+  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().email().max(200),
+  password: z.string().min(MIN_PASSWORD_LENGTH).max(128),
 });
 
 /**
@@ -62,9 +69,11 @@ export async function signUpAction(
     email: formData.get("email"),
     password: formData.get("password"),
   });
+  const { t } = await getTranslations();
+
   if (!parsed.success) {
     return {
-      error: "Formulaire invalide (12 caractères minimum pour le mot de passe)",
+      error: interpolate(t.errors.formInvalid, { min: MIN_PASSWORD_LENGTH }),
     };
   }
 
@@ -74,15 +83,12 @@ export async function signUpAction(
     await clientIp(),
   );
   if (!captchaOk) {
-    return { error: "Vérification anti-robot échouée, réessayez" };
+    return { error: t.errors.captchaFailed };
   }
 
   // 3. Liste noire des mots de passe fuités
   if (isPasswordDenylisted(parsed.data.password)) {
-    return {
-      error:
-        "Ce mot de passe figure dans des fuites connues, choisissez-en un autre",
-    };
+    return { error: t.errors.passwordLeaked };
   }
 
   // 4. Délégation à Better Auth (Argon2id + session)
@@ -101,7 +107,7 @@ export async function signUpAction(
       "[sign-up] Refusé :",
       err instanceof Error ? err.message : err,
     );
-    return { error: "Inscription impossible avec ces informations" };
+    return { error: t.errors.signUpRefused };
   }
 
   redirect("/");
@@ -123,8 +129,9 @@ export async function signInAction(
     email: formData.get("email"),
     password: formData.get("password"),
   });
+  const { t } = await getTranslations();
   if (!parsed.success) {
-    return { error: "Email ou mot de passe incorrect" };
+    return { error: t.errors.badCredentials };
   }
 
   try {
@@ -135,7 +142,7 @@ export async function signInAction(
   } catch {
     // Générique volontairement : pas de distinction compte inexistant /
     // mauvais mot de passe (anti-énumération)
-    return { error: "Email ou mot de passe incorrect" };
+    return { error: t.errors.badCredentials };
   }
 
   redirect("/");

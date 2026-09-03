@@ -65,7 +65,7 @@ export function BandCard({ band }: BandCardProps) {
               </span>
             )}
             <span>{activityPeriod(band, t.band.active)}</span>
-            {band.dissolvedYear && <span>({t.band.disbanded})</span>}
+            {band.dissolvedYear && <span>{`(${t.band.disbanded})`}</span>}
           </p>
         </div>
       </div>

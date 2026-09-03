@@ -57,6 +57,9 @@ function yearOrUndefined(value: string): number | undefined {
   return trimmed === "" ? undefined : Number(trimmed);
 }
 
+/** Exemple de code pays ISO 3166-1 : un code, pas un mot à traduire. */
+const COUNTRY_CODE_EXAMPLE = "NO";
+
 export function ContributionForm() {
   const t = useT();
   const [band, setBand] = useState<BandDraft>(EMPTY_BAND);
@@ -99,18 +102,14 @@ export function ContributionForm() {
   if (create.isSuccess) {
     return (
       <div className="metal-card flex flex-col items-start gap-3 p-6">
-        <h2 className="metal-title text-lg">Dossier transmis</h2>
-        <p className="text-sm">
-          Votre contribution part en relecture. Un modérateur la validera ou
-          vous demandera des preuves complémentaires — vous suivrez son
-          avancement depuis vos dossiers.
-        </p>
+        <h2 className="metal-title text-lg">{t.contributions.submitted}</h2>
+        <p className="text-sm">{t.contributions.submittedNotice}</p>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/contributions/mes-dossiers"
             className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase hover:opacity-90"
           >
-            Voir mes dossiers
+            {t.contributions.mySubmissions}
           </Link>
           <button
             type="button"
@@ -141,7 +140,7 @@ export function ContributionForm() {
 
         <label>
           <span className="text-muted-foreground mb-1 block text-xs">
-            Nom <span aria-hidden>*</span>
+            {t.contributions.name} <span aria-hidden>*</span>
           </span>
           <input
             required
@@ -154,7 +153,7 @@ export function ContributionForm() {
 
         <label>
           <span className="text-muted-foreground mb-1 block text-xs">
-            Identifiant d&apos;URL <span aria-hidden>*</span>
+            {t.contributions.urlIdentifier} <span aria-hidden>*</span>
           </span>
           <input
             required
@@ -174,11 +173,11 @@ export function ContributionForm() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <label className="sm:w-32">
             <span className="text-muted-foreground mb-1 block text-xs">
-              Pays (ISO)
+              {t.contributions.countryIso}
             </span>
             <input
               maxLength={2}
-              placeholder="NO"
+              placeholder={COUNTRY_CODE_EXAMPLE}
               value={band.countryCode}
               onChange={(e) =>
                 setBand({ ...band, countryCode: e.target.value.toUpperCase() })
@@ -218,7 +217,7 @@ export function ContributionForm() {
 
         <label>
           <span className="text-muted-foreground mb-1 block text-xs">
-            Biographie
+            {t.contributions.biography}
           </span>
           <textarea
             rows={5}
@@ -248,7 +247,7 @@ export function ContributionForm() {
           disabled={!canSubmit}
           className="bg-primary text-primary-foreground self-start rounded-md px-5 py-2 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {create.isPending ? "Envoi…" : "Soumettre le dossier"}
+          {create.isPending ? t.app.sending : t.contributions.submit}
         </button>
         {!evidenceValid && (
           <p className="text-muted-foreground text-xs">

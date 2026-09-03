@@ -20,20 +20,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 // Lecture directe : la désambiguïsation n'est pas une ressource publique
 import { listAlbumsBySlugWithBand } from "@/db/queries/albums";
+import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
 
 type AlbumsSlugPageProps = {
   params: Promise<{ slug: string }>;
 };
 
 /** Page technique de redirection : jamais indexée. */
-export const metadata: Metadata = {
-  title: "Album",
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    title: t.releaseType.album,
+    robots: { index: false, follow: true },
+  };
+}
 
 export default async function AlbumsSlugPage({ params }: AlbumsSlugPageProps) {
   const { slug } = await params;
-  const matches = await listAlbumsBySlugWithBand(slug);
+  const [matches, { t, n }] = await Promise.all([
+    listAlbumsBySlugWithBand(slug),
+    getTranslations(),
+  ]);
 
   if (matches.length === 0) notFound();
 
@@ -46,11 +54,14 @@ export default async function AlbumsSlugPage({ params }: AlbumsSlugPageProps) {
   return (
     <section className="flex flex-col gap-6">
       <header>
-        <h1 className="metal-title text-2xl">Plusieurs albums « {slug} »</h1>
+        <h1 className="metal-title text-2xl">
+          {interpolate(t.album.ambiguousTitle, { slug })}
+        </h1>
         <div className="metal-rule mt-2 w-40" />
         <p className="text-muted-foreground mt-3 text-sm">
-          Ce nom de sortie est utilisé par {matches.length} groupes. Choisissez
-          celui que vous cherchez.
+          {interpolate(t.album.ambiguousLead, {
+            bands: n(t.count.bands, matches.length),
+          })}
         </p>
       </header>
 
@@ -62,7 +73,7 @@ export default async function AlbumsSlugPage({ params }: AlbumsSlugPageProps) {
               className="metal-card hover:bg-accent/30 flex items-center gap-3 px-4 py-3"
             >
               <span className="text-muted-foreground w-12 shrink-0 font-mono text-sm">
-                {album.releaseYear ?? "—"}
+                {album.releaseYear ?? t.band.unknownYear}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">

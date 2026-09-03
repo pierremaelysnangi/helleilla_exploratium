@@ -15,6 +15,9 @@ import { ActionError } from "@/lib/rbac/guards";
 // next/headers throw hors contexte Next (importé via la chaîne des gardes)
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
+  // La résolution de langue lit le cookie avant l'en-tête : sans ce
+  // substitut, toute action qui traduit un message échouerait ici.
+  cookies: vi.fn(async () => ({ get: () => undefined })),
 }));
 
 vi.mock("@/lib/auth", () => ({
@@ -26,17 +29,19 @@ afterEach(() => {
 });
 
 describe("handleActionError", () => {
-  it("propage tel quel le message d'une ActionError", () => {
-    const res = handleActionError(
+  it("propage tel quel le message d'une ActionError", async () => {
+    const res = await handleActionError(
       new ActionError("Permission refusée.", "FORBIDDEN"),
     );
     expect(res).toEqual({ success: false, error: "Permission refusée." });
   });
 
-  it("masque une erreur inattendue et la journalise côté serveur", () => {
+  it("masque une erreur inattendue et la journalise côté serveur", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const res = handleActionError(new Error("connexion Postgres refusée"));
+    const res = await handleActionError(
+      new Error("connexion Postgres refusée"),
+    );
 
     expect(res).toEqual({
       success: false,
@@ -47,10 +52,10 @@ describe("handleActionError", () => {
     expect(spy).toHaveBeenCalledWith("[action]", expect.any(Error));
   });
 
-  it("masque aussi une valeur levée qui n'est pas une Error", () => {
+  it("masque aussi une valeur levée qui n'est pas une Error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const res = handleActionError("panne interne");
+    const res = await handleActionError("panne interne");
 
     expect(res.error).toBe("Erreur serveur inattendue.");
     expect(spy).toHaveBeenCalledWith("[action]", "panne interne");

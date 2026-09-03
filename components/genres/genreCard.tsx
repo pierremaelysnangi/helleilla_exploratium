@@ -17,11 +17,9 @@ import type { GenreSummary } from "@/hooks/api/schemas";
 
 type GenreCardProps = {
   genre: GenreSummary;
-  /** Nombre de groupes rattachés, affiché s'il est connu. */
-  bandCount?: number;
 };
 
-export function GenreCard({ genre, bandCount }: GenreCardProps) {
+export function GenreCard({ genre }: GenreCardProps) {
   return (
     <Link
       href={`/genres/${genre.slug}`}
@@ -33,11 +31,6 @@ export function GenreCard({ genre, bandCount }: GenreCardProps) {
       <span className="line-clamp-2 text-sm font-semibold tracking-wide uppercase">
         {genre.name}
       </span>
-      {bandCount !== undefined && (
-        <span className="text-muted-foreground text-xs">
-          {bandCount} {bandCount > 1 ? "groupes" : "groupe"}
-        </span>
-      )}
     </Link>
   );
 }

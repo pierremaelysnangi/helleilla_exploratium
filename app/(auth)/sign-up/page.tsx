@@ -4,12 +4,16 @@
  * La validation serveur est portée par signUpAction (lib/actions/auth.ts).
  */
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SignUpForm } from "@/components/auth/signUpForm";
 import { AuthHeading } from "@/components/auth/authHeading";
 import { getTranslations } from "@/lib/i18n/server";
 
-export const metadata = { robots: { index: false }, title: "Inscription" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { robots: { index: false }, title: t.auth.signUp };
+}
 
 export default async function SignUpPage() {
   const { t } = await getTranslations();

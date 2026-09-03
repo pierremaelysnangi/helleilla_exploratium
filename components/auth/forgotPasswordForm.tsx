@@ -13,8 +13,10 @@ import {
 import { useActionState } from "react";
 import { TurnstileWidget } from "@/components/auth/turnstileWidget";
 import { AuthField, AuthSubmit, AuthError } from "./authField";
+import { useT } from "@/lib/i18n/client";
 
 export function ForgotPasswordForm() {
+  const t = useT();
   const [state, formAction, isPending] = useActionState<
     ResetFormState,
     FormData
@@ -26,7 +28,7 @@ export function ForgotPasswordForm() {
         id="email"
         name="email"
         type="email"
-        label="Adresse e-mail du compte"
+        label={t.account.accountEmailLabel}
         required
         maxLength={200}
         autoComplete="email"
@@ -46,7 +48,7 @@ export function ForgotPasswordForm() {
       {state.error && <AuthError>{state.error}</AuthError>}
 
       <AuthSubmit pending={isPending}>
-        {isPending ? "Envoi…" : "Recevoir le lien"}
+        {isPending ? t.app.sending : t.account.receiveLink}
       </AuthSubmit>
     </form>
   );

@@ -13,6 +13,7 @@ import { auth, type Session } from "@/lib/auth";
 import { can, type Resource, type Action } from "./permissions";
 // Hiérarchie des rôles
 import { hasMinRole, type Role } from "./roles";
+import { getTranslations } from "@/lib/i18n/server";
 
 /** Erreur métier levée par les gardes ; portée par un code d'échec. */
 export class ActionError extends Error {
@@ -43,7 +44,10 @@ type SessionWithRole =
  */
 export async function requireSession(): Promise<Session> {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) throw new ActionError("Non authentifié.", "UNAUTHENTICATED");
+  if (!session) {
+    const { t } = await getTranslations();
+    throw new ActionError(t.errors.unauthenticated, "UNAUTHENTICATED");
+  }
   return session as SessionWithRole;
 }
 

@@ -28,6 +28,9 @@ import { AlbumTracklist } from "@/components/albums/albumTracklist";
 // Critiques de presse : pendant professionnel des notes d'auditeurs
 import { PressReviews } from "@/components/albums/pressReviews";
 import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
+import { rich } from "@/lib/i18n/rich";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 // Fond de page : la pochette, très adoucie
 import { AlbumBackdrop } from "@/components/media/mediaBackdrop";
 
@@ -38,35 +41,25 @@ type AlbumPageProps = {
 /** URL de base absolue (cohérente avec le layout racine). */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-/**
- * Libellés français du type de sortie, pour les MÉTADONNÉES seules.
- *
- * Le titre et la description d'une page sont produits avant la
- * résolution de la langue du visiteur, et servent surtout au
- * référencement : ils restent dans la langue par défaut du site. Ce que
- * le lecteur voit, lui, passe par le dictionnaire.
- */
-const TYPE_LABELS: Record<AlbumDetail["type"], string> = {
-  album: "Album",
-  ep: "EP",
-  single: "Single",
-  compilation: "Compilation",
-  live: "Live",
-  demo: "Démo",
-  split: "Split",
-};
-
 export async function generateMetadata({
   params,
 }: AlbumPageProps): Promise<Metadata> {
   const { slug, albumSlug } = await params;
-  const album = await fetchAlbumBySlug(slug, albumSlug);
-  if (!album) return { title: "Album introuvable", robots: { index: false } };
+  const [album, { t }] = await Promise.all([
+    fetchAlbumBySlug(slug, albumSlug),
+    getTranslations(),
+  ]);
+  if (!album) return { title: t.meta.albumNotFound, robots: { index: false } };
 
   const title = `${album.title} — ${album.band.name}`;
-  const description = `${TYPE_LABELS[album.type]} de ${album.band.name}${
-    album.releaseYear ? ` sorti en ${album.releaseYear}` : ""
-  }, tracklist et sources officielles.`;
+  const description = interpolate(
+    album.releaseYear ? t.meta.albumDescriptionDated : t.meta.albumDescription,
+    {
+      type: t.releaseType[album.type],
+      band: album.band.name,
+      year: album.releaseYear ?? "",
+    },
+  );
 
   return {
     title,
@@ -121,7 +114,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
   if (!album) notFound();
 
   const totalDuration = formatTotalDuration(album.tracks);
-  const { t } = await getTranslations();
+  const { t, n } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
@@ -135,20 +128,14 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       />
 
       {/* Fil d'Ariane : l'album n'existe que dans son groupe */}
-      <nav aria-label="Fil d'Ariane" className="text-muted-foreground text-sm">
-        <Link href="/bands" className="hover:text-foreground">
-          Groupes
-        </Link>
-        <span aria-hidden> / </span>
-        <Link
-          href={`/bands/${album.band.slug}`}
-          className="hover:text-foreground"
-        >
-          {album.band.name}
-        </Link>
-        <span aria-hidden> / </span>
-        <span className="text-foreground">{album.title}</span>
-      </nav>
+      <Breadcrumb
+        label={t.app.breadcrumb}
+        items={[
+          { href: "/bands", label: t.nav.bands },
+          { href: `/bands/${album.band.slug}`, label: album.band.name },
+          { label: album.title },
+        ]}
+      />
 
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start">
         {/* Même repli que dans les grilles : l'archive amont peut renvoyer
@@ -187,15 +174,13 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
               <span className="font-mono">{album.releaseYear}</span>
             )}
             {album.tracks.length > 0 && (
-              <span>
-                {album.tracks.length}{" "}
-                {album.tracks.length > 1 ? t.album.tracks : t.album.track}
-              </span>
+              <span>{n(t.count.tracks, album.tracks.length)}</span>
             )}
             {totalDuration && (
               <span className="text-foreground font-mono">
-                {totalDuration.partial ? "≥ " : ""}
-                {totalDuration.label}
+                {totalDuration.partial
+                  ? `≥ ${totalDuration.label}`
+                  : totalDuration.label}
               </span>
             )}
           </p>
@@ -206,7 +191,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
           tracklist se lit en colonne étroite, et reléguer les critiques
           tout en bas les rendait invisibles. En dessous, empilement. */}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section aria-label="Tracklist" className="flex flex-col gap-3">
+        <section aria-label={t.album.tracklist} className="flex flex-col gap-3">
           {/* La durée totale n'est plus répétée ici : l'en-tête de la
               fiche la porte déjà, à quelques centimètres au-dessus. */}
           <h2 className="metal-title text-lg">{t.album.tracklist}</h2>
@@ -221,7 +206,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
           )}
         </section>
 
-        <section aria-label="Critiques" className="flex flex-col gap-3">
+        <section aria-label={t.album.reviews} className="flex flex-col gap-3">
           <h2 className="metal-title text-lg">{t.album.reviews}</h2>
           {/* Presse et auditeurs séparés : ce sont deux jugements
               différents, et les fondre en une note unique effacerait
@@ -231,16 +216,20 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
         </section>
       </div>
 
+      {/* Provenance des visuels : la phrase entière vit dans le
+          dictionnaire, le lien étant inséré là où chaque langue le
+          place. */}
       <p className="text-muted-foreground text-xs">
-        Pochette et informations proviennent des sources référencées pour ce
-        groupe.{" "}
-        <Link
-          href={`/bands/${album.band.slug}`}
-          className="hover:text-foreground underline"
-        >
-          Voir la fiche de {album.band.name}
-        </Link>
-        .
+        {rich(t.album.sourceNotice, {
+          link: (
+            <Link
+              href={`/bands/${album.band.slug}`}
+              className="hover:text-foreground underline"
+            >
+              {interpolate(t.album.seeBandPage, { band: album.band.name })}
+            </Link>
+          ),
+        })}
       </p>
     </article>
   );

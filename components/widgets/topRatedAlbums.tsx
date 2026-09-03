@@ -8,6 +8,8 @@
  */
 
 import Link from "next/link";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { PluralForms } from "@/lib/i18n/plural";
 
 /** Ligne de classement telle que renvoyée par `listTopRatedAlbums`. */
 export type TopRatedAlbum = {
@@ -23,17 +25,23 @@ export type TopRatedAlbum = {
 
 export function TopRatedAlbums({
   albums,
-  title,
+  t,
+  n,
 }: {
   albums: TopRatedAlbum[];
-  title: string;
+  /**
+   * Dictionnaire et accord en nombre reçus du parent : ce widget est un
+   * composant serveur, il ne peut pas appeler les hooks du contexte.
+   */
+  t: Dictionary;
+  n: (forms: PluralForms, count: number) => string;
 }) {
   if (albums.length === 0) return null;
 
   return (
     <section aria-labelledby="mieux-notes" className="flex flex-col gap-3">
       <h2 id="mieux-notes" className="metal-title text-lg">
-        {title}
+        {t.home.topRated}
       </h2>
       <ol className="divide-border border-border divide-y rounded-lg border">
         {albums.map((album, index) => (
@@ -58,11 +66,11 @@ export function TopRatedAlbums({
                 <span className="block font-mono text-sm">
                   {album.average
                     ? `${Math.round(Number(album.average) * 10) / 10}/5`
-                    : "—"}
+                    : t.band.unknownYear}
                 </span>
                 {/* L'effectif conditionne la lecture de la moyenne */}
                 <span className="text-muted-foreground block text-xs">
-                  {album.votes} vote{album.votes > 1 ? "s" : ""}
+                  {n(t.count.votes, album.votes)}
                 </span>
               </span>
             </Link>

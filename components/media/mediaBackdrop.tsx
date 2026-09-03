@@ -38,10 +38,14 @@ export function MediaBackdrop({ imageUrl }: MediaBackdropProps) {
         src={imageUrl}
         alt=""
         fill
-        // PAS de `priority` : ce fond est décoratif et passe derrière le
-        // contenu. Le précharger le mettait en concurrence avec le
-        // visuel de l'en-tête — la même image, à une autre taille — et
-        // le navigateur signalait un préchargement inutilisé.
+        // `eager` mais PAS `priority`. Ce fond occupe les trois quarts
+        // de la fenêtre : c'est lui que le navigateur retient comme
+        // Largest Contentful Paint, et le charger paresseusement
+        // retardait la mesure. `priority` irait plus loin en posant un
+        // lien de préchargement — mais l'en-tête demande déjà la même
+        // image à une autre taille, et le navigateur signalait alors un
+        // préchargement inutilisé.
+        loading="eager"
         sizes="100vw"
         // `blur` léger : une pochette porte du texte et des motifs fins
         // qui, nets, rivalisent avec le contenu de la page.

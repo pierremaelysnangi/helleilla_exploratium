@@ -19,15 +19,23 @@ import type { ContributionRow, ContributionStatus } from "@/hooks/api/schemas";
 import { ContributionStatusBadge } from "./contributionStatusBadge";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { rich } from "@/lib/i18n/rich";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /** Filtres proposés au modérateur. */
-const FILTERS: { value: ContributionStatus | undefined; label: string }[] = [
-  { value: undefined, label: "Dossiers ouverts" },
-  { value: "pending", label: "En attente" },
-  { value: "evidence_requested", label: "Preuves demandées" },
-  { value: "approved", label: "Approuvés" },
-  { value: "expired", label: "Expirés" },
+const FILTERS: {
+  value: ContributionStatus | undefined;
+  label: (t: Dictionary) => string;
+}[] = [
+  { value: undefined, label: (t) => t.contributions.filterOpen },
+  { value: "pending", label: (t) => t.contributions.filterPending },
+  {
+    value: "evidence_requested",
+    label: (t) => t.contributionStatus.evidence_requested,
+  },
+  { value: "approved", label: (t) => t.contributions.filterApproved },
+  { value: "expired", label: (t) => t.contributions.filterExpired },
 ];
 
 type ReviewQueueProps = {
@@ -44,10 +52,14 @@ export function ReviewQueue({ canReject }: ReviewQueueProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrer">
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label={t.app.filter}
+      >
         {FILTERS.map((filter) => (
           <button
-            key={filter.label}
+            key={filter.value ?? "open"}
             type="button"
             aria-pressed={status === filter.value}
             onClick={() => setStatus(filter.value)}
@@ -57,7 +69,7 @@ export function ReviewQueue({ canReject }: ReviewQueueProps) {
                 : "border-border hover:bg-accent/30 rounded-full border px-3 py-1 text-xs font-medium tracking-wide uppercase"
             }
           >
-            {filter.label}
+            {filter.label(t)}
           </button>
         ))}
       </div>
@@ -77,8 +89,8 @@ export function ReviewQueue({ canReject }: ReviewQueueProps) {
 
       {queue.isSuccess && queue.data.length === 0 && (
         <EmptyState
-          title="{t.contributions.nothingToReview}"
-          description="Aucun dossier ne correspond à ce filtre."
+          title={t.contributions.nothingToReview}
+          description={t.contributions.noMatchingSubmission}
         />
       )}
 
@@ -102,6 +114,7 @@ function ReviewCard({
   canReject: boolean;
 }) {
   const t = useT();
+  const n = usePlural();
   const [notes, setNotes] = useState("");
   const [asking, setAsking] = useState(false);
   const review = useReviewContribution();
@@ -114,20 +127,23 @@ function ReviewCard({
     <article className="metal-card flex flex-col gap-3 p-4">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">
-          {contribution.payload.name ?? "Dossier sans nom"}
+          {contribution.payload.name ?? t.contributions.untitledSubmission}
           <span className="text-muted-foreground ml-2 text-xs font-normal">
             {contribution.type === "band_create"
-              ? "nouveau groupe"
-              : "enrichissement"}
+              ? t.contributions.typeBandCreate
+              : t.contributions.typeBandEnrich}
           </span>
         </h3>
-        <ContributionStatusBadge status={contribution.status} />
+        <ContributionStatusBadge t={t} status={contribution.status} />
       </header>
 
       {/* Les preuves sont l'objet même de la relecture : liens sortants */}
-      <section aria-label="Preuves fournies" className="flex flex-col gap-1">
+      <section
+        aria-label={t.contributions.evidenceProvided}
+        className="flex flex-col gap-1"
+      >
         <h4 className="text-muted-foreground text-xs font-semibold uppercase">
-          Preuves ({contribution.evidence.length})
+          {n(t.count.evidence, contribution.evidence.length)}
         </h4>
         <ul className="flex flex-col gap-1">
           {contribution.evidence.map((item, index) => (
@@ -145,7 +161,7 @@ function ReviewCard({
               </a>
               {item.note && (
                 <span className="text-muted-foreground ml-2 text-xs">
-                  — {item.note}
+                  {`— ${item.note}`}
                 </span>
               )}
             </li>
@@ -161,13 +177,16 @@ function ReviewCard({
 
       {review.isSuccess && review.data.bandId && (
         <p className="text-sm">
-          Dossier approuvé —{" "}
-          <Link
-            href={`/bands/${contribution.payload.slug ?? ""}`}
-            className="underline"
-          >
-            voir la fiche publiée
-          </Link>
+          {rich(t.contributions.approvedNotice, {
+            link: (
+              <Link
+                href={`/bands/${contribution.payload.slug ?? ""}`}
+                className="underline"
+              >
+                {t.contributions.seePublished}
+              </Link>
+            ),
+          })}
         </p>
       )}
 
@@ -201,20 +220,21 @@ function ReviewCard({
                   }
                   className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-xs font-semibold tracking-wide uppercase hover:opacity-90 disabled:opacity-50"
                 >
-                  {review.isPending ? "Envoi…" : "Envoyer la demande"}
+                  {review.isPending
+                    ? t.app.sending
+                    : t.contributions.sendRequest}
                 </button>
                 <button
                   type="button"
                   onClick={() => setAsking(false)}
                   className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-xs font-semibold tracking-wide uppercase"
                 >
-                  Annuler
+                  {t.app.cancel}
                 </button>
               </div>
               {notes.trim().length < 10 && (
                 <p className="text-muted-foreground text-xs">
-                  Dix caractères minimum : une demande floue fait perdre un
-                  aller-retour.
+                  {t.contributions.requestMinLength}
                 </p>
               )}
             </div>
@@ -236,7 +256,9 @@ function ReviewCard({
                 }
                 className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-xs font-semibold tracking-wide uppercase hover:opacity-90 disabled:opacity-50"
               >
-                {review.isPending ? "Traitement…" : "Approuver"}
+                {review.isPending
+                  ? t.contributions.processing
+                  : t.contributions.approve}
               </button>
               {canReject && (
                 <button

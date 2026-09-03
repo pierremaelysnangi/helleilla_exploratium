@@ -13,12 +13,16 @@ import { requirePagePermission } from "@/lib/rbac/page";
 import { ReviewQueue } from "@/components/contributions/reviewQueue";
 import { AccessNotice } from "@/components/contributions/accessNotice";
 import { getTranslations } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
 
-export const metadata: Metadata = {
-  title: "Relecture des contributions",
-  description: "File de modération des dossiers soumis.",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    title: t.contributions.reviewTitle,
+    description: t.meta.reviewDescription,
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function ReviewPage() {
   const { t } = await getTranslations();
@@ -31,10 +35,10 @@ export default async function ReviewPage() {
   if (!session) {
     return (
       <section className="flex max-w-3xl flex-col gap-6">
-        <h1 className="metal-title text-3xl">Relecture</h1>
+        <h1 className="metal-title text-3xl">{t.auth.review}</h1>
         <AccessNotice
           title={t.contributions.moderatorRequired}
-          description="La file de relecture est réservée aux modérateurs et aux administrateurs. Si vous avez soumis un dossier, vous pouvez en suivre l'avancement depuis vos dossiers."
+          description={t.contributions.moderatorRequiredNotice}
         />
       </section>
     );
@@ -43,16 +47,16 @@ export default async function ReviewPage() {
   return (
     <section className="flex max-w-4xl flex-col gap-6">
       <header>
-        <h1 className="metal-title text-3xl">Relecture</h1>
+        <h1 className="metal-title text-3xl">{t.auth.review}</h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-          Vérifiez les sources avant d&apos;approuver : l&apos;approbation crée
-          réellement la fiche du groupe. En cas de doute, demandez des preuves
-          plutôt que de rejeter —{" "}
-          <Link href="/about" className="hover:text-foreground underline">
-            le workflow privilégie le dialogue
-          </Link>
-          .
+          {rich(t.contributions.reviewLead, {
+            link: (
+              <Link href="/about" className="hover:text-foreground underline">
+                {t.contributions.reviewLeadLink}
+              </Link>
+            ),
+          })}
         </p>
       </header>
 

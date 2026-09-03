@@ -23,6 +23,7 @@ import {
   type Locale,
 } from "./locales";
 import { getDictionary, type Dictionary } from "./dictionaries";
+import { plural, type PluralForms } from "./plural";
 
 /** Nom du cookie portant le choix explicite du visiteur. */
 export const LOCALE_COOKIE = "locale";
@@ -39,11 +40,26 @@ export async function resolveLocale(): Promise<Locale> {
   return negotiateLocale(header) ?? DEFAULT_LOCALE;
 }
 
-/** Langue et dictionnaire de la requête en cours. */
+/**
+ * Langue, dictionnaire et accord en nombre de la requête en cours.
+ *
+ * `n` est déjà lié à la langue : un compteur n'a besoin de rien d'autre,
+ * et l'exposer ainsi évite de faire circuler `locale` dans des pages qui
+ * ne s'en servent que pour ça.
+ */
 export async function getTranslations(): Promise<{
   locale: Locale;
   t: Dictionary;
+  n: (
+    forms: PluralForms,
+    count: number,
+    values?: Record<string, string | number>,
+  ) => string;
 }> {
   const locale = await resolveLocale();
-  return { locale, t: getDictionary(locale) };
+  return {
+    locale,
+    t: getDictionary(locale),
+    n: (forms, count, values) => plural(locale, forms, count, values),
+  };
 }

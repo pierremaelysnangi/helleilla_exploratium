@@ -47,6 +47,15 @@ const OFFICIAL_SOURCES = [
 
 export default async function AboutPage() {
   const { t } = await getTranslations();
+  /* Raccourcis de fin de page, construits hors du rendu : ce sont des
+     adresses, pas du texte. */
+  const shortcuts = [
+    { href: "/bands", label: t.nav.bands },
+    { href: "/albums", label: t.nav.albums },
+    { href: "/genres", label: t.nav.genres },
+    { href: "/contributions", label: t.auth.contribute },
+  ];
+
   return (
     <article className="flex max-w-3xl flex-col gap-8">
       <header>
@@ -94,12 +103,7 @@ export default async function AboutPage() {
           {t.pages.startTitle}
         </h2>
         <ul className="flex flex-wrap gap-2">
-          {[
-            { href: "/bands", label: "Groupes" },
-            { href: "/albums", label: "Albums" },
-            { href: "/genres", label: "Genres" },
-            { href: "/contributions", label: "Contribuer" },
-          ].map((link) => (
+          {shortcuts.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}

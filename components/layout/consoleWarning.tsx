@@ -26,11 +26,14 @@
  */
 
 import { useEffect } from "react";
+import { useT } from "@/lib/i18n/client";
 
 /** N'avertir qu'une fois par onglet, même après une navigation. */
 const FLAG = "__helleillaConsoleWarned";
 
 export function ConsoleWarning() {
+  const t = useT();
+
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
     if (w[FLAG]) return;
@@ -41,17 +44,9 @@ export function ConsoleWarning() {
 
     // `console.info` plutôt que `log` : c'est la règle du dépôt, et le
     // niveau convient — il s'agit d'une information, pas d'un rejet.
-    console.info("%cUn instant.", title);
-    console.info(
-      "%cSi quelqu'un vous a demandé de coller du code ici, il cherche à " +
-        "prendre le contrôle de votre compte.\n" +
-        "Ne collez jamais dans cette console un code que vous ne " +
-        "comprenez pas.\n\n" +
-        "Cette console reste ouverte à tous : le projet est libre, et son " +
-        "code est consultable.",
-      body,
-    );
-  }, []);
+    console.info(`%c${t.console.title}`, title);
+    console.info(`%c${t.console.body}`, body);
+  }, [t]);
 
   return null;
 }

@@ -14,6 +14,9 @@
 // Transport SMTP nodemailer (lazy pour éviter l'instanciation inutile)
 import nodemailer, { type Transporter } from "nodemailer";
 import { env } from "@/lib/env";
+import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
+import { SITE_NAME } from "@/lib/site";
 
 /** Indique si l'envoi réel est possible. */
 export function isMailConfigured(): boolean {
@@ -47,8 +50,11 @@ export async function sendResetPasswordEmail(
   to: string,
   resetUrl: string,
 ): Promise<void> {
-  const subject =
-    "Réinitialisation de votre mot de passe — Helleilla Exploratium";
+  // La langue du message suit celle de la personne qui a fait la
+  // demande : l'envoi part de sa requête, le cookie et l'en-tête sont
+  // donc encore lisibles ici.
+  const { t } = await getTranslations();
+  const subject = interpolate(t.mail.resetSubject, { site: SITE_NAME });
 
   // Dégradation dev/sans SMTP : lien en console uniquement
   if (!isMailConfigured()) {
@@ -63,15 +69,15 @@ export async function sendResetPasswordEmail(
     to,
     subject,
     text: [
-      "Bonjour,",
+      t.mail.greeting,
       "",
-      "Vous avez demandé la réinitialisation de votre mot de passe.",
-      "Cliquez sur le lien ci-dessous (valide une heure) :",
+      t.mail.resetIntro,
+      t.mail.resetAction,
       resetUrl,
       "",
-      "Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.",
+      t.mail.resetIgnore,
       "",
-      "— Helleilla Exploratium",
+      interpolate(t.mail.signature, { site: SITE_NAME }),
     ].join("\n"),
     // Pas de HTML riche ni de médias : texte transactionnel seul
   });

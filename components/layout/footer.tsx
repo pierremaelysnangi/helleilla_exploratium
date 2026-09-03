@@ -8,6 +8,7 @@
 
 import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { SITE_NAME } from "@/lib/site";
 
 /**
  * Colonnes de liens, décrites par leurs CLÉS de traduction.
@@ -54,11 +55,9 @@ export function Footer({ t }: { t: Dictionary }) {
       <div className="site-container flex flex-col gap-8 py-10">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-3">
-            <span className="metal-title text-sm">Helleilla Exploratium</span>
+            <span className="metal-title text-sm">{SITE_NAME}</span>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Une encyclopédie du metal écrite par ceux qui l&apos;écoutent.
-              Groupes, discographies, genres — et de quoi remonter à la source
-              de chaque information.
+              {t.footer.intro}
             </p>
           </div>
 
@@ -84,18 +83,14 @@ export function Footer({ t }: { t: Dictionary }) {
         </div>
 
         <div className="border-border/60 text-muted-foreground flex flex-col gap-2 border-t pt-6 text-xs">
+          <p>{t.footer.rights}</p>
           <p>
-            Pochettes et photos appartiennent à leurs auteurs et à leurs ayants
-            droit. Rien n&apos;est hébergé ici : tout est affiché depuis sa
-            source d&apos;origine, à titre d&apos;illustration.
-          </p>
-          <p>
-            Projet sans publicité, sans abonnement et sans revenus.{" "}
+            {t.footer.noMonetisation}{" "}
             <Link
               href="/credits"
               className="hover:text-foreground underline underline-offset-4"
             >
-              Sources et droits
+              {t.footer.sourcesAndRights}
             </Link>
           </p>
         </div>

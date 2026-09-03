@@ -14,7 +14,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiJson, type ApiClientError } from "@/hooks/api/client";
 import { updateProfileSchema } from "@/lib/validations/profile";
-import { usePreferenceStore } from "@/stores/preference.store";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/lib/i18n/client";
 
@@ -61,11 +60,6 @@ export function ProfileForm() {
     },
   });
 
-  const volume = usePreferenceStore((s) => s.volume);
-  const muted = usePreferenceStore((s) => s.muted);
-  const setVolume = usePreferenceStore((s) => s.setVolume);
-  const toggleMuted = usePreferenceStore((s) => s.toggleMuted);
-
   if (profile.isPending) return <Skeleton className="h-40" />;
   if (profile.isError) {
     return (
@@ -87,7 +81,7 @@ export function ProfileForm() {
         }}
         className="flex flex-col gap-3"
       >
-        <h2 className="metal-title text-lg">Profil public</h2>
+        <h2 className="metal-title text-lg">{t.profile.publicProfile}</h2>
         <p className="text-muted-foreground text-sm">{t.app.displayNameHint}</p>
 
         <label className="max-w-sm">
@@ -122,38 +116,9 @@ export function ProfileForm() {
           disabled={!dirty || save.isPending}
           className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase hover:opacity-90 disabled:opacity-50"
         >
-          {save.isPending ? "Enregistrement…" : "Enregistrer"}
+          {save.isPending ? t.app.saving : t.app.save}
         </button>
       </form>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Lecture</h2>
-        <p className="text-muted-foreground text-sm">
-          Ces réglages restent sur cet appareil : ils ne sont pas envoyés au
-          serveur et ne suivent pas votre compte.
-        </p>
-
-        <label className="flex max-w-sm items-center gap-3">
-          <span className="text-muted-foreground w-20 text-xs">Volume</span>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={muted ? 0 : volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
-            className="flex-1"
-          />
-          <span className="w-10 text-right font-mono text-xs">
-            {Math.round((muted ? 0 : volume) * 100)}%
-          </span>
-        </label>
-
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={muted} onChange={toggleMuted} />
-          {t.app.mutedByDefault}
-        </label>
-      </section>
     </div>
   );
 }

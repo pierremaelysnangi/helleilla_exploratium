@@ -26,6 +26,7 @@ import { handleActionError, type ActionResult } from "./utils";
 import { enqueueAlbumIndex } from "@/lib/queue/jobs/index-album";
 import { listTrackIdsByAlbumId } from "@/db/queries/tracks";
 import { enqueueTrackIndex } from "@/lib/queue/jobs/index-track";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Crée un album à partir d'un FormData.
@@ -51,7 +52,8 @@ export async function createAlbumAction(
 
     const band = await getBandById(parsed.data.bandId);
     if (!band) {
-      return { success: false, error: "Groupe introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.bandNotFound };
     }
 
     let coverUrl: string | undefined;
@@ -69,7 +71,7 @@ export async function createAlbumAction(
     revalidatePath("/albums");
     return { success: true, data: album };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -97,7 +99,8 @@ export async function updateAlbumAction(
 
     const existing = await getAlbumById(parsed.data.id);
     if (!existing) {
-      return { success: false, error: "Album introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.albumNotFound };
     }
 
     let coverUrl = existing.coverUrl;
@@ -117,7 +120,7 @@ export async function updateAlbumAction(
     revalidatePath(`/albums/${album.slug}`);
     return { success: true, data: album };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -142,7 +145,8 @@ export async function deleteAlbumAction(
 
     const existing = await getAlbumById(id);
     if (!existing) {
-      return { success: false, error: "Album introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.albumNotFound };
     }
 
     if (existing.coverUrl) await deleteImage(existing.coverUrl);
@@ -157,6 +161,6 @@ export async function deleteAlbumAction(
     revalidatePath("/albums");
     return { success: true, data: { id } };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }

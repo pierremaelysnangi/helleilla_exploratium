@@ -27,23 +27,18 @@ function ensureZxcvbn() {
   return zxcvbnInstance;
 }
 
-/** Résultat normalisé consommé par le composant de formulaire. */
+/**
+ * Résultat normalisé consommé par le composant de formulaire.
+ *
+ * Volontairement RÉDUIT au score : le libellé était produit ici, en
+ * français, et se retrouvait tel quel devant un lecteur japonais. Le
+ * score est un nombre, que le dictionnaire nomme dans sa langue.
+ */
 export type PasswordStrength = {
   /** 0 = très faible … 4 = excellent (zxcvbn). */
   score: 0 | 1 | 2 | 3 | 4;
-  /** Libellé français correspondant au score. */
-  label: string;
   /** Estimations zxcvbn brutes (crack time, suggestions). */
   feedback: Pick<ZxcvbnResult, "feedback">["feedback"];
-};
-
-/** Libellés français par score. */
-const LABELS: Record<PasswordStrength["score"], string> = {
-  0: "Très faible",
-  1: "Faible",
-  2: "Moyen",
-  3: "Fort",
-  4: "Très fort",
 };
 
 /**
@@ -64,6 +59,6 @@ export function usePasswordStrength(
     // pour un champ de formulaire (< 5 ms sur dictionnaire commun)
     const result = ensureZxcvbn().check(password, userInputs.slice(0, 5));
     const score = result.score as PasswordStrength["score"];
-    return { score, label: LABELS[score], feedback: result.feedback };
+    return { score, feedback: result.feedback };
   }, [password, userInputs]);
 }

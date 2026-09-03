@@ -18,6 +18,7 @@ import { createGenre, updateGenre, deleteGenre } from "@/db/mutations/genres";
 import { getGenreById } from "@/db/queries/genres";
 // Gestion d'erreur commune + type de retour standard des actions
 import { handleActionError, type ActionResult } from "./utils";
+import { getTranslations } from "@/lib/i18n/server";
 
 /**
  * Crée un genre à partir d'un FormData.
@@ -44,7 +45,7 @@ export async function createGenreAction(
     revalidatePath("/genres");
     return { success: true, data: genre };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -71,7 +72,8 @@ export async function updateGenreAction(
 
     const existing = await getGenreById(parsed.data.id);
     if (!existing) {
-      return { success: false, error: "Genre introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.genreNotFound };
     }
 
     const { id, ...data } = parsed.data;
@@ -84,7 +86,7 @@ export async function updateGenreAction(
 
     return { success: true, data: genre };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }
 
@@ -105,7 +107,8 @@ export async function deleteGenreAction(
 
     const existing = await getGenreById(id);
     if (!existing) {
-      return { success: false, error: "Genre introuvable." };
+      const { t } = await getTranslations();
+      return { success: false, error: t.errors.genreNotFound };
     }
 
     await deleteGenre(id);
@@ -114,6 +117,6 @@ export async function deleteGenreAction(
     revalidatePath(`/genres/${existing.slug}`);
     return { success: true, data: { id } };
   } catch (err) {
-    return handleActionError(err);
+    return await handleActionError(err);
   }
 }

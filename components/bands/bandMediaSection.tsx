@@ -16,7 +16,7 @@
 import { useBandMedia } from "@/hooks/use-band-media";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BandGallery } from "./bandGallery";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
 
 type BandMediaSectionProps = {
   bandId: string;
@@ -26,6 +26,7 @@ type BandMediaSectionProps = {
 
 export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
   const t = useT();
+  const n = usePlural();
   const { data: media, isPending, isError } = useBandMedia(bandId);
 
   if (isPending) {
@@ -74,7 +75,7 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
                   {pastMembers.length > 0 && (
                     <details className="mt-1">
                       <summary className="text-muted-foreground cursor-pointer text-xs">
-                        {t.band.formerMembers} ({pastMembers.length})
+                        {n(t.count.formerMembers, pastMembers.length)}
                       </summary>
                       <p className="text-muted-foreground mt-1 text-xs">
                         {pastMembers.map((m) => m.name).join(", ")}

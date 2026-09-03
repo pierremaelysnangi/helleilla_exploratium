@@ -25,6 +25,9 @@ import {
 // Mocks des modules Next.js inutilisables hors rendu (headers, cache)
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
+  // La résolution de langue lit le cookie avant l'en-tête : sans ce
+  // substitut, toute action qui traduit un message échouerait ici.
+  cookies: vi.fn(async () => ({ get: () => undefined })),
 }));
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),

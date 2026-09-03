@@ -22,6 +22,7 @@ import { DiscographySections } from "@/components/bands/discographySections";
 // Chargement serveur de la discographie complète
 import { fetchDiscography } from "@/lib/api/discography";
 import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
 
 /** Props App Router : params est une promesse en Next 15+. */
 type BandDetailPageProps = {
@@ -36,13 +37,20 @@ export async function generateMetadata({
   params,
 }: BandDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
-  if (!band) return { title: "Groupe introuvable", robots: { index: false } };
+  const [band, { t }] = await Promise.all([
+    fetchBandBySlug(slug),
+    getTranslations(),
+  ]);
+  if (!band) return { title: t.meta.bandNotFound, robots: { index: false } };
 
   const title = band.name;
   const description =
     band.bio?.slice(0, 160) ??
-    `${band.name} : période d'activité ${band.formedYear ?? "?"} – ${band.dissolvedYear ?? "…"}, genres et médias officiels.`;
+    interpolate(t.meta.bandFallbackDescription, {
+      band: band.name,
+      from: band.formedYear ?? "?",
+      to: band.dissolvedYear ?? "…",
+    });
 
   return {
     title,
@@ -93,7 +101,7 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
   if (!band) notFound();
 
   const discography = await fetchDiscography(band.id);
-  const { t } = await getTranslations();
+  const { t, n } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
@@ -114,11 +122,11 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
       {/* Discographie en cartes : rendue côté serveur, donc présente au
           premier affichage — le tableau client précédent laissait un
           espace vide le temps de sa requête. */}
-      <section aria-label="Discographie" className="flex flex-col gap-3">
+      <section aria-label={t.band.discography} className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="metal-title text-lg">Discographie</h2>
+          <h2 className="metal-title text-lg">{t.band.discography}</h2>
           <span className="text-muted-foreground text-sm">
-            {discography.length} {discography.length > 1 ? "sorties" : "sortie"}
+            {n(t.count.releases, discography.length)}
           </span>
         </div>
         <DiscographySections

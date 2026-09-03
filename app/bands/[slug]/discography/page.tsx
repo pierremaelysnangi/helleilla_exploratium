@@ -9,14 +9,15 @@
 
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
 // Fetch serveur : groupe par slug, puis ses albums
 import { fetchBandBySlug } from "@/hooks/use-bands";
 import { fetchDiscography } from "@/lib/api/discography";
 // Présentation — mêmes sections que la fiche du groupe
 import { DiscographySections } from "@/components/bands/discographySections";
 import { EmptyState } from "@/components/shared/emptyState";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { getTranslations } from "@/lib/i18n/server";
+import { interpolate } from "@/lib/i18n/format";
 
 type DiscographyPageProps = {
   params: Promise<{ slug: string }>;
@@ -29,11 +30,16 @@ export async function generateMetadata({
   params,
 }: DiscographyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
-  if (!band) return { title: "Groupe introuvable", robots: { index: false } };
+  const [band, { t }] = await Promise.all([
+    fetchBandBySlug(slug),
+    getTranslations(),
+  ]);
+  if (!band) return { title: t.meta.bandNotFound, robots: { index: false } };
 
-  const title = `Discographie de ${band.name}`;
-  const description = `Toutes les sorties référencées de ${band.name} : albums, EP, singles, live et démos.`;
+  const title = interpolate(t.band.discographyOf, { band: band.name });
+  const description = interpolate(t.meta.discographyDescription, {
+    band: band.name,
+  });
 
   return {
     title,
@@ -57,38 +63,37 @@ export default async function DiscographyPage({
   if (!band) notFound();
 
   const albums = await fetchDiscography(band.id);
-  const { t } = await getTranslations();
+  const { t, n } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">
-      <nav aria-label="Fil d'Ariane" className="text-muted-foreground text-sm">
-        <Link href="/bands" className="hover:text-foreground">
-          Groupes
-        </Link>
-        <span aria-hidden> / </span>
-        <Link href={`/bands/${band.slug}`} className="hover:text-foreground">
-          {band.name}
-        </Link>
-        <span aria-hidden> / </span>
-        <span className="text-foreground">Discographie</span>
-      </nav>
+      <Breadcrumb
+        label={t.app.breadcrumb}
+        items={[
+          { href: "/bands", label: t.nav.bands },
+          { href: `/bands/${band.slug}`, label: band.name },
+          { label: t.band.discography },
+        ]}
+      />
 
       <header>
         <h1 className="metal-title text-3xl sm:text-4xl">
-          Discographie de {band.name}
+          {interpolate(t.band.discographyOf, { band: band.name })}
         </h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm">
-          {albums.length} {albums.length > 1 ? "sorties" : "sortie"} référencées
+          {n(t.count.releases, albums.length)}
         </p>
       </header>
 
       {albums.length === 0 ? (
         <EmptyState
           title={t.app.noReleaseListed}
-          description={`La discographie de ${band.name} n'a pas encore été documentée.`}
+          description={interpolate(t.band.noDiscographyYet, {
+            band: band.name,
+          })}
           ctaHref={`/bands/${band.slug}`}
-          ctaLabel="Retour à la fiche du groupe"
+          ctaLabel={t.member.backToBand}
         />
       ) : (
         <DiscographySections

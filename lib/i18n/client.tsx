@@ -15,9 +15,10 @@
  * japonais.
  */
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo } from "react";
 import type { Dictionary } from "./dictionaries";
 import type { Locale } from "./locales";
+import { plural, type PluralForms } from "./plural";
 
 type I18nValue = {
   locale: Locale;
@@ -54,4 +55,28 @@ export function useI18n(): I18nValue {
 /** Raccourci : le dictionnaire seul, cas le plus fréquent. */
 export function useT(): Dictionary {
   return useI18n().t;
+}
+
+/**
+ * Accord en nombre, déjà lié à la langue de la page.
+ *
+ * Évite de faire remonter `locale` jusqu'à chaque compteur : le seul
+ * usage qu'en aurait l'appelant est celui-ci.
+ *
+ * @example
+ *   const n = usePlural();
+ *   <span>{n(t.count.bands, total)}</span>
+ */
+export function usePlural() {
+  const { locale } = useI18n();
+  return useMemo(
+    () =>
+      (
+        forms: PluralForms,
+        count: number,
+        values?: Record<string, string | number>,
+      ) =>
+        plural(locale, forms, count, values),
+    [locale],
+  );
 }

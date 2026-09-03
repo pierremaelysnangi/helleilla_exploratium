@@ -25,15 +25,20 @@ type GenreSelectProps = {
 
 export function GenreSelect({ value, onChange, label }: GenreSelectProps) {
   const t = useT();
-  const { families, isPending } = useGenreTaxonomy();
+  const { families } = useGenreTaxonomy();
   const accessibleLabel = label ?? t.catalogue.filterByGenre;
 
+  // Volontairement JAMAIS désactivé pendant le chargement de la
+  // taxonomie. `isPending` n'a pas la même valeur au rendu serveur et à
+  // l'hydratation — le serveur rend la liste peuplée, le client repart
+  // d'un cache vide — ce qui produisait un écart d'attribut `disabled`
+  // signalé par React. Une liste réduite à « tous les genres » est de
+  // toute façon inoffensive : elle correspond déjà à la valeur en cours.
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
       aria-label={accessibleLabel}
-      disabled={isPending}
       className="border-border bg-card rounded-md border px-3 py-2 text-sm"
     >
       <option value="">{t.catalogue.allGenres}</option>

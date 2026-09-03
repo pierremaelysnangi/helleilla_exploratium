@@ -10,6 +10,7 @@ import { Providers } from "@/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ConsoleWarning } from "@/components/layout/consoleWarning";
+import { SITE_NAME } from "@/lib/site";
 import { getTranslations } from "@/lib/i18n/server";
 import { localeDir } from "@/lib/i18n/locales";
 import { CommandPalette } from "@/components/search/commandPalette";
@@ -28,25 +29,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Métadonnées globales : titre par défaut avec template (%s remplacé par chaque page)
-// et description du site utilisée pour le SEO.
-export const metadata: Metadata = {
-  // Base absolue requise pour résoudre les URLs OpenGraph/canonical
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  ),
-  title: {
-    default: "Helleilla Exploratium",
-    template: "%s | Helleilla Exploratium",
-  },
-  description:
-    "L'encyclopédie collaborative du metal : groupes, discographies et genres.",
-  openGraph: {
-    type: "website",
-    siteName: "Helleilla Exploratium",
-    locale: "fr_FR",
-  },
-};
+/**
+ * Métadonnées globales : titre par défaut avec template (%s remplacé par
+ * chaque page) et description du site.
+ *
+ * Résolues par requête, et non figées : le titre de l'onglet et la
+ * description partagée sont des textes lus, au même titre que la page.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, t } = await getTranslations();
+  return {
+    // Base absolue requise pour résoudre les URLs OpenGraph/canonical
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    ),
+    title: {
+      default: SITE_NAME,
+      template: `%s | ${SITE_NAME}`,
+    },
+    description: t.meta.siteDescription,
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      locale,
+    },
+  };
+}
 
 /**
  * Layout racine de l'application.

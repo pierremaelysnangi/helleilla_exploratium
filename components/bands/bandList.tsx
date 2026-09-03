@@ -27,7 +27,8 @@ import { BandCard } from "./bandCard";
 // Filtre par genre partagé (inclusif des sous-genres)
 import { GenreSelect } from "@/components/genres/genreSelect";
 import { z } from "zod";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
 
 /** Schéma du payload paginé renvoyé par l'API (validation runtime). */
 const pageSchema = z.object({
@@ -60,6 +61,7 @@ const PER_PAGE = 20;
  */
 export function BandList() {
   const t = useT();
+  const n = usePlural();
   const [filters, setFilters] = useQueryStates(bandFilters);
 
   const infinite = useInfiniteQuery({
@@ -135,7 +137,7 @@ export function BandList() {
         </button>
         {meta && (
           <span className="text-muted-foreground text-sm">
-            {meta.total} groupe{meta.total > 1 ? "s" : ""}
+            {n(t.count.bands, meta.total)}
           </span>
         )}
       </div>
@@ -146,8 +148,9 @@ export function BandList() {
           <p className="text-muted-foreground">{t.catalogue.loading}</p>
         ) : infinite.isError ? (
           <p role="alert" className="text-destructive">
-            Impossible de charger les groupes :{" "}
-            {(infinite.error as Error).message}
+            {interpolate(t.catalogue.bandsLoadFailed, {
+              reason: (infinite.error as Error).message,
+            })}
           </p>
         ) : rows.length === 0 ? (
           <p className="text-muted-foreground">{t.catalogue.noResult}</p>

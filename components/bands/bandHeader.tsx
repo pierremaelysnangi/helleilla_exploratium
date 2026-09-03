@@ -12,6 +12,8 @@ import Link from "next/link";
 import type { BandDetail } from "@/hooks/api/schemas";
 import { ArtworkFallback } from "@/components/media/artworkFallback";
 import { useT } from "@/lib/i18n/client";
+import { interpolate } from "@/lib/i18n/format";
+import { translateTheme } from "@/lib/i18n/themes";
 
 type BandHeaderProps = {
   band: BandDetail;
@@ -25,7 +27,7 @@ export function BandHeader({ band }: BandHeaderProps) {
       {band.imageUrl ? (
         <Image
           src={band.imageUrl}
-          alt={`Image de ${band.name}`}
+          alt={interpolate(t.band.photoCredit, { band: band.name })}
           width={128}
           height={128}
           priority
@@ -53,10 +55,12 @@ export function BandHeader({ band }: BandHeaderProps) {
           {/* « actif » plutôt qu'une ellipse : l'absence de date de fin
               est une information, pas une donnée manquante. */}
           <span>
-            {band.formedYear ?? "?"} –{" "}
-            {band.dissolvedYear
-              ? `${band.dissolvedYear} (${t.band.disbanded})`
-              : t.band.active}
+            {interpolate(t.band.period, {
+              from: band.formedYear ?? t.band.unknownYear,
+              to: band.dissolvedYear
+                ? `${band.dissolvedYear} (${t.band.disbanded})`
+                : t.band.active,
+            })}
           </span>
         </p>
 
@@ -66,7 +70,9 @@ export function BandHeader({ band }: BandHeaderProps) {
           <p className="text-muted-foreground mt-3 text-sm">
             <span className="tracking-wide uppercase">{t.band.themes}</span>
             {" · "}
-            {band.themes.join(", ")}
+            {/* Vocabulaire fermé : les thèmes se traduisent, contrairement
+                aux noms de genres. */}
+            {band.themes.map((theme) => translateTheme(t, theme)).join(", ")}
           </p>
         )}
 

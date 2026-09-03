@@ -23,7 +23,7 @@ import { albumListItemSchema, type AlbumListItem } from "@/hooks/api/schemas";
 import { GenreSelect } from "@/components/genres/genreSelect";
 import { InfiniteGrid } from "@/components/shared/infiniteGrid";
 import { AlbumCard } from "./albumCard";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
 
 const pageSchema = z.object({
   data: z.array(albumListItemSchema),
@@ -37,6 +37,7 @@ const pageSchema = z.object({
 
 export function AlbumsList() {
   const t = useT();
+  const n = usePlural();
   const [filters, setFilters] = useQueryStates({
     q: parseAsString.withDefault(""),
     genre: parseAsString.withDefault(""),
@@ -85,7 +86,7 @@ export function AlbumsList() {
         />
         {total !== undefined && (
           <span className="text-muted-foreground text-sm">
-            {total} sortie{total > 1 ? "s" : ""}
+            {n(t.count.releases, total)}
           </span>
         )}
       </div>

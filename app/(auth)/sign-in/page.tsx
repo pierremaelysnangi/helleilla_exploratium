@@ -3,12 +3,16 @@
  * anti-énumération, rate limiting Redis 5 essais/5 min/IP).
  */
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SignInForm } from "@/components/auth/signInForm";
 import { AuthHeading } from "@/components/auth/authHeading";
 import { getTranslations } from "@/lib/i18n/server";
 
-export const metadata = { robots: { index: false }, title: "Connexion" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { robots: { index: false }, title: t.auth.signIn };
+}
 
 export default async function SignInPage() {
   const { t } = await getTranslations();

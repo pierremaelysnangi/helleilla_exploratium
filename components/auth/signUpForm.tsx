@@ -15,7 +15,6 @@ import { useActionState, useState } from "react";
 import {
   PasswordField,
   passwordMeetsPolicy,
-  MIN_LENGTH,
 } from "@/components/auth/passwordField";
 // Jauge zxcvbn réutilisée pour le verrou de soumission
 import { usePasswordStrength } from "@/hooks/use-password-strength";
@@ -23,6 +22,7 @@ import { usePasswordStrength } from "@/hooks/use-password-strength";
 import { TurnstileWidget } from "@/components/auth/turnstileWidget";
 // Primitives de formulaire partagées par les quatre pages d'authentification
 import { AuthField, AuthSubmit, AuthError } from "./authField";
+import { useT } from "@/lib/i18n/client";
 
 export function SignUpForm() {
   const [state, formAction, isPending] = useActionState<
@@ -33,6 +33,8 @@ export function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
+  const t = useT();
+
   // Verrou client : longueur minimale + score zxcvbn suffisant
   const strength = usePasswordStrength(password, [email, name]);
   const policyOk = passwordMeetsPolicy(password, strength?.score ?? null);
@@ -42,20 +44,19 @@ export function SignUpForm() {
       <AuthField
         id="name"
         name="name"
-        label="Nom affiché"
+        label={t.app.displayName}
         required
         maxLength={100}
         autoComplete="name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        hint="Visible sur vos contributions."
       />
 
       <AuthField
         id="email"
         name="email"
         type="email"
-        label="Adresse e-mail"
+        label={t.account.emailLabel}
         required
         maxLength={200}
         autoComplete="email"
@@ -75,15 +76,8 @@ export function SignUpForm() {
       {state.error && <AuthError>{state.error}</AuthError>}
 
       <AuthSubmit pending={isPending || !policyOk}>
-        {isPending ? "Création…" : "Créer mon compte"}
+        {isPending ? t.account.creating : t.account.signUpTitle}
       </AuthSubmit>
-
-      {!policyOk && (
-        <p className="text-muted-foreground text-xs">
-          Mot de passe requis : {MIN_LENGTH} caractères minimum et score de
-          force suffisant — le bouton « Générer » en produit un valide.
-        </p>
-      )}
     </form>
   );
 }

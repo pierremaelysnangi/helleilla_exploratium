@@ -17,7 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { apiJson } from "@/hooks/api/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useT } from "@/lib/i18n/client";
+import { useT, usePlural } from "@/lib/i18n/client";
+import { externalLabel } from "@/lib/media/externalLabel";
 
 const pressReviewSchema = z.object({
   id: z.string(),
@@ -41,6 +42,7 @@ function year(value: string | null): string | null {
 
 export function PressReviews({ albumId }: { albumId: string }) {
   const t = useT();
+  const n = usePlural();
   const press = useQuery({
     queryKey: ["press-reviews", albumId],
     queryFn: async ({ signal }) => {
@@ -66,10 +68,9 @@ export function PressReviews({ albumId }: { albumId: string }) {
             ) : (
               <>
                 <span className="text-foreground font-mono">
-                  {press.data.average}/100
+                  {`${press.data.average}/100`}
                 </span>{" "}
-                · {press.data.count} critique
-                {press.data.count > 1 ? "s" : ""}
+                · {n(t.count.pressReviews, press.data.count)}
               </>
             )}
           </p>
@@ -96,7 +97,7 @@ export function PressReviews({ albumId }: { albumId: string }) {
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">
-                    {review.outlet} ↗
+                    {externalLabel(review.outlet)}
                   </span>
                   {(review.author || year(review.publishedAt)) && (
                     <span className="text-muted-foreground block truncate text-xs">
@@ -118,11 +119,7 @@ export function PressReviews({ albumId }: { albumId: string }) {
       )}
 
       {press.data && press.data.reviews.length === 0 && (
-        <p className="text-muted-foreground text-sm">
-          Les critiques de presse sont documentées par les contributeurs, avec
-          un lien vers l&apos;article d&apos;origine. Aucun texte n&apos;est
-          reproduit ici.
-        </p>
+        <p className="text-muted-foreground text-sm">{t.album.pressNotice}</p>
       )}
     </section>
   );

@@ -9,16 +9,19 @@
 
 import { Badge } from "@/components/ui/badge";
 import type { UserRole } from "@/hooks/api/schemas";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-/** Libellé et intention visuelle de chaque rôle. */
-const ROLE_META: Record<
-  UserRole,
-  { label: string; variant: "default" | "secondary" | "outline" }
-> = {
-  user: { label: "Utilisateur", variant: "outline" },
-  contributor: { label: "Contributeur", variant: "secondary" },
-  moderator: { label: "Modérateur", variant: "secondary" },
-  admin: { label: "Administrateur", variant: "default" },
+/**
+ * Intention visuelle de chaque rôle.
+ *
+ * Le LIBELLÉ n'est plus ici : il vient du dictionnaire, sans quoi la
+ * hiérarchie s'affichait en français quelle que soit la langue choisie.
+ */
+const ROLE_VARIANTS: Record<UserRole, "default" | "secondary" | "outline"> = {
+  user: "outline",
+  contributor: "secondary",
+  moderator: "secondary",
+  admin: "default",
 };
 
 /** Ordre hiérarchique, réutilisé par les sélecteurs de rôle. */
@@ -29,12 +32,11 @@ export const ROLE_ORDER: UserRole[] = [
   "admin",
 ];
 
-/** Libellé seul, pour les options de formulaire. */
-export function roleLabel(role: UserRole): string {
-  return ROLE_META[role].label;
+/** Libellé traduit, pour les options de formulaire. */
+export function roleLabel(t: Dictionary, role: UserRole): string {
+  return t.role[role];
 }
 
-export function RoleBadge({ role }: { role: UserRole }) {
-  const meta = ROLE_META[role];
-  return <Badge variant={meta.variant}>{meta.label}</Badge>;
+export function RoleBadge({ t, role }: { t: Dictionary; role: UserRole }) {
+  return <Badge variant={ROLE_VARIANTS[role]}>{roleLabel(t, role)}</Badge>;
 }

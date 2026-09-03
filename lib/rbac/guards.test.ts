@@ -22,6 +22,9 @@ const mockSession = vi.hoisted(() => ({ current: null as any }));
 // next/headers throw hors contexte Next
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
+  // La résolution de langue lit le cookie avant l'en-tête : sans ce
+  // substitut, toute action qui traduit un message échouerait ici.
+  cookies: vi.fn(async () => ({ get: () => undefined })),
 }));
 
 vi.mock("@/lib/auth", () => ({

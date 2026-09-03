@@ -4,15 +4,17 @@
  * Sans token : invite à refaire une demande (pas d'erreur technique).
  */
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetPasswordForm } from "@/components/auth/resetPasswordForm";
 import { AuthHeading } from "@/components/auth/authHeading";
 import { getTranslations } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
 
-export const metadata = {
-  robots: { index: false },
-  title: "Nouveau mot de passe",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return { robots: { index: false }, title: t.account.resetTitle };
+}
 
 /** Props App Router : searchParams est une promesse en Next 15+. */
 type ResetPasswordPageProps = {
@@ -36,11 +38,13 @@ export default async function ResetPasswordPage({
         <ResetPasswordForm token={token} />
       ) : (
         <p className="text-muted-foreground text-sm">
-          Lien incomplet.{" "}
-          <Link href="/forgot-password" className="underline">
-            {t.account.askAgain}
-          </Link>{" "}
-          pour recevoir un nouveau lien.
+          {rich(t.account.incompleteLink, {
+            link: (
+              <Link href="/forgot-password" className="underline">
+                {t.account.askAgain}
+              </Link>
+            ),
+          })}
         </p>
       )}
     </>
