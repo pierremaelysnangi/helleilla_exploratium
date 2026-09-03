@@ -71,7 +71,6 @@ export const pt: Dictionary = {
     noPressReview: "Ainda ninguém acrescentou uma crítica deste álbum.",
     noRating: "Ainda sem avaliações",
     listenAt: "Ouvir na fonte",
-    lyrics: "Letras",
     linksFor: "Ligações de {track}",
   },
   releaseType: {

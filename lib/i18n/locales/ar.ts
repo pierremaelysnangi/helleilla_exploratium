@@ -73,7 +73,6 @@ export const ar: Dictionary = {
     noPressReview: "لم يضف أحد بعد مراجعة لهذا الألبوم.",
     noRating: "لا تقييمات بعد",
     listenAt: "الاستماع لدى الناشر",
-    lyrics: "الكلمات",
     linksFor: "روابط {track}",
   },
   releaseType: {

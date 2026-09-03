@@ -73,7 +73,6 @@ export const ja: Dictionary = {
     noPressReview: "このアルバムのレビューはまだありません。",
     noRating: "評価はまだありません",
     listenAt: "配信元で聴く",
-    lyrics: "歌詞",
     linksFor: "{track} のリンク",
   },
   releaseType: {

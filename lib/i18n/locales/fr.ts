@@ -73,7 +73,6 @@ export const fr = {
     noPressReview: "Personne n'a encore ajouté de critique pour cet album.",
     noRating: "Aucune note pour l'instant",
     listenAt: "Écouter chez le diffuseur",
-    lyrics: "Paroles",
     linksFor: "Liens pour {track}",
   },
   releaseType: {

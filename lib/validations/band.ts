@@ -70,7 +70,7 @@ export const bandShape = {
    * Thèmes des textes du groupe.
    *
    * Bornés à dix entrées courtes : c'est une caractérisation, pas un
-   * résumé des paroles — lesquelles ne sont jamais reproduites ici.
+   * résumé du propos de chaque morceau.
    */
   themes: z
     .array(z.string().trim().min(2).max(60))

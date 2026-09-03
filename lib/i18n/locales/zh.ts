@@ -70,7 +70,6 @@ export const zh: Dictionary = {
     noPressReview: "还没有人为这张专辑写过评论。",
     noRating: "暂无评分",
     listenAt: "到发行方收听",
-    lyrics: "歌词",
     linksFor: "{track} 的链接",
   },
   releaseType: {

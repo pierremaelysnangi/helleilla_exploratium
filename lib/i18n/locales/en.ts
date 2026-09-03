@@ -75,7 +75,6 @@ export const en: Dictionary = {
     noPressReview: "Nobody has added a review for this album yet.",
     noRating: "No ratings yet",
     listenAt: "Listen at the source",
-    lyrics: "Lyrics",
     linksFor: "Links for {track}",
   },
   releaseType: {

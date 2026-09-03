@@ -4,36 +4,27 @@
  * <AlbumTracklist> — liste des pistes d'un album, chaque ligne ouvrant
  * un panneau de liens.
  *
- * Il n'y a plus d'écoute intégrée. Les extraits de trente secondes ont
- * été retirés : leur diffusion, même depuis les serveurs de la
- * plateforme, expose le projet à des signalements qu'une encyclopédie
- * sans revenus n'a pas les moyens de contester. Qui veut écouter passe
- * par les liens ci-dessous, chez le diffuseur.
- *
- * Le panneau réunit donc deux choses : où écouter la piste, et où en
- * lire les paroles. Aucune parole n'est reproduite ici.
+ * Le panneau ne dit qu'une chose : où écouter la piste. Ni extrait
+ * intégré — sa diffusion, même depuis les serveurs de la plateforme,
+ * exposait le projet à des signalements qu'une encyclopédie sans
+ * revenus n'a pas les moyens de contester — ni lien vers les paroles,
+ * qui encombraient la liste sans jamais tomber juste.
  */
 
 import { useState } from "react";
 import type { TrackRow } from "@/hooks/api/schemas";
-import { trackSearchLinks, trackLyricsLinks } from "@/lib/media/platformLinks";
+import { trackSearchLinks } from "@/lib/media/platformLinks";
 import { formatTrackDuration } from "@/lib/media/duration";
 import { useT } from "@/lib/i18n/client";
 import { interpolate } from "@/lib/i18n/format";
 
 type AlbumTracklistProps = {
   tracks: TrackRow[];
-  /** Nom du groupe : construit les adresses de recherche et de paroles. */
+  /** Nom du groupe : construit les requêtes de recherche des plateformes. */
   artistName: string;
-  /** Titre de l'album : DarkLyrics indexe ses pages par album. */
-  albumTitle?: string;
 };
 
-export function AlbumTracklist({
-  tracks,
-  artistName,
-  albumTitle,
-}: AlbumTracklistProps) {
+export function AlbumTracklist({ tracks, artistName }: AlbumTracklistProps) {
   const t = useT();
   // Une seule piste dépliée à la fois (index dans la liste)
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -43,7 +34,6 @@ export function AlbumTracklist({
       {tracks.map((track, index) => {
         const isOpen = openIndex === index;
         const listen = trackSearchLinks(artistName, track.title);
-        const lyrics = trackLyricsLinks(artistName, track.title, albumTitle);
 
         return (
           <li key={track.id} className="bg-card">
@@ -81,24 +71,6 @@ export function AlbumTracklist({
                 <ul className="flex flex-wrap gap-2">
                   {Object.entries(listen).map(([platform, link]) => (
                     <li key={platform}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase transition-colors"
-                      >
-                        {link.label} ↗
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="text-muted-foreground mt-3 mb-1.5 text-[11px] tracking-wide uppercase">
-                  {t.album.lyrics}
-                </p>
-                <ul className="flex flex-wrap gap-2">
-                  {Object.entries(lyrics).map(([source, link]) => (
-                    <li key={source}>
                       <a
                         href={link.url}
                         target="_blank"

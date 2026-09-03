@@ -104,14 +104,13 @@ export default function CreditsPage() {
         </p>
       </section>
 
-      <section aria-labelledby="paroles" className="flex flex-col gap-3">
-        <h2 id="paroles" className="metal-title text-lg">
-          Ni paroles, ni musique
+      <section aria-labelledby="musique" className="flex flex-col gap-3">
+        <h2 id="musique" className="metal-title text-lg">
+          Pas de musique ici
         </h2>
         <p className="text-sm leading-relaxed">
-          Aucune parole n&apos;est reproduite ici, et il n&apos;y a pas de
-          lecteur audio : pour écouter, les liens vous emmènent chez le
-          diffuseur. C&apos;est la place de la musique, et c&apos;est là que les
+          Il n&apos;y a pas de lecteur : pour écouter, les liens vous emmènent
+          chez le diffuseur. C&apos;est sa place, et c&apos;est là que les
           artistes sont payés.
         </p>
       </section>

@@ -70,7 +70,6 @@ export const nb: Dictionary = {
     noPressReview: "Ingen har ennå lagt til en anmeldelse av albumet.",
     noRating: "Ingen vurderinger ennå",
     listenAt: "Hør hos kilden",
-    lyrics: "Sangtekster",
     linksFor: "Lenker for {track}",
   },
   releaseType: {

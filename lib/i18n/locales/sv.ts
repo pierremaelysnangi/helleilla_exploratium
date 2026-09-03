@@ -70,7 +70,6 @@ export const sv: Dictionary = {
     noPressReview: "Ingen har ännu lagt till någon recension av albumet.",
     noRating: "Inga betyg ännu",
     listenAt: "Lyssna hos källan",
-    lyrics: "Sångtexter",
     linksFor: "Länkar för {track}",
   },
   releaseType: {

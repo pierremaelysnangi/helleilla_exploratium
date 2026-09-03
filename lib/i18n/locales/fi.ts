@@ -73,7 +73,6 @@ export const fi: Dictionary = {
     noPressReview: "Kukaan ei ole vielä lisännyt arviota tästä albumista.",
     noRating: "Ei vielä arvioita",
     listenAt: "Kuuntele lähteessä",
-    lyrics: "Sanoitukset",
     linksFor: "Linkit kappaleeseen {track}",
   },
   releaseType: {

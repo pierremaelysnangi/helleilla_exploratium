@@ -23,7 +23,7 @@ import type { AlbumDetail } from "@/hooks/api/schemas";
 import { AlbumActions } from "@/components/collections/albumActions";
 // Mise en forme des durées, partagée avec la tracklist
 import { formatTotalDuration, totalDurationIso } from "@/lib/media/duration";
-// Tracklist interactive : menu déroulant par piste (écoute + paroles)
+// Tracklist interactive : menu déroulant par piste
 import { AlbumTracklist } from "@/components/albums/albumTracklist";
 // Critiques de presse : pendant professionnel des notes d'auditeurs
 import { PressReviews } from "@/components/albums/pressReviews";
@@ -226,7 +226,6 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             <AlbumTracklist
               tracks={album.tracks}
               artistName={album.band.name}
-              albumTitle={album.title}
             />
           )}
         </section>

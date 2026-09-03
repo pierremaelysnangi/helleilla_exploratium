@@ -110,7 +110,7 @@ export function CommandPalette() {
                 value={`track-${track.id}`}
                 // La palette navigue avec le routeur Next : lui passer une
                 // URL externe ne fonctionne pas. On ouvre l'album qui porte
-                // la piste, d'où partent les liens d'écoute et de paroles.
+                // la piste, d'où partent les liens d'écoute.
                 onSelect={() =>
                   go(`/bands/${track.bandSlug}/albums/${track.albumSlug}`)
                 }

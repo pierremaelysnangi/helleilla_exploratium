@@ -70,7 +70,6 @@ export const nl: Dictionary = {
     noPressReview: "Nog niemand heeft een recensie van dit album toegevoegd.",
     noRating: "Nog geen beoordelingen",
     listenAt: "Luisteren bij de bron",
-    lyrics: "Songteksten",
     linksFor: "Links voor {track}",
   },
   releaseType: {

@@ -73,7 +73,6 @@ export const ru: Dictionary = {
     noPressReview: "Рецензий на этот альбом пока никто не добавил.",
     noRating: "Оценок пока нет",
     listenAt: "Слушать у источника",
-    lyrics: "Тексты",
     linksFor: "Ссылки для «{track}»",
   },
   releaseType: {
