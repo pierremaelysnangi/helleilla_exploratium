@@ -16,9 +16,17 @@ import { Nav } from "./nav";
 import { MobileNav } from "./mobileNav";
 // Zone authentifiée (client)
 import { UserMenu } from "./userMenu";
+import { LanguageSwitcher } from "./languageSwitcher";
 import Link from "next/link";
+import type { Locale } from "@/lib/i18n/locales";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-export function Header() {
+type HeaderProps = {
+  locale: Locale;
+  t: Dictionary;
+};
+
+export function Header({ locale, t }: HeaderProps) {
   return (
     <header className="border-border bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 border-b backdrop-blur">
       <div className="site-container flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 sm:gap-x-4">
@@ -29,17 +37,19 @@ export function Header() {
 
         {/* Navigation centrale (grand écran) */}
         <div className="hidden lg:block">
-          <Nav />
+          <Nav t={t} />
         </div>
 
-        {/* Zone droite : session (grand écran) */}
+        {/* Zone droite : langue et session (grand écran) */}
         <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher current={locale} t={t} />
           <UserMenu />
         </div>
 
         {/* Burger : le panneau déplié occupe toute la largeur grâce à
             `basis-full`, sous la ligne du titre. */}
-        <MobileNav>
+        <MobileNav t={t}>
+          <LanguageSwitcher current={locale} t={t} />
           <UserMenu />
         </MobileNav>
       </div>

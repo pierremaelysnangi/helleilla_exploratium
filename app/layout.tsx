@@ -10,6 +10,8 @@ import { Providers } from "@/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ConsoleWarning } from "@/components/layout/consoleWarning";
+import { getTranslations } from "@/lib/i18n/server";
+import { localeDir } from "@/lib/i18n/locales";
 import { CommandPalette } from "@/components/search/commandPalette";
 // Lecteur audio global : élément <audio> unique de l'application
 import { ErrorBoundary } from "@/components/shared/errorBoundary";
@@ -53,10 +55,15 @@ export const metadata: Metadata = {
  *
  * @param children - Les pages rendues dans ce layout.
  */
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // La langue est résolue côté serveur : le cookie du visiteur d'abord,
+  // sinon les préférences déclarées par son navigateur.
+  const { locale, t } = await getTranslations();
+
   return (
     <html
-      lang="fr"
+      lang={locale}
+      dir={localeDir(locale)}
       // `dark` en dur : l'application n'a qu'une apparence. Le thème
       // n'étant plus résolu côté client, `suppressHydrationWarning`
       // devient inutile — et masquait de vrais écarts.
@@ -75,7 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col">
         <Providers>
-          <Header />
+          <Header locale={locale} t={t} />
           {/* Avertissement anti-auto-XSS dans la console du navigateur */}
           <ConsoleWarning />
           {/* Palette de recherche rapide, disponible sur toutes les pages */}
@@ -85,7 +92,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* Capture les erreurs de rendu des composants clients */}
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
-          <Footer />
+          <Footer t={t} />
         </Providers>
       </body>
     </html>

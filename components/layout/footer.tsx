@@ -7,36 +7,48 @@
  */
 
 import Link from "next/link";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-/** Colonnes de liens du pied de page. */
-const COLUMNS = [
+/**
+ * Colonnes de liens, décrites par leurs CLÉS de traduction.
+ *
+ * Les libellés sont résolus au rendu : y écrire du français figerait le
+ * pied de page dans une seule langue.
+ */
+const COLUMNS: {
+  title: keyof Dictionary["footer"];
+  links: { href: string; label: (t: Dictionary) => string }[];
+}[] = [
   {
-    title: "Explorer",
+    title: "explore",
     links: [
-      { href: "/bands", label: "Groupes" },
-      { href: "/albums", label: "Albums" },
-      { href: "/genres", label: "Genres" },
-      { href: "/search", label: "Recherche" },
+      { href: "/bands", label: (t) => t.nav.bands },
+      { href: "/albums", label: (t) => t.nav.albums },
+      { href: "/genres", label: (t) => t.nav.genres },
+      { href: "/search", label: (t) => t.nav.search },
     ],
   },
   {
-    title: "Participer",
+    title: "participate",
     links: [
-      { href: "/contributions", label: "Proposer une fiche" },
-      { href: "/contributions/mes-dossiers", label: "Mes contributions" },
-      { href: "/sign-up", label: "Créer un compte" },
+      { href: "/contributions", label: (t) => t.footer.proposeEntry },
+      {
+        href: "/contributions/mes-dossiers",
+        label: (t) => t.auth.myContributions,
+      },
+      { href: "/sign-up", label: (t) => t.footer.createAccount },
     ],
   },
   {
-    title: "Le projet",
+    title: "project",
     links: [
-      { href: "/about", label: "À propos" },
-      { href: "/credits", label: "Crédits et droits" },
+      { href: "/about", label: (t) => t.footer.about },
+      { href: "/credits", label: (t) => t.footer.credits },
     ],
   },
-] as const;
+];
 
-export function Footer() {
+export function Footer({ t }: { t: Dictionary }) {
   return (
     <footer className="border-border bg-background/60 mt-8 border-t">
       <div className="site-container flex flex-col gap-8 py-10">
@@ -51,9 +63,9 @@ export function Footer() {
           </div>
 
           {COLUMNS.map((column) => (
-            <nav key={column.title} aria-label={column.title}>
+            <nav key={column.title} aria-label={t.footer[column.title]}>
               <h2 className="text-xs font-semibold tracking-widest uppercase">
-                {column.title}
+                {t.footer[column.title]}
               </h2>
               <ul className="mt-3 flex flex-col gap-2">
                 {column.links.map((link) => (
@@ -62,7 +74,7 @@ export function Footer() {
                       href={link.href}
                       className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                     >
-                      {link.label}
+                      {link.label(t)}
                     </Link>
                   </li>
                 ))}

@@ -1,0 +1,141 @@
+/**
+ * Dicionário em português.
+ *
+ * Redigido à mão a partir da referência francesa, em português europeu
+ * com formas aceites também no Brasil. Os nomes dos géneros não são
+ * traduzidos: são nomes próprios da cena.
+ */
+
+import type { Dictionary } from "./fr";
+
+export const pt: Dictionary = {
+  nav: {
+    home: "Início",
+    bands: "Bandas",
+    albums: "Álbuns",
+    genres: "Géneros",
+    search: "Pesquisa",
+    openMenu: "Abrir o menu",
+    closeMenu: "Fechar o menu",
+    mainNavigation: "Navegação principal",
+    language: "Idioma",
+    chooseLanguage: "Escolher idioma",
+  },
+  auth: {
+    signIn: "Iniciar sessão",
+    signUp: "Criar conta",
+    signOut: "Terminar sessão",
+    myContributions: "As minhas contribuições",
+  },
+  home: {
+    tagline:
+      "Bem-vindo à enciclopédia colaborativa do metal: gratuita, moderna e intuitiva! Boa exploração",
+    explore: "Explorar o catálogo",
+    shortcutHint: "Dica: {keys} para a pesquisa rápida",
+    recentBands: "Últimas bandas adicionadas",
+    recentAlbums: "Últimos lançamentos registados",
+    topRated: "Melhor avaliados",
+  },
+  band: {
+    country: "País",
+    activity: "Atividade",
+    active: "em atividade",
+    disbanded: "dissolvida",
+    members: "Membros",
+    formerMembers: "Antigos membros",
+    themes: "Temas",
+    genres: "Géneros",
+    gallery: "Galeria",
+    officialLinks: "Ligações oficiais",
+    discography: "Discografia",
+    noReleases: "Sem lançamentos registados.",
+    photoCredit: "Fotografia de {band}",
+    logoCredit: "Logótipo de {band}",
+    by: "por",
+    viewSource: "Ver a fonte",
+    close: "Fechar",
+    enlarge: "Ampliar",
+    galleryNotice:
+      "Estas fotografias ilustram uma ficha enciclopédica. Continuam a pertencer aos seus autores, e aqui nada é vendido nem monetizado.",
+  },
+  album: {
+    tracklist: "Alinhamento",
+    totalDuration: "Duração total",
+    tracks: "faixas",
+    track: "faixa",
+    noTracks: "Sem faixas registadas para este lançamento.",
+    reviews: "Críticas",
+    press: "Imprensa",
+    listeners: "Ouvintes",
+    noPressReview: "Ainda ninguém acrescentou uma crítica deste álbum.",
+    noRating: "Ainda sem avaliações",
+    listenAt: "Ouvir na fonte",
+    lyrics: "Letras",
+    linksFor: "Ligações de {track}",
+  },
+  releaseType: {
+    album: "Álbum",
+    ep: "EP",
+    single: "Single",
+    compilation: "Coletânea",
+    live: "Ao vivo",
+    demo: "Demo",
+    split: "Split",
+  },
+  releaseSection: {
+    album: "Álbuns de estúdio",
+    ep: "EP",
+    single: "Singles",
+    compilation: "Coletâneas",
+    live: "Ao vivo",
+    demo: "Demos",
+    split: "Splits",
+  },
+  catalogue: {
+    allGenres: "Todos os géneros",
+    filterByGenre: "Filtrar por género",
+    searchBand: "Procurar uma banda…",
+    searchAlbum: "Procurar um álbum…",
+    searchPlaceholder: "Bandas, álbuns, faixas…",
+    sortBy: "Ordenar por",
+    newest: "Mais recentes",
+    name: "Nome",
+    year: "Ano",
+    ascending: "Crescente",
+    descending: "Decrescente",
+    loading: "A carregar…",
+    noResult: "Sem resultados.",
+    releases: "lançamentos",
+    release: "lançamento",
+  },
+  search: {
+    title: "Pesquisa",
+    prompt: "Escreva um termo para pesquisar bandas, álbuns e faixas.",
+    noResultFor: "Sem resultados para «{term}».",
+    searching: "A pesquisar…",
+    refreshing: "A atualizar…",
+  },
+  common: {
+    error: "Ocorreu um erro.",
+    retry: "Tentar novamente",
+    unavailable: "Indisponível de momento.",
+    noVisual: "Sem imagem disponível de {name}",
+    noCoverFor: "Sem capa de {title} — imagem de {band}",
+    coverOf: "Capa de {title}",
+  },
+  footer: {
+    about: "Sobre o projeto",
+    credits: "Créditos e direitos",
+    explore: "Explorar",
+    participate: "Participar",
+    project: "O projeto",
+    proposeEntry: "Propor uma ficha",
+    createAccount: "Criar uma conta",
+    intro:
+      "Uma enciclopédia do metal escrita por quem o ouve. Bandas, discografias, géneros — e o caminho de volta à fonte de cada informação.",
+    rights:
+      "As capas e as fotografias pertencem aos seus autores e titulares de direitos. Aqui nada é alojado: tudo é apresentado a partir da fonte original, a título ilustrativo.",
+    noMonetisation: "Projeto sem publicidade, sem subscrição e sem receitas.",
+    sourcesAndRights: "Fontes e direitos",
+  },
+};

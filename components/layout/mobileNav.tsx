@@ -19,22 +19,24 @@ import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /** Entrées de navigation : mêmes cibles que la navigation de bureau. */
 const LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/bands", label: "Groupes" },
-  { href: "/albums", label: "Albums" },
-  { href: "/genres", label: "Genres" },
-  { href: "/search", label: "Recherche" },
+  { href: "/", key: "home" },
+  { href: "/bands", key: "bands" },
+  { href: "/albums", key: "albums" },
+  { href: "/genres", key: "genres" },
+  { href: "/search", key: "search" },
 ] as const;
 
 type MobileNavProps = {
-  /** Zone de session, listée sous les liens une fois le menu ouvert. */
+  /** Zone de langue et de session, listée sous les liens une fois ouvert. */
   children: React.ReactNode;
+  t: Dictionary;
 };
 
-export function MobileNav({ children }: MobileNavProps) {
+export function MobileNav({ children, t }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const panelId = useId();
@@ -66,7 +68,7 @@ export function MobileNav({ children }: MobileNavProps) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+        aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
         className="border-border hover:border-primary/50 flex h-9 w-9 items-center justify-center rounded-md border transition-colors lg:hidden"
       >
         {open ? (
@@ -83,9 +85,9 @@ export function MobileNav({ children }: MobileNavProps) {
         hidden={!open}
         className="border-border/60 basis-full border-t lg:hidden"
       >
-        <nav aria-label="Navigation principale" className="py-2">
+        <nav aria-label={t.nav.mainNavigation} className="py-2">
           <ul className="flex flex-col">
-            {LINKS.map(({ href, label }) => {
+            {LINKS.map(({ href, key }) => {
               const active =
                 href === "/" ? pathname === "/" : pathname.startsWith(href);
               return (
@@ -97,7 +99,7 @@ export function MobileNav({ children }: MobileNavProps) {
                       active ? "text-primary font-semibold" : ""
                     }`}
                   >
-                    {label}
+                    {t.nav[key]}
                   </Link>
                 </li>
               );

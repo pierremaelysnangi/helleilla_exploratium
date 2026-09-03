@@ -11,23 +11,24 @@
 // Détection de la route active
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-/** Entrées de navigation : libellé FR + route. */
+/** Entrées de navigation : route + clé de traduction du libellé. */
 const LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/bands", label: "Groupes" },
-  { href: "/albums", label: "Albums" },
-  { href: "/genres", label: "Genres" },
-  { href: "/search", label: "Recherche" },
+  { href: "/", key: "home" },
+  { href: "/bands", key: "bands" },
+  { href: "/albums", key: "albums" },
+  { href: "/genres", key: "genres" },
+  { href: "/search", key: "search" },
 ] as const;
 
-export function Nav() {
+export function Nav({ t }: { t: Dictionary }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Navigation principale">
+    <nav aria-label={t.nav.mainNavigation}>
       <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-6">
-        {LINKS.map(({ href, label }) => {
+        {LINKS.map(({ href, key }) => {
           // Actif si route exacte (accueil) ou sous-route (/bands/...)
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -38,7 +39,7 @@ export function Nav() {
                 className={`metal-nav-link ${active ? "metal-nav-link-active" : ""}`}
                 aria-current={active ? "page" : undefined}
               >
-                {label}
+                {t.nav[key]}
               </Link>
             </li>
           );

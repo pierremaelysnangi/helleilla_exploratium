@@ -1,0 +1,141 @@
+/**
+ * Dizionario italiano.
+ *
+ * Redatto a mano a partire dalla versione francese di riferimento. I
+ * nomi dei generi non vengono tradotti: sono nomi propri della scena.
+ */
+
+import type { Dictionary } from "./fr";
+
+export const it: Dictionary = {
+  nav: {
+    home: "Home",
+    bands: "Gruppi",
+    albums: "Album",
+    genres: "Generi",
+    search: "Ricerca",
+    openMenu: "Apri il menu",
+    closeMenu: "Chiudi il menu",
+    mainNavigation: "Navigazione principale",
+    language: "Lingua",
+    chooseLanguage: "Scegli la lingua",
+  },
+  auth: {
+    signIn: "Accedi",
+    signUp: "Registrati",
+    signOut: "Esci",
+    myContributions: "I miei contributi",
+  },
+  home: {
+    tagline:
+      "Benvenuto nell'enciclopedia collaborativa del metal: gratuita, moderna e intuitiva! Buona esplorazione",
+    explore: "Esplora il catalogo",
+    shortcutHint: "Suggerimento: {keys} per la ricerca rapida",
+    recentBands: "Ultimi gruppi aggiunti",
+    recentAlbums: "Ultime uscite registrate",
+    topRated: "I più votati",
+  },
+  band: {
+    country: "Paese",
+    activity: "Attività",
+    active: "in attività",
+    disbanded: "sciolto",
+    members: "Membri",
+    formerMembers: "Ex membri",
+    themes: "Temi",
+    genres: "Generi",
+    gallery: "Galleria",
+    officialLinks: "Link ufficiali",
+    discography: "Discografia",
+    noReleases: "Nessuna uscita registrata.",
+    photoCredit: "Foto di {band}",
+    logoCredit: "Logo di {band}",
+    by: "di",
+    viewSource: "Vedi la fonte",
+    close: "Chiudi",
+    enlarge: "Ingrandisci",
+    galleryNotice:
+      "Queste foto illustrano una scheda enciclopedica. Restano dei loro autori, e qui non si vende né si monetizza nulla.",
+  },
+  album: {
+    tracklist: "Tracklist",
+    totalDuration: "Durata totale",
+    tracks: "tracce",
+    track: "traccia",
+    noTracks: "Nessuna traccia registrata per questa uscita.",
+    reviews: "Recensioni",
+    press: "Stampa",
+    listeners: "Ascoltatori",
+    noPressReview: "Nessuno ha ancora aggiunto una recensione di questo album.",
+    noRating: "Ancora nessun voto",
+    listenAt: "Ascolta alla fonte",
+    lyrics: "Testi",
+    linksFor: "Link per {track}",
+  },
+  releaseType: {
+    album: "Album",
+    ep: "EP",
+    single: "Singolo",
+    compilation: "Raccolta",
+    live: "Live",
+    demo: "Demo",
+    split: "Split",
+  },
+  releaseSection: {
+    album: "Album in studio",
+    ep: "EP",
+    single: "Singoli",
+    compilation: "Raccolte",
+    live: "Live",
+    demo: "Demo",
+    split: "Split",
+  },
+  catalogue: {
+    allGenres: "Tutti i generi",
+    filterByGenre: "Filtra per genere",
+    searchBand: "Cerca un gruppo…",
+    searchAlbum: "Cerca un album…",
+    searchPlaceholder: "Gruppi, album, tracce…",
+    sortBy: "Ordina per",
+    newest: "Più recenti",
+    name: "Nome",
+    year: "Anno",
+    ascending: "Crescente",
+    descending: "Decrescente",
+    loading: "Caricamento…",
+    noResult: "Nessun risultato.",
+    releases: "uscite",
+    release: "uscita",
+  },
+  search: {
+    title: "Ricerca",
+    prompt: "Scrivi un termine per cercare gruppi, album e tracce.",
+    noResultFor: "Nessun risultato per «{term}».",
+    searching: "Ricerca in corso…",
+    refreshing: "Aggiornamento…",
+  },
+  common: {
+    error: "Si è verificato un errore.",
+    retry: "Riprova",
+    unavailable: "Momentaneamente non disponibile.",
+    noVisual: "Nessuna immagine disponibile per {name}",
+    noCoverFor: "Nessuna copertina per {title} — immagine di {band}",
+    coverOf: "Copertina di {title}",
+  },
+  footer: {
+    about: "Il progetto",
+    credits: "Crediti e diritti",
+    explore: "Esplora",
+    participate: "Partecipa",
+    project: "Il progetto",
+    proposeEntry: "Proponi una scheda",
+    createAccount: "Crea un account",
+    intro:
+      "Un'enciclopedia del metal scritta da chi lo ascolta. Gruppi, discografie, generi — e la via del ritorno alla fonte di ogni informazione.",
+    rights:
+      "Copertine e fotografie appartengono ai loro autori e aventi diritto. Qui non è ospitato nulla: tutto è mostrato dalla fonte originale, a scopo illustrativo.",
+    noMonetisation:
+      "Progetto senza pubblicità, senza abbonamento e senza ricavi.",
+    sourcesAndRights: "Fonti e diritti",
+  },
+};
