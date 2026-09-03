@@ -13,6 +13,7 @@ import Link from "next/link";
 import { requirePagePermission } from "@/lib/rbac/page";
 import { UsersTable } from "@/components/admin/usersTable";
 import { AccessNotice } from "@/components/contributions/accessNotice";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Comptes",
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminUsersPage() {
+  const { t } = await getTranslations();
   const session = await requirePagePermission(
     "user",
     "read",
@@ -31,7 +33,7 @@ export default async function AdminUsersPage() {
       <section className="flex max-w-3xl flex-col gap-6">
         <h1 className="metal-title text-3xl">Comptes</h1>
         <AccessNotice
-          title="Rôle administrateur requis"
+          title={t.app.adminRequired}
           description="La gestion des comptes est réservée aux administrateurs."
         />
       </section>

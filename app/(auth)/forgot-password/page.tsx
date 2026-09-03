@@ -7,18 +7,20 @@
 import Link from "next/link";
 import { ForgotPasswordForm } from "@/components/auth/forgotPasswordForm";
 import { AuthHeading } from "@/components/auth/authHeading";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata = {
   robots: { index: false },
   title: "Mot de passe oublié",
 };
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const { t } = await getTranslations();
   return (
     <>
       <AuthHeading
-        title="Mot de passe oublié"
-        subtitle="Indiquez votre adresse : si un compte existe, vous recevrez un lien valable une heure."
+        title={t.account.forgotTitle}
+        subtitle={t.account.forgotSubtitle}
       />
 
       <ForgotPasswordForm />
@@ -28,7 +30,7 @@ export default function ForgotPasswordPage() {
           href="/sign-in"
           className="text-muted-foreground hover:text-foreground underline underline-offset-4"
         >
-          Retour à la connexion
+          {t.account.backToSignIn}
         </Link>
       </p>
     </>

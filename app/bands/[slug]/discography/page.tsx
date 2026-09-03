@@ -85,7 +85,7 @@ export default async function DiscographyPage({
 
       {albums.length === 0 ? (
         <EmptyState
-          title="Aucune sortie référencée"
+          title={t.app.noReleaseListed}
           description={`La discographie de ${band.name} n'a pas encore été documentée.`}
           ctaHref={`/bands/${band.slug}`}
           ctaLabel="Retour à la fiche du groupe"

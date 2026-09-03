@@ -16,6 +16,7 @@ import { apiJson, type ApiClientError } from "@/hooks/api/client";
 import { updateProfileSchema } from "@/lib/validations/profile";
 import { usePreferenceStore } from "@/stores/preference.store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 /** Profil renvoyé par GET /api/profile. */
 const profileSchema = z.object({
@@ -28,6 +29,7 @@ const profileSchema = z.object({
 type Profile = z.infer<typeof profileSchema>;
 
 export function ProfileForm() {
+  const t = useT();
   const qc = useQueryClient();
   // `null` = champ non touché : la valeur affichée suit alors le serveur.
   // Dériver au rendu évite de synchroniser l'état depuis un effet.
@@ -68,7 +70,7 @@ export function ProfileForm() {
   if (profile.isError) {
     return (
       <p role="alert" className="text-destructive text-sm">
-        Impossible de charger votre profil.
+        {t.app.profileLoadFailed}
       </p>
     );
   }
@@ -86,13 +88,11 @@ export function ProfileForm() {
         className="flex flex-col gap-3"
       >
         <h2 className="metal-title text-lg">Profil public</h2>
-        <p className="text-muted-foreground text-sm">
-          Ce nom apparaît comme auteur de vos contributions.
-        </p>
+        <p className="text-muted-foreground text-sm">{t.app.displayNameHint}</p>
 
         <label className="max-w-sm">
           <span className="text-muted-foreground mb-1 block text-xs">
-            Nom affiché
+            {t.app.displayName}
           </span>
           <input
             required
@@ -113,7 +113,7 @@ export function ProfileForm() {
         )}
         {saved && !dirty && (
           <p role="status" className="text-muted-foreground text-sm">
-            Profil enregistré.
+            {t.app.profileSaved}
           </p>
         )}
 
@@ -151,7 +151,7 @@ export function ProfileForm() {
 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={muted} onChange={toggleMuted} />
-          Couper le son par défaut
+          {t.app.mutedByDefault}
         </label>
       </section>
     </div>

@@ -13,8 +13,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 // Recherche globale debouncée
 import { useGlobalSearch } from "@/hooks/use-search";
+import { useT } from "@/lib/i18n/client";
 
 export function CommandPalette() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -50,12 +52,12 @@ export function CommandPalette() {
       <Command.Input
         value={query}
         onValueChange={setQuery}
-        placeholder="Rechercher un groupe, un album, une piste…"
+        placeholder={t.app.searchEverything}
         className="border-border w-full border-b bg-transparent px-4 py-3 text-sm outline-none"
       />
       <Command.List className="max-h-80 overflow-y-auto p-2">
         <Command.Empty className="text-muted-foreground px-3 py-4 text-sm">
-          Aucun résultat.
+          {t.catalogue.noResult}
         </Command.Empty>
 
         {data && data.bands.length > 0 && (
@@ -128,7 +130,8 @@ export function CommandPalette() {
 
       {/* Astuce raccourci */}
       <div className="border-border text-muted-foreground border-t px-4 py-2 text-xs">
-        <kbd>Ctrl</kbd>+<kbd>K</kbd> pour ouvrir · <kbd>Échap</kbd> pour fermer
+        <kbd>Ctrl</kbd>+<kbd>K</kbd> pour ouvrir · <kbd>{t.app.escape}</kbd>{" "}
+        pour fermer
       </div>
     </Command.Dialog>
   );

@@ -21,6 +21,7 @@ import { fetchPublicOrNull } from "@/lib/api/client";
 import { bandMediaSchema } from "@/hooks/api/schemas";
 import { listMembersByBandId } from "@/db/queries/members";
 import { EmptyState } from "@/components/shared/emptyState";
+import { getTranslations } from "@/lib/i18n/server";
 
 type MembersPageProps = {
   params: Promise<{ slug: string }>;
@@ -47,6 +48,7 @@ export async function generateMetadata({
 }
 
 export default async function BandMembersPage({ params }: MembersPageProps) {
+  const { t } = await getTranslations();
   const { slug } = await params;
   const band = await fetchBandBySlug(slug);
 
@@ -127,7 +129,7 @@ export default async function BandMembersPage({ params }: MembersPageProps) {
         </ul>
       ) : external.length === 0 ? (
         <EmptyState
-          title="Aucun membre référencé"
+          title={t.app.noMemberListed}
           description={`La formation de ${band.name} n'est pas encore documentée, et MusicBrainz n'en fournit aucune.`}
           ctaHref={`/bands/${band.slug}`}
           ctaLabel="Retour à la fiche du groupe"

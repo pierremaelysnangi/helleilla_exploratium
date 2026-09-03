@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePageSession } from "@/lib/rbac/page";
 import { MyContributions } from "@/components/contributions/myContributions";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Mes dossiers",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MyContributionsPage() {
+  const { t } = await getTranslations();
   await requirePageSession("/contributions/mes-dossiers");
 
   return (
@@ -33,7 +35,7 @@ export default async function MyContributionsPage() {
             href="/contributions"
             className="hover:text-foreground underline"
           >
-            Proposer un groupe
+            {t.contributions.proposeBand}
           </Link>
           .
         </p>

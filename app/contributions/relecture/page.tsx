@@ -12,6 +12,7 @@ import Link from "next/link";
 import { requirePagePermission } from "@/lib/rbac/page";
 import { ReviewQueue } from "@/components/contributions/reviewQueue";
 import { AccessNotice } from "@/components/contributions/accessNotice";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Relecture des contributions",
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewPage() {
+  const { t } = await getTranslations();
   const session = await requirePagePermission(
     "contribution",
     "moderate",
@@ -31,7 +33,7 @@ export default async function ReviewPage() {
       <section className="flex max-w-3xl flex-col gap-6">
         <h1 className="metal-title text-3xl">Relecture</h1>
         <AccessNotice
-          title="Rôle modérateur requis"
+          title={t.contributions.moderatorRequired}
           description="La file de relecture est réservée aux modérateurs et aux administrateurs. Si vous avez soumis un dossier, vous pouvez en suivre l'avancement depuis vos dossiers."
         />
       </section>

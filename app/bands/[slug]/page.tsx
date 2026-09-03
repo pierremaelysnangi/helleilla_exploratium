@@ -16,7 +16,7 @@ import { fetchBandBySlug } from "@/hooks/use-bands";
 // Présentation
 import { BandHeader } from "@/components/bands/bandHeader";
 // Visuel du groupe en fond de fiche
-import { BandBackdrop } from "@/components/bands/bandBackdrop";
+import { BandBackdrop } from "@/components/media/mediaBackdrop";
 import { BandMediaSection } from "@/components/bands/bandMediaSection";
 import { DiscographySections } from "@/components/bands/discographySections";
 // Chargement serveur de la discographie complète

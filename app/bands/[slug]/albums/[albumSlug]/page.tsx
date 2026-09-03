@@ -28,6 +28,8 @@ import { AlbumTracklist } from "@/components/albums/albumTracklist";
 // Critiques de presse : pendant professionnel des notes d'auditeurs
 import { PressReviews } from "@/components/albums/pressReviews";
 import { getTranslations } from "@/lib/i18n/server";
+// Fond de page : la pochette, très adoucie
+import { AlbumBackdrop } from "@/components/media/mediaBackdrop";
 
 type AlbumPageProps = {
   params: Promise<{ slug: string; albumSlug: string }>;
@@ -123,6 +125,8 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
 
   return (
     <article className="flex flex-col gap-8">
+      <AlbumBackdrop imageUrl={album.coverUrl ?? album.band.imageUrl} />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -203,22 +207,9 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
           tout en bas les rendait invisibles. En dessous, empilement. */}
       <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <section aria-label="Tracklist" className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="metal-title text-lg">{t.album.tracklist}</h2>
-            {totalDuration && (
-              <span
-                className="text-muted-foreground font-mono text-sm"
-                title={
-                  totalDuration.partial
-                    ? "Certaines pistes ne sont pas minutées : ce total est un minimum."
-                    : undefined
-                }
-              >
-                {t.album.totalDuration} : {totalDuration.partial ? "≥ " : ""}
-                {totalDuration.label}
-              </span>
-            )}
-          </div>
+          {/* La durée totale n'est plus répétée ici : l'en-tête de la
+              fiche la porte déjà, à quelques centimètres au-dessus. */}
+          <h2 className="metal-title text-lg">{t.album.tracklist}</h2>
 
           {album.tracks.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t.album.noTracks}</p>

@@ -19,6 +19,7 @@ import {
   type EvidenceItem,
   type EvidenceKind,
 } from "@/lib/validations/contribution";
+import { useT } from "@/lib/i18n/client";
 
 /** Libellés français des types de preuve, ordre = du plus probant au moins. */
 const KIND_LABELS: Record<EvidenceKind, string> = {
@@ -83,6 +84,7 @@ export function EvidenceFields({
   onChange,
   disabled = false,
 }: EvidenceFieldsProps) {
+  const t = useT();
   const { items, enough, official } = evidenceDiagnostics(value);
 
   /** Remplace une ligne à l'index donné. */
@@ -124,7 +126,7 @@ export function EvidenceFields({
 
               <label className="min-w-0 flex-1">
                 <span className="text-muted-foreground mb-1 block text-xs">
-                  Lien vérifiable
+                  {t.contributions.verifiableLink}
                 </span>
                 <input
                   type="url"
@@ -144,7 +146,7 @@ export function EvidenceFields({
               </span>
               <input
                 type="text"
-                placeholder="Ce que cette source atteste"
+                placeholder={t.contributions.evidenceNote}
                 value={draft.note}
                 maxLength={500}
                 onChange={(e) => update(index, { note: e.target.value })}
@@ -158,7 +160,7 @@ export function EvidenceFields({
                 onClick={() => onChange(value.filter((_, i) => i !== index))}
                 className="text-muted-foreground hover:text-destructive self-start text-xs underline"
               >
-                Retirer cette preuve
+                {t.contributions.removeEvidence}
               </button>
             )}
           </li>
@@ -170,7 +172,7 @@ export function EvidenceFields({
         onClick={() => onChange([...value, emptyEvidence()])}
         className="border-border hover:bg-accent/30 self-start rounded-md border px-3 py-1.5 text-xs font-medium tracking-wide uppercase"
       >
-        Ajouter une preuve
+        {t.contributions.addEvidence}
       </button>
 
       {/* État courant de la règle, annoncé aux lecteurs d'écran */}

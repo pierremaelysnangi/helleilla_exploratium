@@ -9,7 +9,8 @@
  */
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithI18n as render } from "@/lib/i18n/testing";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { ContributionForm } from "./contributionForm";

@@ -7,6 +7,7 @@
 import Link from "next/link";
 import { ResetPasswordForm } from "@/components/auth/resetPasswordForm";
 import { AuthHeading } from "@/components/auth/authHeading";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata = {
   robots: { index: false },
@@ -21,13 +22,14 @@ type ResetPasswordPageProps = {
 export default async function ResetPasswordPage({
   searchParams,
 }: ResetPasswordPageProps) {
+  const { t } = await getTranslations();
   const { token } = await searchParams;
 
   return (
     <>
       <AuthHeading
-        title="Nouveau mot de passe"
-        subtitle="Choisissez un mot de passe long : le générateur en produit un valide."
+        title={t.account.resetTitle}
+        subtitle={t.account.resetSubtitle}
       />
 
       {token ? (
@@ -36,7 +38,7 @@ export default async function ResetPasswordPage({
         <p className="text-muted-foreground text-sm">
           Lien incomplet.{" "}
           <Link href="/forgot-password" className="underline">
-            Refaites une demande
+            {t.account.askAgain}
           </Link>{" "}
           pour recevoir un nouveau lien.
         </p>

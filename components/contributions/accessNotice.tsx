@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * <AccessNotice> — message affiché à un utilisateur connecté qui n'a pas
  * le rôle requis.
@@ -9,6 +11,7 @@
  */
 
 import Link from "next/link";
+import { useT } from "@/lib/i18n/client";
 
 type AccessNoticeProps = {
   title: string;
@@ -16,6 +19,7 @@ type AccessNoticeProps = {
 };
 
 export function AccessNotice({ title, description }: AccessNoticeProps) {
+  const t = useT();
   return (
     <div className="metal-card flex flex-col items-start gap-3 p-6">
       <h2 className="metal-title text-lg">{title}</h2>
@@ -24,7 +28,7 @@ export function AccessNotice({ title, description }: AccessNoticeProps) {
         href="/about"
         className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
       >
-        Comment fonctionnent les contributions
+        {t.contributions.howItWorks}
       </Link>
     </div>
   );

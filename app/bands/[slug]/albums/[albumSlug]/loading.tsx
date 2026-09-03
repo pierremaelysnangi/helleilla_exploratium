@@ -12,14 +12,16 @@
  */
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { getTranslations } from "@/lib/i18n/server";
 
-export default function AlbumLoading() {
+export default async function AlbumLoading() {
+  const { t } = await getTranslations();
   return (
     <div className="flex flex-col gap-8" aria-busy>
       {/* Annonce l'attente : un squelette seul n'est pas perçu par un
           lecteur d'écran. */}
       <p role="status" className="sr-only">
-        Chargement de la fiche de l&apos;album…
+        {t.app.loadingAlbum}
       </p>
 
       <Skeleton className="h-4 w-64" />

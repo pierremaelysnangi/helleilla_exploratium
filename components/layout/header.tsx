@@ -48,9 +48,11 @@ export function Header({ locale, t }: HeaderProps) {
 
         {/* Burger : le panneau déplié occupe toute la largeur grâce à
             `basis-full`, sous la ligne du titre. */}
+        {/* Ordre du menu replié : la langue d'abord — elle conditionne
+            la lecture du reste —, puis les actions de compte en liste. */}
         <MobileNav t={t}>
           <LanguageSwitcher current={locale} t={t} />
-          <UserMenu />
+          <UserMenu stacked />
         </MobileNav>
       </div>
     </header>

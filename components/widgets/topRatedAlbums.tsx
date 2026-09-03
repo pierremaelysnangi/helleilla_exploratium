@@ -21,13 +21,19 @@ export type TopRatedAlbum = {
   votes: number;
 };
 
-export function TopRatedAlbums({ albums }: { albums: TopRatedAlbum[] }) {
+export function TopRatedAlbums({
+  albums,
+  title,
+}: {
+  albums: TopRatedAlbum[];
+  title: string;
+}) {
   if (albums.length === 0) return null;
 
   return (
     <section aria-labelledby="mieux-notes" className="flex flex-col gap-3">
       <h2 id="mieux-notes" className="metal-title text-lg">
-        Les mieux notés
+        {title}
       </h2>
       <ol className="divide-border border-border divide-y rounded-lg border">
         {albums.map((album, index) => (

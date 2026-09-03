@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMemberBySlug } from "@/db/queries/members";
 import { EmptyState } from "@/components/shared/emptyState";
+import { getTranslations } from "@/lib/i18n/server";
 
 type MemberPageProps = {
   params: Promise<{ slug: string }>;
@@ -51,6 +52,7 @@ export async function generateMetadata({
 }
 
 export default async function MemberPage({ params }: MemberPageProps) {
+  const { t } = await getTranslations();
   const { slug } = await params;
   const member = await getMemberBySlug(slug);
 
@@ -104,7 +106,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
         <h2 className="metal-title text-lg">Groupes</h2>
         {member.bands.length === 0 ? (
           <EmptyState
-            title="Aucun groupe référencé"
+            title={t.app.noBandListed}
             description="Aucune appartenance n'a encore été documentée pour cette personne."
           />
         ) : (
@@ -129,7 +131,7 @@ export default async function MemberPage({ params }: MemberPageProps) {
 
       {member.albums.length > 0 && (
         <section aria-label="Albums" className="flex flex-col gap-3">
-          <h2 className="metal-title text-lg">Présent sur</h2>
+          <h2 className="metal-title text-lg">{t.app.appearsOn}</h2>
           <ul className="divide-border border-border divide-y rounded-lg border">
             {member.albums.map((album) => (
               <li key={album.id} className="bg-card">

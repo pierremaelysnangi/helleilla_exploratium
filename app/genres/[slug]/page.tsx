@@ -17,6 +17,7 @@ import { fetchGenreBySlug } from "@/hooks/use-genres";
 import { GenreCard } from "@/components/genres/genreCard";
 import { BandCard } from "@/components/bands/bandCard";
 import { EmptyState } from "@/components/shared/emptyState";
+import { getTranslations } from "@/lib/i18n/server";
 
 type GenrePageProps = {
   params: Promise<{ slug: string }>;
@@ -54,6 +55,7 @@ export async function generateMetadata({
 }
 
 export default async function GenreDetailPage({ params }: GenrePageProps) {
+  const { t } = await getTranslations();
   const { slug } = await params;
   const genre = await fetchGenreBySlug(slug);
 
@@ -112,7 +114,7 @@ export default async function GenreDetailPage({ params }: GenrePageProps) {
 
         {genre.bands.length === 0 ? (
           <EmptyState
-            title="Aucun groupe dans ce genre"
+            title={t.app.noBandInGenre}
             description="Ce genre existe dans la taxonomie mais aucun groupe n'y est encore rattaché."
             ctaHref="/bands"
             ctaLabel="Parcourir le catalogue"

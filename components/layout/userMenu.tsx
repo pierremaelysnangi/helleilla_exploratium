@@ -17,9 +17,33 @@
 import { useSession } from "@/lib/auth-client";
 import { signOutAction } from "@/lib/actions/auth";
 import Link from "next/link";
+import { useT } from "@/lib/i18n/client";
 
-export function UserMenu() {
+type UserMenuProps = {
+  /**
+   * Disposition en LISTE, pour le menu replié des petits écrans.
+   *
+   * Les mêmes liens y sont empilés au lieu d'être alignés : à 390 px de
+   * large, « Contribuer · Mes dossiers · Relecture · Admin · nom ·
+   * Déconnexion » repassait sur trois lignes irrégulières, chaque lien
+   * finissant à une position différente et difficile à viser au pouce.
+   */
+  stacked?: boolean;
+};
+
+export function UserMenu({ stacked = false }: UserMenuProps) {
+  const t = useT();
   const { data: session, isPending } = useSession();
+
+  /** Classes du conteneur, selon la disposition demandée. */
+  const container = stacked
+    ? "flex flex-col items-stretch gap-1"
+    : "flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3";
+
+  /** Un lien de menu : pleine largeur et cible confortable en liste. */
+  const link = stacked
+    ? "hover:bg-accent/30 block rounded-md px-2 py-2.5 text-sm tracking-wide uppercase transition-colors"
+    : "metal-nav-link";
 
   // État pendant le chargement de session : placeholder stable
   if (isPending) {
@@ -28,15 +52,21 @@ export function UserMenu() {
 
   if (!session) {
     return (
-      <div className="flex items-center gap-3">
-        <Link href="/sign-in" className="metal-nav-link">
-          Connexion
+      <div
+        className={stacked ? "flex flex-col gap-2" : "flex items-center gap-3"}
+      >
+        <Link href="/sign-in" className={link}>
+          {t.auth.signIn}
         </Link>
         <Link
           href="/sign-up"
-          className="bg-primary text-primary-foreground rounded-md px-2.5 py-1.5 text-xs font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 sm:px-3 sm:text-sm sm:tracking-widest"
+          className={`bg-primary text-primary-foreground rounded-md font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 ${
+            stacked
+              ? "px-3 py-2.5 text-center text-sm"
+              : "px-2.5 py-1.5 text-xs sm:px-3 sm:text-sm sm:tracking-widest"
+          }`}
         >
-          Inscription
+          {t.auth.signUp}
         </Link>
       </div>
     );
@@ -48,36 +78,43 @@ export function UserMenu() {
   const isAdmin = role === "admin";
 
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3">
-      <Link href="/contributions" className="metal-nav-link">
-        Contribuer
+    <div className={container}>
+      <Link href="/contributions" className={link}>
+        {t.auth.contribute}
       </Link>
-      <Link href="/contributions/mes-dossiers" className="metal-nav-link">
-        Mes dossiers
+      <Link href="/contributions/mes-dossiers" className={link}>
+        {t.auth.myContributions}
       </Link>
       {canModerate && (
-        <Link href="/contributions/relecture" className="metal-nav-link">
-          Relecture
+        <Link href="/contributions/relecture" className={link}>
+          {t.auth.review}
         </Link>
       )}
       {isAdmin && (
-        <Link href="/admin" className="metal-nav-link">
-          Admin
+        <Link href="/admin" className={link}>
+          {t.auth.admin}
         </Link>
       )}
       <Link
         href="/profile"
-        className="text-muted-foreground text-sm hover:underline"
+        className={
+          stacked
+            ? "text-muted-foreground px-2 py-2 text-sm hover:underline"
+            : "text-muted-foreground text-sm hover:underline"
+        }
       >
         {session.user.name}
       </Link>
       {/* Server Action : révocation serveur + purge du cookie de session */}
-      <form action={signOutAction}>
+      <form
+        action={signOutAction}
+        className={stacked ? "px-2 pt-1" : undefined}
+      >
         <button
           type="submit"
-          className="metal-nav-link border-border hover:border-primary/40 rounded-md border px-2 py-1"
+          className="metal-nav-link border-border hover:border-primary/40 w-full rounded-md border px-2 py-1"
         >
-          Déconnexion
+          {t.auth.signOut}
         </button>
       </form>
     </div>

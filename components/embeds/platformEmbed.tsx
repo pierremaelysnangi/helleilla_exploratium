@@ -21,6 +21,7 @@ import {
   buildEmbedFromRef,
   type ResolvedEmbed,
 } from "@/lib/media/embeds";
+import { useT } from "@/lib/i18n/client";
 
 /** Props du composant : une URL publique OU une référence en base. */
 type PlatformEmbedProps = {
@@ -44,6 +45,7 @@ export function PlatformEmbed({
   externalId,
   fallbackLabel = "Ouvrir sur la plateforme",
 }: PlatformEmbedProps) {
+  const t = useT();
   // Résolution : URL prioritaire, sinon référence brute
   const resolved: ResolvedEmbed | null = url
     ? parseEmbedUrl(url)
@@ -66,14 +68,14 @@ export function PlatformEmbed({
     return (
       <button
         type="button"
-        aria-label="Lire la vidéo"
+        aria-label={t.app.playVideo}
         onClick={() => setFacadeClicked(true)}
         style={{ cursor: "pointer" }}
       >
         {/* Miniature native YouTube : aucune ressource plateforme JS */}
         <Image
           src={`https://i.ytimg.com/vi/${resolved.nativeId}/hqdefault.jpg`}
-          alt="Miniature de la vidéo"
+          alt={t.app.videoThumbnail}
           loading="lazy"
           width={480}
           height={360}

@@ -23,6 +23,7 @@ import type { AdminUserRow, UserRole } from "@/hooks/api/schemas";
 import { RoleBadge, ROLE_ORDER, roleLabel } from "./roleBadge";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 type UsersTableProps = {
   /** Identifiant de l'administrateur connecté, pour l'auto-protection. */
@@ -39,6 +40,7 @@ function formatDate(iso: string): string {
 }
 
 export function UsersTable({ currentUserId }: UsersTableProps) {
+  const t = useT();
   const [q, setQ] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
   const [page, setPage] = useState(1);
@@ -78,7 +80,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             }}
             className="border-border bg-card focus:border-primary/50 w-full rounded-md border px-3 py-2 text-sm outline-none"
           >
-            <option value="">Tous les rôles</option>
+            <option value="">{t.app.allRoles}</option>
             {ROLE_ORDER.map((r) => (
               <option key={r} value={r}>
                 {roleLabel(r)}
@@ -98,7 +100,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
 
       {users.isError && (
         <p role="alert" className="text-destructive text-sm">
-          Impossible de charger les comptes.
+          {t.app.accountsLoadFailed}
         </p>
       )}
 
@@ -128,7 +130,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             onClick={() => setPage((p) => p - 1)}
             className="border-border hover:bg-accent/30 rounded-md border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase disabled:opacity-40"
           >
-            Précédent
+            {t.app.previous}
           </button>
           <span className="text-muted-foreground text-xs">
             Page {users.data.meta.page} sur {users.data.meta.totalPages} ·{" "}
@@ -156,6 +158,7 @@ function UserRow({
   account: AdminUserRow;
   isSelf: boolean;
 }) {
+  const t = useT();
   const [confirming, setConfirming] = useState(false);
   const [confirmName, setConfirmName] = useState("");
 
@@ -265,7 +268,7 @@ function UserRow({
                   onClick={() => remove.mutate(account.id)}
                   className="border-destructive/40 text-destructive hover:bg-destructive/10 rounded-md border px-3 py-1.5 text-xs font-semibold tracking-wide uppercase disabled:opacity-40"
                 >
-                  Confirmer la suppression
+                  {t.app.confirmDeletion}
                 </button>
                 <button
                   type="button"

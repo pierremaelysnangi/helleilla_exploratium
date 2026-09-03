@@ -18,6 +18,7 @@ import {
   MIN_LENGTH,
 } from "@/components/auth/passwordField";
 import { usePasswordStrength } from "@/hooks/use-password-strength";
+import { useT } from "@/lib/i18n/client";
 
 type ResetPasswordFormProps = {
   /** Token signé Better Auth extrait de l'URL du lien email. */
@@ -25,6 +26,7 @@ type ResetPasswordFormProps = {
 };
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+  const t = useT();
   const [state, formAction, isPending] = useActionState<
     ResetFormState,
     FormData
@@ -55,7 +57,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             {state.success}
           </p>
           <a href="/sign-in" className="metal-nav-link text-sm underline">
-            Aller à la connexion
+            {t.app.goToSignIn}
           </a>
         </>
       )}

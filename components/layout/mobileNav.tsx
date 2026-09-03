@@ -108,8 +108,10 @@ export function MobileNav({ children, t }: MobileNavProps) {
           </ul>
         </nav>
 
-        {/* Session : mêmes actions que sur grand écran */}
-        <div className="border-border/60 flex items-center gap-3 border-t py-3">
+        {/* Langue puis session, EMPILÉES : sur un écran étroit, aligner
+            le sélecteur de langue et les liens de compte les comprimait
+            jusqu'à les rendre difficiles à viser au pouce. */}
+        <div className="border-border/60 flex flex-col gap-3 border-t py-3">
           {children}
         </div>
       </div>

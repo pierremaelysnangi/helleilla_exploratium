@@ -12,6 +12,7 @@ import Link from "next/link";
 import { requirePagePermission } from "@/lib/rbac/page";
 import { getAdminStats } from "@/db/queries/stats";
 import { AccessNotice } from "@/components/contributions/accessNotice";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Administration",
@@ -31,6 +32,7 @@ function StatTile({ label, value }: { label: string; value: number }) {
 }
 
 export default async function AdminPage() {
+  const { t } = await getTranslations();
   const session = await requirePagePermission("user", "read", "/admin");
 
   if (!session) {
@@ -38,7 +40,7 @@ export default async function AdminPage() {
       <section className="flex max-w-3xl flex-col gap-6">
         <h1 className="metal-title text-3xl">Administration</h1>
         <AccessNotice
-          title="Rôle administrateur requis"
+          title={t.app.adminRequired}
           description="Cet espace est réservé aux administrateurs. Les modérateurs disposent de la file de relecture des contributions."
         />
       </section>
@@ -54,7 +56,7 @@ export default async function AdminPage() {
         <div className="metal-rule mt-2 w-48" />
       </header>
 
-      <section aria-label="Chiffres clés" className="flex flex-col gap-3">
+      <section aria-label="{t.app.keyFigures}" className="flex flex-col gap-3">
         <h2 className="metal-title text-lg">Catalogue</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatTile label="Groupes" value={stats.bands} />
@@ -64,8 +66,8 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section aria-label="Communauté" className="flex flex-col gap-3">
-        <h2 className="metal-title text-lg">Communauté</h2>
+      <section aria-label={t.app.community} className="flex flex-col gap-3">
+        <h2 className="metal-title text-lg">{t.app.community}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <StatTile label="Comptes" value={stats.users} />
           <StatTile label="Administrateurs" value={stats.admins} />
@@ -78,7 +80,7 @@ export default async function AdminPage() {
           href="/admin/utilisateurs"
           className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase hover:opacity-90"
         >
-          Gérer les comptes
+          {t.app.manageAccounts}
         </Link>
         <Link
           href="/contributions/relecture"

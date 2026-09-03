@@ -6,16 +6,15 @@
 import Link from "next/link";
 import { SignInForm } from "@/components/auth/signInForm";
 import { AuthHeading } from "@/components/auth/authHeading";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata = { robots: { index: false }, title: "Connexion" };
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  const { t } = await getTranslations();
   return (
     <>
-      <AuthHeading
-        title="Se connecter"
-        subtitle="Pour contribuer, noter les albums et tenir votre liste."
-      />
+      <AuthHeading title={t.auth.signIn} subtitle={t.account.signInSubtitle} />
 
       <SignInForm />
 
@@ -24,15 +23,15 @@ export default function SignInPage() {
           href="/forgot-password"
           className="text-muted-foreground hover:text-foreground underline underline-offset-4"
         >
-          Mot de passe oublié ?
+          {t.account.forgotLink}
         </Link>
         <p className="text-muted-foreground">
-          Pas encore de compte ?{" "}
+          {t.account.noAccount}{" "}
           <Link
             href="/sign-up"
             className="text-foreground font-medium underline underline-offset-4"
           >
-            S&apos;inscrire
+            {t.auth.signUp}
           </Link>
         </p>
       </div>

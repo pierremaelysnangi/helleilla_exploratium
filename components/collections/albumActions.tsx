@@ -18,6 +18,7 @@ import { z } from "zod";
 import { apiJson, type ApiClientError } from "@/hooks/api/client";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
+import { useT } from "@/lib/i18n/client";
 
 /** Agrégat renvoyé par /api/albums/:id/ratings. */
 const ratingSummarySchema = z.object({
@@ -41,6 +42,7 @@ type AlbumActionsProps = {
 };
 
 export function AlbumActions({ albumId }: AlbumActionsProps) {
+  const t = useT();
   const qc = useQueryClient();
   const { data: session } = useSession();
 
@@ -130,7 +132,7 @@ export function AlbumActions({ albumId }: AlbumActionsProps) {
         <div className="flex flex-col gap-3">
           <div
             role="group"
-            aria-label="Votre note"
+            aria-label={t.app.yourRating}
             className="flex items-center gap-2"
           >
             {SCORES.map((score) => (

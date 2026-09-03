@@ -15,6 +15,7 @@ import {
 import { RecentAlbums } from "@/components/widgets/recentAlbums";
 import { RecentBands } from "@/components/widgets/recentBands";
 import { TopRatedAlbums } from "@/components/widgets/topRatedAlbums";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Accueil",
@@ -65,6 +66,7 @@ async function loadWidgets() {
 
 export default async function HomePage() {
   const { recentBands, recentAlbums, topRated } = await loadWidgets();
+  const { t } = await getTranslations();
 
   return (
     <div className="flex flex-col gap-10">
@@ -74,15 +76,14 @@ export default async function HomePage() {
           Helleilla Exploratium
         </h1>
         <p className="text-muted-foreground max-w-xl">
-          Bienvenue sur l&apos;encyclopédie collaborative, gratuite, modernisée
-          et intuitive sur la musique metal ! Bonne exploration à tous
+          {t.home.tagline}
           {" \\m/"}
         </p>
         <Link
           href="/bands"
           className="bg-primary text-primary-foreground rounded-md px-6 py-2.5 text-sm font-semibold tracking-widest uppercase transition-opacity hover:opacity-90"
         >
-          Explorer le catalogue
+          {t.home.explore}
         </Link>
         <p className="text-muted-foreground text-xs">
           Astuce : <kbd>Ctrl</kbd>+<kbd>K</kbd> pour la recherche rapide
@@ -115,9 +116,9 @@ export default async function HomePage() {
 
       {/* Widgets : chacun disparaît si le catalogue n'a rien à montrer,
           plutôt que d'afficher une section vide. */}
-      <RecentAlbums albums={recentAlbums} />
-      <TopRatedAlbums albums={topRated} />
-      <RecentBands bands={recentBands} />
+      <RecentAlbums albums={recentAlbums} title={t.home.recentAlbums} />
+      <TopRatedAlbums albums={topRated} title={t.home.topRated} />
+      <RecentBands bands={recentBands} title={t.home.recentBands} />
     </div>
   );
 }

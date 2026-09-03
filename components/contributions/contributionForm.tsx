@@ -20,6 +20,7 @@ import {
   evidenceDiagnostics,
   type EvidenceDraft,
 } from "./evidenceFields";
+import { useT } from "@/lib/i18n/client";
 
 /** Champs du groupe soumis, tous optionnels sauf nom et slug. */
 type BandDraft = {
@@ -57,6 +58,7 @@ function yearOrUndefined(value: string): number | undefined {
 }
 
 export function ContributionForm() {
+  const t = useT();
   const [band, setBand] = useState<BandDraft>(EMPTY_BAND);
   // Le slug suit le nom tant que l'utilisateur ne l'a pas édité lui-même
   const [slugTouched, setSlugTouched] = useState(false);
@@ -123,7 +125,7 @@ export function ContributionForm() {
             }}
             className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
           >
-            Proposer un autre groupe
+            {t.contributions.proposeAnother}
           </button>
         </div>
       </div>
@@ -133,7 +135,9 @@ export function ContributionForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <fieldset className="flex flex-col gap-3" disabled={create.isPending}>
-        <legend className="metal-title text-base">Le groupe</legend>
+        <legend className="metal-title text-base">
+          {t.contributions.theBand}
+        </legend>
 
         <label>
           <span className="text-muted-foreground mb-1 block text-xs">
@@ -163,7 +167,7 @@ export function ContributionForm() {
             className="border-border bg-card focus:border-primary/50 w-full rounded-md border px-3 py-2 font-mono text-sm outline-none"
           />
           <span className="text-muted-foreground mt-1 block text-xs">
-            Dérivé du nom ; en minuscules et tirets.
+            {t.contributions.slugHint}
           </span>
         </label>
 
@@ -184,7 +188,7 @@ export function ContributionForm() {
           </label>
           <label className="sm:w-40">
             <span className="text-muted-foreground mb-1 block text-xs">
-              Année de formation
+              {t.contributions.formedYear}
             </span>
             <input
               type="number"
@@ -197,7 +201,7 @@ export function ContributionForm() {
           </label>
           <label className="sm:w-40">
             <span className="text-muted-foreground mb-1 block text-xs">
-              Année de séparation
+              {t.contributions.dissolvedYear}
             </span>
             <input
               type="number"
@@ -248,7 +252,7 @@ export function ContributionForm() {
         </button>
         {!evidenceValid && (
           <p className="text-muted-foreground text-xs">
-            Complétez les preuves pour pouvoir soumettre.
+            {t.contributions.completeEvidence}
           </p>
         )}
       </div>

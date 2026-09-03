@@ -11,6 +11,8 @@
  * la cause brute.
  */
 
+import { useT } from "@/lib/i18n/client";
+
 type ErrorFallbackProps = {
   error: Error & { digest?: string };
   reset: () => void;
@@ -19,6 +21,7 @@ type ErrorFallbackProps = {
 };
 
 export function ErrorFallback({ error, reset, scope }: ErrorFallbackProps) {
+  const t = useT();
   return (
     <div
       role="alert"
@@ -44,7 +47,7 @@ export function ErrorFallback({ error, reset, scope }: ErrorFallbackProps) {
         onClick={reset}
         className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90"
       >
-        Réessayer
+        {t.common.retry}
       </button>
     </div>
   );

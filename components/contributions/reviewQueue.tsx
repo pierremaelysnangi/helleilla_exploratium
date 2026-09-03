@@ -19,6 +19,7 @@ import type { ContributionRow, ContributionStatus } from "@/hooks/api/schemas";
 import { ContributionStatusBadge } from "./contributionStatusBadge";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 /** Filtres proposés au modérateur. */
 const FILTERS: { value: ContributionStatus | undefined; label: string }[] = [
@@ -35,6 +36,7 @@ type ReviewQueueProps = {
 };
 
 export function ReviewQueue({ canReject }: ReviewQueueProps) {
+  const t = useT();
   const [status, setStatus] = useState<ContributionStatus | undefined>(
     undefined,
   );
@@ -69,13 +71,13 @@ export function ReviewQueue({ canReject }: ReviewQueueProps) {
 
       {queue.isError && (
         <p role="alert" className="text-destructive text-sm">
-          Impossible de charger la file de relecture.
+          {t.contributions.queueLoadFailed}
         </p>
       )}
 
       {queue.isSuccess && queue.data.length === 0 && (
         <EmptyState
-          title="Rien à relire"
+          title="{t.contributions.nothingToReview}"
           description="Aucun dossier ne correspond à ce filtre."
         />
       )}
@@ -99,6 +101,7 @@ function ReviewCard({
   contribution: ContributionRow;
   canReject: boolean;
 }) {
+  const t = useT();
   const [notes, setNotes] = useState("");
   const [asking, setAsking] = useState(false);
   const review = useReviewContribution();
@@ -174,7 +177,7 @@ function ReviewCard({
             <div className="flex flex-col gap-2">
               <label>
                 <span className="text-muted-foreground mb-1 block text-xs">
-                  Ce qui manque (visible par le contributeur)
+                  {t.contributions.whatIsMissing}
                 </span>
                 <textarea
                   rows={3}
@@ -223,7 +226,7 @@ function ReviewCard({
                 onClick={() => setAsking(true)}
                 className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-xs font-semibold tracking-wide uppercase"
               >
-                Demander des preuves
+                {t.contributions.requestEvidence}
               </button>
               <button
                 type="button"
@@ -244,7 +247,7 @@ function ReviewCard({
                   }
                   className="border-destructive/40 text-destructive hover:bg-destructive/10 rounded-md border px-4 py-2 text-xs font-semibold tracking-wide uppercase disabled:opacity-50"
                 >
-                  Rejeter définitivement
+                  {t.contributions.rejectDefinitively}
                 </button>
               )}
             </div>

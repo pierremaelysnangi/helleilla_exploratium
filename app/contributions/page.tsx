@@ -12,6 +12,7 @@ import Link from "next/link";
 import { requirePagePermission } from "@/lib/rbac/page";
 import { ContributionForm } from "@/components/contributions/contributionForm";
 import { AccessNotice } from "@/components/contributions/accessNotice";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
   title: "Proposer un groupe",
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ContributionsPage() {
+  const { t } = await getTranslations();
   const session = await requirePagePermission(
     "contribution",
     "create",
@@ -31,13 +33,13 @@ export default async function ContributionsPage() {
   return (
     <section className="flex max-w-3xl flex-col gap-6">
       <header>
-        <h1 className="metal-title text-3xl">Proposer un groupe</h1>
+        <h1 className="metal-title text-3xl">{t.contributions.proposeBand}</h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           Chaque fiche doit pouvoir être vérifiée : deux preuves minimum, dont
           une source officielle.{" "}
           <Link href="/about" className="hover:text-foreground underline">
-            Pourquoi cette exigence
+            {t.contributions.whyRequired}
           </Link>
           .
         </p>
@@ -47,7 +49,7 @@ export default async function ContributionsPage() {
         <ContributionForm />
       ) : (
         <AccessNotice
-          title="Rôle contributeur requis"
+          title={t.contributions.contributorRequired}
           description="Votre compte n'a pas encore le rôle contributeur, nécessaire pour soumettre un dossier. Il est attribué par un administrateur ; en attendant, vous pouvez parcourir l'encyclopédie et suivre vos éventuels dossiers existants."
         />
       )}

@@ -22,6 +22,7 @@ import {
 } from "./evidenceFields";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/lib/i18n/client";
 
 /** Formate une date ISO en date lisible, ou tiret si absente. */
 function formatDate(iso?: string | null): string {
@@ -34,6 +35,7 @@ function formatDate(iso?: string | null): string {
 }
 
 export function MyContributions() {
+  const t = useT();
   const contributions = useMyContributions();
 
   if (contributions.isPending) {
@@ -48,7 +50,7 @@ export function MyContributions() {
   if (contributions.isError) {
     return (
       <p role="alert" className="text-destructive text-sm">
-        Impossible de charger vos dossiers.
+        {t.contributions.loadFailed}
       </p>
     );
   }
@@ -79,6 +81,7 @@ export function MyContributions() {
 
 /** Fiche d'un dossier, avec réponse inline si des preuves sont demandées. */
 function ContributionCard({ contribution }: { contribution: ContributionRow }) {
+  const t = useT();
   const [answering, setAnswering] = useState(false);
   const [drafts, setDrafts] = useState<EvidenceDraft[]>([emptyEvidence()]);
   const addEvidence = useAddEvidence();
@@ -107,11 +110,11 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
         {contribution.evidence.length > 1 ? "s" : ""}
       </p>
 
-      {/* Demande du modérateur : la note explique ce qui manque */}
+      {/* {t.contributions.moderatorRequest} : la note explique ce qui manque */}
       {awaitingEvidence && contribution.reviewNotes && (
         <div className="border-border bg-background/40 rounded-md border px-3 py-2">
           <p className="text-muted-foreground text-xs font-semibold uppercase">
-            Demande du modérateur
+            {t.contributions.moderatorRequest}
           </p>
           <p className="mt-1 text-sm">{contribution.reviewNotes}</p>
           {contribution.deadlineAt && (
@@ -128,7 +131,7 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
           href={`/bands/${contribution.payload.slug}`}
           className="text-sm underline"
         >
-          Voir la fiche publiée
+          {t.contributions.seePublished}
         </Link>
       )}
 
@@ -176,7 +179,7 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
                 un complément peut ne contenir qu'une seule preuve. */}
             {!valid && items.length > 0 && (
               <p className="text-muted-foreground text-xs">
-                Ces preuves complètent celles déjà fournies.
+                {t.contributions.evidenceComplement}
               </p>
             )}
           </div>
@@ -186,7 +189,7 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
             onClick={() => setAnswering(true)}
             className="bg-primary text-primary-foreground self-start rounded-md px-4 py-2 text-xs font-semibold tracking-wide uppercase hover:opacity-90"
           >
-            Répondre avec des preuves
+            {t.contributions.replyWithEvidence}
           </button>
         ))}
     </article>
