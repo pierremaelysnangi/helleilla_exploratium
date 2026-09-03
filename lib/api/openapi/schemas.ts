@@ -427,19 +427,12 @@ export const BandMediaSchema = z
         kind: z.enum(["photo", "logo"]),
         /** Page d'origine : auteur, licence, historique. */
         sourceUrl: z.string().nullable(),
-        credit: z.string().nullable(),
+        author: z.string().nullable(),
+        licence: z.string().nullable(),
       }),
     ),
     links: z.array(
       z.object({ provider: z.string(), label: z.string(), url: z.string() }),
-    ),
-    previews: z.array(
-      z.object({
-        title: z.string(),
-        artistName: z.string(),
-        previewUrl: z.string(),
-        coverUrl: z.string().nullish(),
-      }),
     ),
     degraded: z.boolean(),
   })

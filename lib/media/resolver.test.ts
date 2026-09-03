@@ -2,7 +2,7 @@
  * Tests unitaires du resolver média (lib/media/resolver.ts).
  * Providers, DB et Redis mockés : vérifie la fusion multi-sources,
  * l'isolement des pannes (allSettled -> degraded), le cache Redis et
- * l'absence de référence MusicBrainz (résultat minimal + previews).
+ * l'absence de référence MusicBrainz (résultat minimal).
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -44,7 +44,6 @@ const providersMock = vi.hoisted(() => ({
   discogsEnabled: true,
   discogsGetArtist: vi.fn(),
   discogsSearch: vi.fn(),
-  deezerSearch: vi.fn(),
 }));
 vi.mock("@/lib/providers", () => ({
   dataProviders: {
@@ -62,7 +61,6 @@ vi.mock("@/lib/providers", () => ({
       searchArtists: providersMock.discogsSearch,
       isDiscogsEnabled: () => providersMock.discogsEnabled,
     },
-    deezer: { searchTracks: providersMock.deezerSearch },
   },
   isProviderAvailable: (name: string) =>
     name === "discogs" ? providersMock.discogsEnabled : true,
@@ -152,19 +150,6 @@ describe("resolveBandMedia", () => {
       sourceUrl: "https://commons.wikimedia.org/wiki/File:logo.svg",
       fileName: "logo.svg",
     });
-    providersMock.deezerSearch.mockResolvedValue([
-      {
-        id: 1,
-        title: "I Am the Black Wizards",
-        preview: "https://cdn.dz/a.mp3",
-        artist: { id: 9, name: "Emperor" },
-        album: {
-          id: 3,
-          title: "Anthems",
-          cover_medium: "https://cdn.dz/c.jpg",
-        },
-      },
-    ]);
 
     const media = await resolveBandMedia("b1");
 
@@ -212,7 +197,6 @@ describe("resolveBandMedia", () => {
     expect(media.images[0].sourceUrl).toContain(
       "commons.wikimedia.org/wiki/File:",
     );
-    expect(media.previews).toHaveLength(1);
     expect(media.degraded).toBe(false);
 
     // Le résultat a été mis en cache
@@ -224,28 +208,19 @@ describe("resolveBandMedia", () => {
       { provider: "musicbrainz", externalId: "mb-1" },
     ]);
     providersMock.mbGetArtist.mockRejectedValue(new Error("MB down"));
-    providersMock.deezerSearch.mockResolvedValue([]);
 
     const media = await resolveBandMedia("b1");
     expect(media.degraded).toBe(true);
     expect(media.info.memberships).toEqual([]); // partiel mais valide
   });
 
-  it("sans aucune ref : résultat minimal avec previews Deezer seuls", async () => {
+  it("sans aucune ref : résultat réduit aux données locales", async () => {
     dbMock.getExternalRefs.mockResolvedValue([]);
-    providersMock.deezerSearch.mockResolvedValue([]);
 
     const media = await resolveBandMedia("b1");
     expect(media.info.area).toBeNull();
     expect(media.images).toEqual([]);
     expect(media.degraded).toBe(false);
-    // Deezer est interrogé même sans ref (provider public), et le nom du
-    // groupe sert aussi de filtre d'artiste : sans lui, un homonyme
-    // fournirait des « titres iconiques » qui ne sont pas de lui.
-    expect(providersMock.deezerSearch).toHaveBeenCalledWith(
-      "Emperor",
-      "Emperor",
-    );
   });
 
   it("sert depuis le cache Redis, mais re-résout les extraits", async () => {
@@ -254,12 +229,9 @@ describe("resolveBandMedia", () => {
       info: { memberships: [], genres: [] },
       images: [],
       links: [],
-      previews: [],
       degraded: false,
     };
     redisStore.store.set("media:band:b1", JSON.stringify(cached));
-
-    providersMock.deezerSearch.mockResolvedValue([]);
 
     const media = await resolveBandMedia("b1");
 
@@ -268,13 +240,6 @@ describe("resolveBandMedia", () => {
     // une requête par seconde, la reconstruire à chaque visite laissait
     // la fiche vide plusieurs secondes.
     expect(providersMock.mbGetArtist).not.toHaveBeenCalled();
-    // Les extraits, eux, sont TOUJOURS refaits : leurs URLs portent un
-    // jeton signé d'environ une heure, et un lien mis en cache 24 h
-    // renvoyait un 403 silencieux à la lecture.
-    expect(providersMock.deezerSearch).toHaveBeenCalledWith(
-      "Emperor",
-      "Emperor",
-    );
   });
 
   it("ignore une entrée de cache au format obsolète et recalcule", async () => {
@@ -286,12 +251,10 @@ describe("resolveBandMedia", () => {
       JSON.stringify({ band: { id: "b1" }, info: {} }),
     );
     dbMock.getExternalRefs.mockResolvedValue([]);
-    providersMock.deezerSearch.mockResolvedValue([]);
 
     const media = await resolveBandMedia("b1");
 
     expect(media.band.name).toBe("Emperor");
-    expect(providersMock.deezerSearch).toHaveBeenCalled();
   });
 });
 

@@ -18,7 +18,6 @@
 import { useGlobalSearch } from "@/hooks/use-search";
 import Link from "next/link";
 import { CoverImage } from "@/components/albums/coverImage";
-import { trackSearchLinks } from "@/lib/media/platformLinks";
 
 type SearchResultsProps = {
   /** Terme brut saisi (le debounce est géré par le hook). */
@@ -149,8 +148,10 @@ export function SearchResults({ q }: SearchResultsProps) {
         </section>
       )}
 
-      {/* Pistes : la carte mène à l'album qui les porte, et le lien
-          d'écoute à la plateforme (il n'y a pas de page piste). */}
+      {/* Pistes : la carte mène à l'album qui les porte. Les liens
+          d'écoute vivent sur la page de l'album, où ils accompagnent la
+          piste dans son contexte — les répéter ici encombrait la grille
+          sans rien ajouter. */}
       {data && data.tracks.length > 0 && (
         <section>
           <SectionHeader label="Pistes" count={data.tracks.length} />
@@ -179,16 +180,6 @@ export function SearchResults({ q }: SearchResultsProps) {
                     </span>
                   </span>
                 </Link>
-                <a
-                  href={
-                    trackSearchLinks(track.bandName, track.title).deezer.url
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-border text-muted-foreground hover:text-foreground block border-t px-3 py-2 text-xs"
-                >
-                  Écouter ↗
-                </a>
               </li>
             ))}
           </ul>

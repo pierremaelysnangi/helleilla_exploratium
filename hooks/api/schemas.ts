@@ -299,19 +299,12 @@ export const bandMediaSchema = z.object({
       url: z.string(),
       kind: z.enum(["photo", "logo"]),
       sourceUrl: z.string().nullish(),
-      credit: z.string().nullish(),
+      author: z.string().nullish(),
+      licence: z.string().nullish(),
     }),
   ),
   links: z.array(
     z.object({ provider: z.string(), label: z.string(), url: z.string() }),
-  ),
-  previews: z.array(
-    z.object({
-      title: z.string(),
-      artistName: z.string(),
-      previewUrl: z.string(),
-      coverUrl: z.string().nullish(),
-    }),
   ),
   degraded: z.boolean(),
 });

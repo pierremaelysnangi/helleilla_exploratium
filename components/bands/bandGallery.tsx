@@ -109,9 +109,12 @@ export function BandGallery({
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Le crédit nomme l'auteur, sans redire ce que le bouton
+                  voisin propose déjà d'ouvrir. */}
               <p className="text-muted-foreground text-xs">
                 {KIND_LABELS[current.kind]} de {bandName}
-                {current.credit ? ` · ${current.credit}` : ""}
+                {current.author ? ` par ${current.author}` : ""}
+                {current.licence ? ` · ${current.licence}` : ""}
               </p>
 
               <div className="flex items-center gap-2">
@@ -122,7 +125,7 @@ export function BandGallery({
                     rel="noopener noreferrer"
                     className="border-border hover:border-primary/50 rounded-md border px-3 py-1.5 text-xs tracking-wide uppercase transition-colors"
                   >
-                    Auteur et licence ↗
+                    Voir la source ↗
                   </a>
                 )}
                 <button

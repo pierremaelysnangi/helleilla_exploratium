@@ -233,7 +233,7 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
             <AlbumTracklist
               tracks={album.tracks}
               artistName={album.band.name}
-              bandId={album.band.id}
+              albumTitle={album.title}
             />
           )}
         </section>
@@ -249,8 +249,8 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       </div>
 
       <p className="text-muted-foreground text-xs">
-        Les écoutes et visuels proviennent exclusivement des plateformes
-        officielles référencées pour ce groupe.{" "}
+        Pochette et informations proviennent des sources référencées pour ce
+        groupe.{" "}
         <Link
           href={`/bands/${album.band.slug}`}
           className="hover:text-foreground underline"

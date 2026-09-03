@@ -12,7 +12,6 @@ import { Footer } from "@/components/layout/footer";
 import { ConsoleWarning } from "@/components/layout/consoleWarning";
 import { CommandPalette } from "@/components/search/commandPalette";
 // Lecteur audio global : élément <audio> unique de l'application
-import { MiniPlayer } from "@/components/audio/miniPlayer";
 import { ErrorBoundary } from "@/components/shared/errorBoundary";
 
 // Police sans-serif principale, exposée via la variable CSS --font-geist-sans
@@ -39,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s | Helleilla Exploratium",
   },
   description:
-    "L'encyclopédie collaborative du metal — genres, groupes, albums, membres.",
+    "L'encyclopédie collaborative du metal : groupes, discographies et genres.",
   openGraph: {
     type: "website",
     siteName: "Helleilla Exploratium",
@@ -63,6 +62,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // devient inutile — et masquait de vrais écarts.
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/*
+          Dark Reader réécrit le DOM avant l'hydratation de React : il
+          pose `style` et `data-darkreader-*` sur chaque SVG, et React
+          signale alors un écart entre le rendu serveur et le client sur
+          toutes les pages. L'extension reconnaît ce verrou et se retire
+          d'elle-même — ce qui est ici la bonne issue, l'application
+          étant déjà sombre et n'ayant rien à assombrir.
+        */}
+        <meta name="darkreader-lock" />
+      </head>
       <body className="flex min-h-full flex-col">
         <Providers>
           <Header />
@@ -75,8 +85,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* Capture les erreurs de rendu des composants clients */}
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
-          {/* Barre de lecture persistante, au-dessus du pied de page */}
-          <MiniPlayer />
           <Footer />
         </Providers>
       </body>

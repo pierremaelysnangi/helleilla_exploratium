@@ -106,7 +106,81 @@ export type CommonsImage = {
   sourceUrl: string;
   /** Nom du fichier, tel que déclaré par Wikidata. */
   fileName: string;
+  /** Auteur de la photographie, quand Commons le renseigne. */
+  author: string | null;
+  /** Licence abrégée : « CC BY-SA 4.0 », « domaine public »… */
+  licence: string | null;
 };
+
+/** Métadonnées éditoriales renvoyées par l'API de Commons. */
+const commonsMetadataSchema = z.object({
+  query: z.object({
+    pages: z.record(
+      z.string(),
+      z.object({
+        imageinfo: z
+          .array(
+            z.object({
+              extmetadata: z
+                .object({
+                  Artist: z.object({ value: z.string() }).nullish(),
+                  LicenseShortName: z.object({ value: z.string() }).nullish(),
+                })
+                .nullish(),
+            }),
+          )
+          .nullish(),
+      }),
+    ),
+  }),
+});
+
+/**
+ * Retire le balisage HTML d'un champ de Commons.
+ *
+ * L'auteur y est renvoyé sous forme de lien (« <a …>Frank
+ * Schwichtenberg</a> »). Seul le nom nous intéresse : le lien vers la
+ * page du fichier est déjà proposé à côté de la légende.
+ */
+function stripHtml(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Auteur et licence d'un fichier de Wikimedia Commons.
+ *
+ * Les licences libres de Commons exigent de créditer l'auteur : sans
+ * cette requête, la légende ne pouvait que renvoyer le lecteur vers la
+ * page du fichier, ce qui reportait sur lui une obligation qui nous
+ * incombe.
+ *
+ * Échec silencieux : une photo sans crédit vaut mieux qu'une fiche en
+ * erreur, et le lien vers la page d'origine reste affiché.
+ */
+async function commonsCredits(
+  fileName: string,
+): Promise<{ author: string | null; licence: string | null }> {
+  try {
+    const data = await fetchJson(
+      "https://commons.wikimedia.org/w/api.php?action=query&format=json" +
+        "&prop=imageinfo&iiprop=extmetadata&titles=" +
+        encodeURIComponent(`File:${fileName}`),
+      commonsMetadataSchema,
+    );
+
+    const page = Object.values(data.query.pages)[0];
+    const meta = page?.imageinfo?.[0]?.extmetadata;
+    return {
+      author: meta?.Artist?.value ? stripHtml(meta.Artist.value) : null,
+      licence: meta?.LicenseShortName?.value ?? null,
+    };
+  } catch {
+    return { author: null, licence: null };
+  }
+}
 
 async function claimFile(
   entityId: string,
@@ -124,10 +198,13 @@ async function claimFile(
     if (!fileName) return null;
 
     const encoded = encodeURIComponent(fileName);
+    const { author, licence } = await commonsCredits(fileName);
     return {
       url: `https://commons.wikimedia.org/wiki/Special:FilePath/${encoded}?width=${width}`,
       sourceUrl: `https://commons.wikimedia.org/wiki/File:${encoded}`,
       fileName,
+      author,
+      licence,
     };
   } catch {
     // Entité absente ou service indisponible : pas de visuel, pas d'erreur

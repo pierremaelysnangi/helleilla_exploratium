@@ -34,7 +34,9 @@ export async function fetchDiscography(bandId: string): Promise<AlbumRow[]> {
   do {
     const payload = await apiFetch("/api/albums", pageSchema, {
       query: { bandId, page, perPage: PER_PAGE, sort: "year", order: "asc" },
-      revalidate: 60,
+      // Pas de cache : l'import écrit en continu, et une discographie
+      // figée 60 s s'affichait incomplète après un enrichissement.
+      revalidate: 0,
     });
     all.push(...payload.data);
     totalPages = payload.meta.totalPages;

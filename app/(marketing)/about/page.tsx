@@ -14,7 +14,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 const TITLE = "À propos";
 const DESCRIPTION =
-  "Helleilla Exploratium est une encyclopédie musicale metal collaborative : aucun média généré par IA, des sources officielles vérifiables pour chaque contribution.";
+  "Une encyclopédie du metal écrite par ceux qui l'écoutent : groupes, discographies et genres, sources à l'appui.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
-/** Les trois preuves considérées comme officielles à la modération. */
+/** Sources acceptées comme preuve officielle à la modération. */
 const OFFICIAL_SOURCES = [
   {
     name: "MusicBrainz",
@@ -53,45 +53,51 @@ export default function AboutPage() {
         </h1>
         <div className="metal-rule mt-2 w-48" />
         <p className="mt-4 text-sm leading-relaxed">
-          Une encyclopédie du metal : groupes, discographies et taxonomie des
-          genres, construite collectivement et vérifiable pièce par pièce.
+          Une encyclopédie du metal, écrite par ceux qui l&apos;écoutent.
+          Groupes, discographies, genres — de la première démo autoproduite aux
+          albums que tout le monde connaît.
         </p>
       </header>
 
-      <section aria-labelledby="regle" className="flex flex-col gap-3">
-        <h2 id="regle" className="metal-title text-lg">
-          Aucun média généré par IA
+      <section aria-labelledby="pourquoi" className="flex flex-col gap-3">
+        <h2 id="pourquoi" className="metal-title text-lg">
+          Pourquoi ce site
         </h2>
         <p className="text-sm leading-relaxed">
-          C&apos;est la règle non négociable du projet. Aucune image, aucun son
-          et aucune vidéo produits par un modèle génératif n&apos;entre ici. Les
-          pochettes, photos et extraits affichés proviennent{" "}
-          <strong>exclusivement</strong> des plateformes officielles, appelées
-          au moment de l&apos;affichage : rien n&apos;est copié, rien n&apos;est
-          recréé, la base ne conserve que des références.
+          Les informations sur le metal sont éparpillées : un split de 1991
+          n&apos;existe que sur un forum, une démo n&apos;a jamais eu de
+          pochette, un groupe a changé six fois de line-up sans que personne ne
+          l&apos;écrive nulle part. On rassemble tout ça au même endroit,
+          gratuitement, sans publicité et sans compte obligatoire pour lire.
         </p>
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          Seule exception : les animations de l&apos;interface, qui relèvent du
-          CSS et non du média.
+      </section>
+
+      <section aria-labelledby="regle" className="flex flex-col gap-3">
+        <h2 id="regle" className="metal-title text-lg">
+          Rien d&apos;inventé, rien de généré
+        </h2>
+        <p className="text-sm leading-relaxed">
+          Aucune image, aucun son et aucune vidéo produits par une intelligence
+          artificielle n&apos;entrent ici. Les pochettes et les photos que vous
+          voyez viennent des plateformes et des archives qui les publient, et
+          s&apos;affichent depuis chez elles.
+        </p>
+        <p className="text-sm leading-relaxed">
+          Les textes, eux, sont écrits par les contributeurs. Un groupe inventé
+          de toutes pièces ne franchit pas la porte : il lui faudrait produire
+          une référence vérifiable, et il n&apos;en a aucune.
         </p>
       </section>
 
       <section aria-labelledby="preuves" className="flex flex-col gap-3">
         <h2 id="preuves" className="metal-title text-lg">
-          Pourquoi des preuves sont exigées
+          Comment contribuer
         </h2>
         <p className="text-sm leading-relaxed">
-          Une encyclopédie ne vaut que par sa vérifiabilité. Toute contribution
-          doit donc être accompagnée d&apos;au moins{" "}
-          <strong>deux preuves</strong>, dont au minimum{" "}
-          <strong>une source officielle</strong>. Cette exigence est appliquée
-          par le code, pas seulement par la modération : un dossier sans source
-          vérifiable n&apos;entre pas dans la file de relecture.
-        </p>
-        <p className="text-sm leading-relaxed">
-          Cette barrière est aussi ce qui protège le projet du contenu inventé :
-          un groupe fabriqué de toutes pièces ne peut pas produire de référence
-          MusicBrainz ou Discogs.
+          Proposez une fiche, accompagnée d&apos;au moins deux sources dont une
+          officielle. Un modérateur la relit, puis la publie ou vous demande de
+          compléter. C&apos;est tout — pas de comité, pas d&apos;attente
+          interminable.
         </p>
         <ul className="mt-1 flex flex-col gap-2">
           {OFFICIAL_SOURCES.map((source) => (
@@ -105,39 +111,16 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="moderation" className="flex flex-col gap-3">
-        <h2 id="moderation" className="metal-title text-lg">
-          Comment une contribution est traitée
-        </h2>
-        <ol className="flex flex-col gap-2 text-sm leading-relaxed">
-          <li>
-            <strong>Soumission</strong> — un contributeur propose une fiche
-            accompagnée de ses preuves.
-          </li>
-          <li>
-            <strong>Relecture</strong> — un modérateur valide, ou demande des
-            preuves complémentaires.
-          </li>
-          <li>
-            <strong>Échanges</strong> — le contributeur complète son dossier ;
-            sans réponse après deux relances, le dossier expire de lui-même.
-          </li>
-          <li>
-            <strong>Rejet définitif</strong> — réservé aux administrateurs, la
-            demande de preuves restant toujours préférable.
-          </li>
-        </ol>
-      </section>
-
       <section aria-labelledby="explorer" className="flex flex-col gap-3">
         <h2 id="explorer" className="metal-title text-lg">
-          Explorer
+          Commencer
         </h2>
         <ul className="flex flex-wrap gap-2">
           {[
             { href: "/bands", label: "Groupes" },
             { href: "/albums", label: "Albums" },
             { href: "/genres", label: "Genres" },
+            { href: "/contributions", label: "Contribuer" },
           ].map((link) => (
             <li key={link.href}>
               <Link

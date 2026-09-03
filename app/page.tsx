@@ -19,7 +19,7 @@ import { TopRatedAlbums } from "@/components/widgets/topRatedAlbums";
 export const metadata: Metadata = {
   title: "Accueil",
   description:
-    "Helleilla Exploratium : l'encyclopédie collaborative du metal — groupes, albums, genres, extraits et médias officiels.",
+    "L'encyclopédie collaborative du metal : groupes, discographies et genres, sources à l'appui.",
 };
 
 /** Entrées d'accès rapide vers les sections principales. */
@@ -74,9 +74,9 @@ export default async function HomePage() {
           Helleilla Exploratium
         </h1>
         <p className="text-muted-foreground max-w-xl">
-          L&apos;encyclopédie collaborative du metal : groupes, albums, genres —
-          enrichie des sources officielles (MusicBrainz, Wikidata, Discogs) et
-          des plateformes d&apos;écoute légitimes.
+          Bienvenue sur l&apos;encyclopédie collaborative, gratuite, modernisée
+          et intuitive sur la musique metal ! Bonne exploration à tous
+          {" \\m/"}
         </p>
         <Link
           href="/bands"
@@ -89,8 +89,15 @@ export default async function HomePage() {
         </p>
       </section>
 
-      {/* Accès aux sections */}
-      <section aria-label="Sections" className="grid gap-4 sm:grid-cols-3">
+      {/* Accès aux sections — masqué à partir de `lg` : la navigation
+          principale y propose déjà Groupes, Albums et Genres, et les
+          répéter en pleine page repoussait le catalogue vers le bas.
+          En dessous, la navigation est repliée derrière le burger : ces
+          cartes redeviennent le chemin le plus court. */}
+      <section
+        aria-label="Sections"
+        className="grid gap-4 sm:grid-cols-3 lg:hidden"
+      >
         {SECTIONS.map((section) => (
           <Link
             key={section.href}

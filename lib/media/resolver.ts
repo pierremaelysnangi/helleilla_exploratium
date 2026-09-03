@@ -39,8 +39,6 @@ import { redis } from "@/lib/redis";
  * première visite — précisément le symptôme « l'image apparaît seulement
  * après un rafraîchissement ».
  *
- * Les extraits Deezer, eux, ne sont JAMAIS servis depuis ce cache : voir
- * `resolvePreviews`.
  */
 const MEDIA_CACHE_TTL = 86_400;
 
@@ -143,8 +141,10 @@ export const bandMediaSchema = z.object({
       kind: z.enum(["photo", "logo"]),
       /** Page d'origine : auteur, licence, historique. */
       sourceUrl: z.string().url().nullish(),
-      /** Libellé de provenance affiché sous la photo. */
-      credit: z.string().nullish(),
+      /** Auteur de la photographie, quand la source le renseigne. */
+      author: z.string().nullish(),
+      /** Licence abrégée : « CC BY-SA 4.0 »… */
+      licence: z.string().nullish(),
     }),
   ),
   /** Liens officiels (site, Discogs, Wikipédia…). */
@@ -153,15 +153,6 @@ export const bandMediaSchema = z.object({
       provider: z.string(),
       label: z.string(),
       url: z.string().url(),
-    }),
-  ),
-  /** Extraits audio 30 s (Deezer) pour l'écoute d'aperçu. */
-  previews: z.array(
-    z.object({
-      title: z.string(),
-      artistName: z.string(),
-      previewUrl: z.string().url(),
-      coverUrl: z.string().url().nullish(),
     }),
   ),
   /** true si au moins un provider a échoué (résultat partiel). */
@@ -175,8 +166,8 @@ export type BandMedia = z.infer<typeof bandMediaSchema>;
  *
  * Séquence :
  * 1. Cache Redis -> retour immédiat si présent ;
- * 2. Lecture band + refs ; sans ref MusicBrainz/Discogs, seules les
- *    previews Deezer (provider public sans référence) sont résolues ;
+ * 2. Lecture band + refs ; sans référence MusicBrainz ni Discogs, le
+ *    résultat se réduit aux données locales ;
  * 3. Providers interrogés en parallèle via allSettled ;
  * 4. Fusion + validation + mise en cache.
  *
@@ -195,8 +186,7 @@ export async function resolveBandMedia(
   const band = await getBandById(bandId);
   if (!band) throw new Error(`Groupe introuvable : ${bandId}`);
 
-  // 1. Cache — les extraits sont volontairement laissés de côté et
-  // re-résolus à chaque appel : leurs URLs expirent en une heure.
+  // 1. Cache
   if (!force) {
     const cached = await redis.get(key).catch(() => null);
     if (cached) {
@@ -205,7 +195,7 @@ export async function resolveBandMedia(
       // ignorées et recalculées, jamais propagées en erreur 500.
       const parsed = bandMediaSchema.safeParse(safeJson(cached));
       if (parsed.success) {
-        return { ...parsed.data, previews: await resolvePreviews(band.name) };
+        return parsed.data;
       }
     }
   }
@@ -215,17 +205,13 @@ export async function resolveBandMedia(
   const discogsRef = refs.find((r) => r.provider === "discogs");
 
   // 2. Providers en parallèle, chacun isolé par allSettled
-  const [mbResult, discogsResult, deezerResult] = await Promise.allSettled([
+  const [mbResult, discogsResult] = await Promise.allSettled([
     mbRef && isProviderAvailable("musicbrainz")
       ? dataProviders.musicbrainz.getArtist(mbRef.externalId)
       : Promise.resolve(null),
     discogsRef && isProviderAvailable("discogs")
       ? dataProviders.discogs.getArtist(Number(discogsRef.externalId))
       : Promise.resolve(null),
-    // Le nom du groupe sert AUSSI de filtre : sans lui, un homonyme
-    // fournissait des « titres iconiques » qui ne sont pas de lui, et
-    // ses pochettes se retrouvaient dans la galerie du groupe.
-    dataProviders.deezer.searchTracks(band.name, band.name),
   ]);
 
   let degraded = false;
@@ -234,7 +220,6 @@ export async function resolveBandMedia(
 
   const mbArtist = unwrap(mbResult);
   const discogsArtist = unwrap(discogsResult);
-  const deezerTracks = unwrap(deezerResult) ?? [];
 
   // Enrichissement Wikidata conditionné à l'ID extrait de MusicBrainz
   const wikidataId = mbArtist ? extractWikidataId(mbArtist) : null;
@@ -280,7 +265,8 @@ export async function resolveBandMedia(
       url: wikidataImage.url,
       kind: "photo",
       sourceUrl: wikidataImage.sourceUrl,
-      credit: "Wikimedia Commons — auteur et licence sur la page du fichier",
+      author: wikidataImage.author,
+      licence: wikidataImage.licence,
     });
   }
   if (wikidataLogo) {
@@ -289,7 +275,8 @@ export async function resolveBandMedia(
       url: wikidataLogo.url,
       kind: "logo",
       sourceUrl: wikidataLogo.sourceUrl,
-      credit: "Wikimedia Commons — auteur et licence sur la page du fichier",
+      author: wikidataLogo.author,
+      licence: wikidataLogo.licence,
     });
   }
 
@@ -357,25 +344,12 @@ export async function resolveBandMedia(
     // Bandcamp, Spotify, YouTube, Deezer ; documentation et réseaux
     // sociaux ensuite. L'ordre de MusicBrainz ne dit rien de l'usage.
     links: byListenOrder(dedupeLinks(links)),
-    previews: deezerTracks.map((t) => ({
-      title: t.title,
-      artistName: t.artist.name,
-      previewUrl: t.preview,
-      coverUrl: t.album.cover_medium ?? null,
-    })),
     degraded,
   });
 
-  // Mise en cache même en cas de dégradation (évite le martèlement).
-  // Les extraits sont retirés avant écriture : leurs URLs seraient
-  // expirées bien avant l'échéance du cache.
+  // Mise en cache même en cas de dégradation (évite le martèlement)
   await redis
-    .set(
-      key,
-      JSON.stringify({ ...payload, previews: [] }),
-      "EX",
-      MEDIA_CACHE_TTL,
-    )
+    .set(key, JSON.stringify(payload), "EX", MEDIA_CACHE_TTL)
     .catch(() => undefined);
   return payload;
 }
@@ -393,34 +367,6 @@ function dedupeImages(images: BandMedia["images"]): BandMedia["images"] {
     if (!seen.has(url)) seen.set(url, { ...image, url });
   }
   return [...seen.values()];
-}
-
-/**
- * Extraits officiels de 30 s d'un groupe, TOUJOURS frais.
- *
- * Les URLs renvoyées par Deezer portent un jeton signé (`hdnea=exp=…`)
- * valable environ une heure. Les conserver dans le cache long du DTO
- * revenait à servir des liens morts la quasi-totalité du temps : la
- * lecture échouait en 403, sans message.
- *
- * L'appel reste peu coûteux — un seul aller-retour, lui-même mémorisé
- * quinze minutes par le client HTTP — et une panne Deezer rend une liste
- * vide plutôt que de faire échouer toute la fiche.
- */
-async function resolvePreviews(
-  bandName: string,
-): Promise<BandMedia["previews"]> {
-  try {
-    const tracks = await dataProviders.deezer.searchTracks(bandName, bandName);
-    return tracks.map((t) => ({
-      title: t.title,
-      artistName: t.artist.name,
-      previewUrl: t.preview,
-      coverUrl: t.album.cover_medium ?? null,
-    }));
-  } catch {
-    return [];
-  }
 }
 
 /** Analyse une entrée de cache, sans jamais lever sur du JSON abîmé. */

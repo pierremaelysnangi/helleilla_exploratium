@@ -27,19 +27,16 @@ function storageOrigin(): string | null {
 }
 
 /**
- * Sources autorisées pour les médias audio (extraits et fichiers hébergés).
+ * Sources autorisées pour les médias audio.
  *
- * Deezer répartit ses extraits sur plusieurs sous-domaines de `dzcdn.net`
- * (`cdns-preview`, `cdnt-preview`…) et en change sans préavis : lister un
- * hôte précis bloquait la lecture dès que l'API renvoyait l'autre. Le
- * joker reste borné au domaine de la plateforme.
+ * Le lecteur d'extraits a été retiré : plus aucune page ne diffuse de
+ * son. Le domaine de Deezer disparaît donc de cette liste, qui ne garde
+ * que le stockage du projet — utilisé par les pièces jointes des
+ * contributions, jamais pour de la musique.
  */
-const mediaSources = [
-  "'self'",
-  "blob:",
-  "https://*.dzcdn.net",
-  storageOrigin(),
-].filter(Boolean) as string[];
+const mediaSources = ["'self'", "blob:", storageOrigin()].filter(
+  Boolean,
+) as string[];
 
 /**
  * Le serveur de développement ouvre une WebSocket de rechargement à chaud
@@ -78,9 +75,7 @@ const securityHeaders = [
       //   la photo de groupe était silencieusement bloquée.
       "img-src 'self' data: blob: https://i.ytimg.com https://*.wikimedia.org https://api.discogs.com https://imgutils.discogs.com https://*.dzcdn.net https://coverartarchive.org https://*.archive.org",
       "frame-src https://challenges.cloudflare.com https://www.youtube-nocookie.com https://open.spotify.com https://bandcamp.com",
-      // Sans media-src, l'audio retombait sur default-src 'self' : les
-      // extraits Deezer et les fichiers MinIO étaient purement et
-      // simplement bloqués par le navigateur.
+      // Sans media-src, tout média retomberait sur default-src 'self'.
       `media-src ${mediaSources.join(" ")}`,
       // Même liste pour connect-src : le décodage d'une forme d'onde
       // télécharge le fichier via fetch avant de l'analyser.
@@ -109,8 +104,8 @@ const nextConfig: NextConfig = {
      * - **.wikimedia.org : images Wikidata/Wikipédia — `commons` pour
      *   l'URL écrite, `upload`/`thumb` pour les cibles de redirection
      * - api.discogs.com + imgutils.discogs.com : pochettes/photos Discogs
-     * - *.dzcdn.net : pochettes et extraits Deezer (les sous-domaines
-     *   varient : cdns-preview, cdnt-preview, e-cdns-images…)
+     * - *.dzcdn.net : pochettes Deezer, repli quand aucune archive n'a
+     *   de visuel (les sous-domaines varient : e-cdns-images, cdn-images…)
      * - coverartarchive.org + *.archive.org : pochettes d'album, l'archive
      *   redirigeant vers un nœud Internet Archive au nom variable
      */

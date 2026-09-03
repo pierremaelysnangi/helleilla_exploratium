@@ -199,7 +199,15 @@ async function seedBands(
         })
         .onConflictDoUpdate({
           target: [albums.bandId, albums.slug],
-          set: { title: album.title, releaseYear: album.releaseYear },
+          // `type` fait partie de la mise à jour : le seed est la
+          // référence éditoriale, et une correction qu'on y apporte doit
+          // atteindre la base. Sans lui, « Morbid Tales » restait typé
+          // EP après avoir été corrigé en album.
+          set: {
+            title: album.title,
+            type: album.type,
+            releaseYear: album.releaseYear,
+          },
         })
         .returning({ id: albums.id });
 

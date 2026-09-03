@@ -82,7 +82,7 @@ export async function apiFetch<S extends z.ZodTypeAny>(
  *
  * @param path - Chemin de l'API (ex : "/api/genres/by-slug/black-metal").
  * @param schema - Schéma zod du contenu de `data`.
- * @param opts - Fenêtre de revalidation ISR (60 s par défaut) et signal.
+ * @param opts - Fenêtre de revalidation ISR (aucune par défaut) et signal.
  * @returns Les données validées, ou `null` si la ressource n'existe pas.
  */
 export async function fetchPublicOrNull<S extends z.ZodTypeAny>(
@@ -95,7 +95,15 @@ export async function fetchPublicOrNull<S extends z.ZodTypeAny>(
     // que TypeScript sait résoudre en zod v4. La validation runtime est
     // bien faite par apiFetch ; on ne restaure ici que le type de sortie.
     const payload = (await apiFetch(path, z.object({ data: schema }), {
-      revalidate: opts.revalidate ?? 60,
+      // `revalidate: 0` par défaut — la fraîcheur prime sur la latence.
+      //
+      // Avec une fenêtre de 60 s, ouvrir la fiche d'un album pouvait
+      // servir un instantané pris AVANT que sa tracklist ne soit
+      // importée : la page s'affichait vide, et il fallait recharger
+      // pour la voir. Le catalogue est alimenté par des scripts qui
+      // écrivent en continu, hors du cycle de rendu ; aucune fenêtre de
+      // cache ne peut donc être supposée sûre.
+      revalidate: opts.revalidate ?? 0,
       signal: opts.signal,
     })) as { data: z.infer<S> };
     return payload.data;

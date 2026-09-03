@@ -572,7 +572,10 @@ export const BANDS: SeedBand[] = [
       {
         title: "Morbid Tales",
         slug: "morbid-tales",
-        type: "ep",
+        // Édition européenne à six titres, souvent décrite comme un
+        // mini-LP ; MusicBrainz et l'édition américaine étendue en font
+        // un album, ce que retient l'encyclopédie.
+        type: "album",
         releaseYear: 1984,
         label: "nuclear-blast",
       },
