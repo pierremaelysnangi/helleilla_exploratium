@@ -37,10 +37,8 @@ export async function generateMetadata({
   params,
 }: BandDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [band, { t }] = await Promise.all([
-    fetchBandBySlug(slug),
-    getTranslations(),
-  ]);
+  const { t, locale } = await getTranslations();
+  const band = await fetchBandBySlug(slug, locale);
   if (!band) return { title: t.meta.bandNotFound, robots: { index: false } };
 
   const title = band.name;
@@ -95,13 +93,13 @@ function buildMusicGroupJsonLd(
 
 export default async function BandDetailPage({ params }: BandDetailPageProps) {
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
+  const { t, n, locale } = await getTranslations();
+  const band = await fetchBandBySlug(slug, locale);
 
   // Slug inconnu -> page 404 applicative
   if (!band) notFound();
 
   const discography = await fetchDiscography(band.id);
-  const { t, n } = await getTranslations();
 
   return (
     <article className="flex flex-col gap-8">

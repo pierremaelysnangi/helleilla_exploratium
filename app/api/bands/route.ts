@@ -21,6 +21,7 @@ import { and, desc, asc, ilike, sql, type SQL } from "drizzle-orm";
 // Filtre par genre, inclusif de ses sous-genres
 import { bandIdsByGenreSlug, restrictTo } from "@/db/queries/genreFilter";
 import { z } from "zod";
+import { localeQuerySchema, localizeBand } from "@/lib/api/localize";
 import { bandIndexQueue } from "@/lib/queue/client";
 // Génération d'embedding sémantique (non bloquante)
 import {
@@ -42,9 +43,12 @@ const SORT_COLUMNS = {
  * Query params de la liste : ceux de `listQuerySchema`, plus un filtre
  * facultatif par slug de genre.
  */
-const bandListQuerySchema = listQuerySchema.extend({
-  genre: z.string().trim().min(1).max(200).optional(),
-});
+const bandListQuerySchema = listQuerySchema
+  .extend({
+    genre: z.string().trim().min(1).max(200).optional(),
+  })
+  // La langue demandée : elle décide de la biographie servie.
+  .extend(localeQuerySchema.shape);
 
 /**
  * GET /api/bands — liste paginée de groupes avec recherche, tri et
@@ -59,7 +63,7 @@ const bandListQuerySchema = listQuerySchema.extend({
 export const GET = route(
   { query: bandListQuerySchema, rateLimit: { limit: 60, window: 60 } },
   async ({ query }) => {
-    const { page, perPage, q, sort, order, genre } = query;
+    const { page, perPage, q, sort, order, genre, locale } = query;
     const offset = (page - 1) * perPage;
     // Le filtre par genre est résolu en amont : il traverse deux tables
     // de jointure, et l'exprimer en sous-requête rendrait le comptage
@@ -93,7 +97,12 @@ export const GET = route(
         .where(where),
     ]);
 
-    return okPaginated(items, counts[0]?.count ?? 0, page, perPage);
+    return okPaginated(
+      items.map((band) => localizeBand(band, locale)),
+      counts[0]?.count ?? 0,
+      page,
+      perPage,
+    );
   },
 );
 

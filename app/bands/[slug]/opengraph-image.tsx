@@ -5,6 +5,7 @@
 
 import { ImageResponse } from "next/og";
 import { fetchBandBySlug } from "@/hooks/use-bands";
+import { DEFAULT_LOCALE } from "@/lib/i18n/locales";
 
 // Runtime Edge : rendu léger à la demande
 export const runtime = "edge";
@@ -17,7 +18,8 @@ type Props = { params: Promise<{ slug: string }> };
 
 export default async function BandOpenGraphImage({ params }: Props) {
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
+  // L'image sociale ne montre que le nom : la langue par défaut suffit.
+  const band = await fetchBandBySlug(slug, DEFAULT_LOCALE);
 
   const name = band?.name ?? "Groupe";
   const period = band?.formedYear

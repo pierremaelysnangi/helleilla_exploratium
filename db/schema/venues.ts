@@ -21,6 +21,7 @@ import {
   timestamp,
   index,
   uniqueIndex,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 /** Nature d'un lieu. */
@@ -64,6 +65,16 @@ export const venues = pgTable(
     capacity: integer("capacity"),
     /** Présentation courte, rédigée par les contributeurs. */
     description: text("description"),
+    /**
+     * Traductions de la présentation, indexées par code de langue.
+     *
+     * Même principe que la biographie d'un groupe : le texte d'origine
+     * reste la référence, la traduction s'affiche quand elle existe.
+     */
+    descriptionTranslations: jsonb("description_translations")
+      .$type<Record<string, string>>()
+      .notNull()
+      .default({}),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

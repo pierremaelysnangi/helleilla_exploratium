@@ -38,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AlbumsSlugPage({ params }: AlbumsSlugPageProps) {
   const { slug } = await params;
-  const [matches, { t, n }] = await Promise.all([
+  const [matches, { t }] = await Promise.all([
     listAlbumsBySlugWithBand(slug),
     getTranslations(),
   ]);
@@ -58,10 +58,11 @@ export default async function AlbumsSlugPage({ params }: AlbumsSlugPageProps) {
           {interpolate(t.album.ambiguousTitle, { slug })}
         </h1>
         <div className="metal-rule mt-2 w-40" />
+        {/* Le nombre de groupes n'est pas répété : la liste est juste
+            en dessous, et un compteur inséré dans la phrase imposait un
+            accord que le polonais et le russe ne peuvent pas tenir. */}
         <p className="text-muted-foreground mt-3 text-sm">
-          {interpolate(t.album.ambiguousLead, {
-            bands: n(t.count.bands, matches.length),
-          })}
+          {t.album.ambiguousLead}
         </p>
       </header>
 

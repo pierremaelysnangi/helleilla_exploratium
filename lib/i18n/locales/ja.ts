@@ -106,7 +106,8 @@ export const ja: Dictionary = {
       "ジャケットと情報はこのバンドについて明示された出典による。{link}。",
     seeBandPage: "{band} のページを見る",
     ambiguousTitle: "「{slug}」という題の作品が複数",
-    ambiguousLead: "この題は {bands} が使っている。探しているものを選ぶ。",
+    ambiguousLead:
+      "この名前で発表している作品が複数ある。探しているものを選ぶ。",
   },
   releaseType: {
     album: "アルバム",
@@ -148,7 +149,7 @@ export const ja: Dictionary = {
   },
   festival: {
     title: "フェスと会場",
-    lead: "シーンが集まる場所：{countries}、{venues}。日程とチケットは主催者のもとにあり、このページは一覧にとどめる。",
+    lead: "シーンが集まる場所：{venues}、{countries}。日程とチケットは主催者のもとにあり、このページは一覧にとどめる。",
     since: "{year} 年から",
     until: "{year} 年まで",
     festival: "フェス",
@@ -446,6 +447,8 @@ export const ja: Dictionary = {
     setPassword: "パスワードを設定",
     receiveLink: "リンクを送ってもらう",
     incompleteLink: "リンクが不完全。新しいものを受け取るには {link}。",
+    createMyAccount: "アカウントを作る",
+    signInAction: "ログイン",
   },
   pages: {
     aboutTitle: "Helleilla Exploratium について",
@@ -514,7 +517,7 @@ export const ja: Dictionary = {
     genreEmptyDescription: "百科事典 {site} における {genre}。",
     memberNotFound: "人物が見つからない",
     memberDescription: "百科事典 {site} における {member}。",
-    membersDescription: "{band} の編成：{count} を記載。",
+    membersDescription: "{band} の編成：{count}。",
     membersFromMusicbrainz: "MusicBrainz による {band} の編成。",
   },
   console: {

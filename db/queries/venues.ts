@@ -9,8 +9,16 @@
 import { db } from "@/db";
 import { venues } from "@/db/schema";
 import { asc } from "drizzle-orm";
+import { localizedText } from "@/lib/i18n/content";
+import type { Locale } from "@/lib/i18n/locales";
 
-export type Venue = typeof venues.$inferSelect;
+/**
+ * Un lieu tel que la page le reçoit : la présentation est déjà résolue
+ * dans la langue du visiteur, et le dictionnaire des traductions ne
+ * quitte pas le serveur. L'envoyer entier ferait voyager quinze
+ * versions d'un texte dont une seule sera lue.
+ */
+export type Venue = Omit<typeof venues.$inferSelect, "descriptionTranslations">;
 
 /** Un pays et les lieux qui s'y trouvent. */
 export type VenuesByCountry = {
@@ -25,13 +33,26 @@ export type VenuesByCountry = {
  * alphabétique ferait ouvrir la page sur l'Australie, où la scène est
  * la moins documentée ici.
  */
-export async function listVenuesByCountry(): Promise<VenuesByCountry[]> {
-  const rows = await db
+export async function listVenuesByCountry(
+  locale: Locale,
+): Promise<VenuesByCountry[]> {
+  const all = await db
     .select()
     .from(venues)
     // Festivals avant salles, puis par nom : l'ordre est stable, et une
     // salle ne doit pas s'intercaler entre deux festivals.
     .orderBy(asc(venues.kind), asc(venues.name));
+
+  // La présentation est résolue ici, au plus près de la lecture : la
+  // page n'a pas à connaître la mécanique des traductions.
+  const rows: Venue[] = all.map(({ descriptionTranslations, ...venue }) => ({
+    ...venue,
+    description: localizedText(
+      venue.description,
+      descriptionTranslations,
+      locale,
+    ),
+  }));
 
   const grouped = new Map<string, Venue[]>();
   for (const row of rows) {

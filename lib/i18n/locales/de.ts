@@ -112,7 +112,7 @@ export const de: Dictionary = {
     seeBandPage: "Zur Seite von {band}",
     ambiguousTitle: "Mehrere Alben mit dem Titel „{slug}“",
     ambiguousLead:
-      "Diesen Titel tragen Veröffentlichungen von {bands}. Wähle die gesuchte aus.",
+      "Mehrere Bands haben unter diesem Namen veröffentlicht. Wähle die gesuchte aus.",
   },
   releaseType: {
     album: "Album",
@@ -156,7 +156,7 @@ export const de: Dictionary = {
   },
   festival: {
     title: "Festivals und Spielstätten",
-    lead: "Wo sich die Szene trifft: {venues} in {countries}. Termine und Tickets liegen bei den Veranstaltenden — diese Seite listet sie nur auf.",
+    lead: "Wo sich die Szene trifft: {venues}, {countries}. Termine und Tickets liegen bei den Veranstaltenden — diese Seite listet sie nur auf.",
     since: "seit {year}",
     until: "bis {year}",
     festival: "Festival",
@@ -461,6 +461,8 @@ export const de: Dictionary = {
     setPassword: "Passwort festlegen",
     receiveLink: "Link zusenden",
     incompleteLink: "Unvollständiger Link. {link}, um einen neuen zu erhalten.",
+    createMyAccount: "Mein Konto erstellen",
+    signInAction: "Anmelden",
   },
   pages: {
     aboutTitle: "Über Helleilla Exploratium",
@@ -532,7 +534,7 @@ export const de: Dictionary = {
     genreEmptyDescription: "Das Genre {genre} in der Enzyklopädie {site}.",
     memberNotFound: "Mitglied nicht gefunden",
     memberDescription: "{member} in der Enzyklopädie {site}.",
-    membersDescription: "Besetzung von {band}: {count} erfasst.",
+    membersDescription: "Besetzung von {band}: {count}.",
     membersFromMusicbrainz: "Besetzung von {band} laut MusicBrainz.",
   },
   console: {

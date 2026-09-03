@@ -16,6 +16,7 @@ import { updateBandBodySchema } from "@/lib/validations/band";
 import { db } from "@/db";
 import { bands } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { localeQuerySchema, localizeBand } from "@/lib/api/localize";
 import { bandIndexQueue } from "@/lib/queue/client";
 // Réindexation sémantique après modification (échec non bloquant)
 import {
@@ -35,9 +36,11 @@ import {
 export const GET = route(
   {
     params: idParamSchema,
+    // Même contrat que /by-slug : la langue passe par la query.
+    query: localeQuerySchema,
     rateLimit: { limit: 60, window: 60 },
   },
-  async ({ params }) => {
+  async ({ params, query }) => {
     // Lecture relationnelle Drizzle : band + jonction + genre complet
     const row = await db.query.bands.findFirst({
       where: eq(bands.id, params.id),
@@ -52,7 +55,7 @@ export const GET = route(
       name: jg.genre.name,
       slug: jg.genre.slug,
     }));
-    return ok({ ...band, genres });
+    return ok({ ...localizeBand(band, query.locale), genres });
   },
 );
 

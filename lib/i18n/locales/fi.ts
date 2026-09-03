@@ -108,7 +108,8 @@ export const fi: Dictionary = {
       "Kansi ja tiedot ovat peräisin tälle yhtyeelle merkityistä lähteistä. {link}.",
     seeBandPage: "Katso yhtyeen {band} sivu",
     ambiguousTitle: "Useita albumeita nimellä ”{slug}”",
-    ambiguousLead: "Tätä julkaisunimeä käyttää {bands}. Valitse etsimäsi.",
+    ambiguousLead:
+      "Useampi yhtye on julkaissut jotain tällä nimellä. Valitse etsimäsi.",
   },
   releaseType: {
     album: "Albumi",
@@ -152,7 +153,7 @@ export const fi: Dictionary = {
   },
   festival: {
     title: "Festivaalit ja klubit",
-    lead: "Missä skene kohtaa: {venues} {countries}. Päivämäärät ja liput ovat järjestäjillä — tämä sivu vain luetteloi ne.",
+    lead: "Missä skene kohtaa: {venues}, {countries}. Päivämäärät ja liput ovat järjestäjillä — tämä sivu vain luetteloi ne.",
     since: "vuodesta {year}",
     until: "vuoteen {year}",
     festival: "Festivaali",
@@ -455,6 +456,8 @@ export const fi: Dictionary = {
     setPassword: "Aseta salasana",
     receiveLink: "Lähetä minulle linkki",
     incompleteLink: "Puutteellinen linkki. {link} saadaksesi uuden.",
+    createMyAccount: "Luo tilini",
+    signInAction: "Kirjaudu sisään",
   },
   pages: {
     aboutTitle: "Tietoa Helleilla Exploratiumista",
@@ -527,7 +530,7 @@ export const fi: Dictionary = {
     genreEmptyDescription: "Laji {genre} tietosanakirjassa {site}.",
     memberNotFound: "Jäsentä ei löydy",
     memberDescription: "{member} tietosanakirjassa {site}.",
-    membersDescription: "Yhtyeen {band} kokoonpano: {count} kirjattuna.",
+    membersDescription: "Yhtyeen {band} kokoonpano: {count}.",
     membersFromMusicbrainz: "Yhtyeen {band} kokoonpano MusicBrainzin mukaan.",
   },
   console: {

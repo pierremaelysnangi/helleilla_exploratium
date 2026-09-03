@@ -108,7 +108,8 @@ export const nb: Dictionary = {
       "Omslag og opplysninger kommer fra kildene som er oppgitt for bandet. {link}.",
     seeBandPage: "Se siden til {band}",
     ambiguousTitle: "Flere album med tittelen «{slug}»",
-    ambiguousLead: "Tittelen brukes av {bands}. Velg den du leter etter.",
+    ambiguousLead:
+      "Flere band har gitt ut noe under dette navnet. Velg den du leter etter.",
   },
   releaseType: {
     album: "Album",
@@ -153,7 +154,7 @@ export const nb: Dictionary = {
   },
   festival: {
     title: "Festivaler og scener",
-    lead: "Der miljøet møtes: {venues} i {countries}. Datoer og billetter ligger hos arrangørene — denne siden bare fører dem opp.",
+    lead: "Der miljøet møtes: {venues}, {countries}. Datoer og billetter ligger hos arrangørene — denne siden bare fører dem opp.",
     since: "siden {year}",
     until: "til {year}",
     festival: "Festival",
@@ -455,6 +456,8 @@ export const nb: Dictionary = {
     setPassword: "Angi passordet",
     receiveLink: "Send meg lenken",
     incompleteLink: "Ufullstendig lenke. {link} for å få en ny.",
+    createMyAccount: "Opprett kontoen min",
+    signInAction: "Logg inn",
   },
   pages: {
     aboutTitle: "Om Helleilla Exploratium",
@@ -527,7 +530,7 @@ export const nb: Dictionary = {
     genreEmptyDescription: "Sjangeren {genre} i oppslagsverket {site}.",
     memberNotFound: "Fant ikke medlemmet",
     memberDescription: "{member} i oppslagsverket {site}.",
-    membersDescription: "Besetning for {band}: {count} dokumentert.",
+    membersDescription: "Besetning for {band}: {count}.",
     membersFromMusicbrainz: "Besetning for {band} ifølge MusicBrainz.",
   },
   console: {

@@ -108,7 +108,8 @@ export const sv: Dictionary = {
       "Omslag och uppgifter kommer från de källor som anges för bandet. {link}.",
     seeBandPage: "Se sidan för {band}",
     ambiguousTitle: "Flera album med titeln ”{slug}”",
-    ambiguousLead: "Titeln används av {bands}. Välj den du söker.",
+    ambiguousLead:
+      "Flera band har gett ut något under det här namnet. Välj den du söker.",
   },
   releaseType: {
     album: "Album",
@@ -153,7 +154,7 @@ export const sv: Dictionary = {
   },
   festival: {
     title: "Festivaler och scener",
-    lead: "Där scenen möts: {venues} i {countries}. Datum och biljetter ligger hos arrangörerna — den här sidan förtecknar dem bara.",
+    lead: "Där scenen möts: {venues}, {countries}. Datum och biljetter ligger hos arrangörerna — den här sidan förtecknar dem bara.",
     since: "sedan {year}",
     until: "till {year}",
     festival: "Festival",
@@ -456,6 +457,8 @@ export const sv: Dictionary = {
     setPassword: "Ange lösenordet",
     receiveLink: "Skicka länken till mig",
     incompleteLink: "Ofullständig länk. {link} för att få en ny.",
+    createMyAccount: "Skapa mitt konto",
+    signInAction: "Logga in",
   },
   pages: {
     aboutTitle: "Om Helleilla Exploratium",
@@ -527,7 +530,7 @@ export const sv: Dictionary = {
     genreEmptyDescription: "Genren {genre} i uppslagsverket {site}.",
     memberNotFound: "Medlemmen hittades inte",
     memberDescription: "{member} i uppslagsverket {site}.",
-    membersDescription: "Sättning för {band}: {count} dokumenterade.",
+    membersDescription: "Sättning för {band}: {count}.",
     membersFromMusicbrainz: "Sättning för {band} enligt MusicBrainz.",
   },
   console: {

@@ -270,6 +270,14 @@ export type SeedBand = {
   formedYear: number;
   dissolvedYear?: number;
   bio: string;
+  /**
+   * Traductions de la biographie, par code de langue.
+   *
+   * Écrites à la main, langue par langue, à partir du texte français :
+   * une biographie est du contenu encyclopédique, et la règle du projet
+   * interdit d'en confier la production à une machine.
+   */
+  bioTranslations: Record<string, string>;
   /** Thèmes des textes, documentés publiquement pour chacun de ces groupes. */
   themes: string[];
   genres: string[];
@@ -285,6 +293,22 @@ export const BANDS: SeedBand[] = [
     formedYear: 1991,
     dissolvedYear: 2001,
     bio: "Groupe norvégien formé à Notodden, figure majeure de la seconde vague de black metal. Sa fusion d'arrangements symphoniques et de black metal a durablement marqué le genre.",
+    bioTranslations: {
+      en: "Norwegian band formed in Notodden, a leading figure of the second wave of black metal. Its fusion of symphonic arrangements and black metal left a lasting mark on the genre.",
+      de: "Norwegische Band aus Notodden, eine der prägenden Gestalten der zweiten Black-Metal-Welle. Ihre Verbindung sinfonischer Arrangements mit Black Metal hat das Genre dauerhaft geprägt.",
+      es: "Grupo noruego formado en Notodden, figura mayor de la segunda oleada del black metal. Su fusión de arreglos sinfónicos y black metal marcó el género de forma duradera.",
+      pt: "Banda norueguesa formada em Notodden, figura maior da segunda vaga do black metal. A sua fusão de arranjos sinfónicos com black metal marcou o género de forma duradoura.",
+      it: "Gruppo norvegese formatosi a Notodden, figura di primo piano della seconda ondata del black metal. La sua fusione di arrangiamenti sinfonici e black metal ha segnato il genere in modo duraturo.",
+      nl: "Noorse band uit Notodden, een van de bepalende namen van de tweede blackmetalgolf. De versmelting van symfonische arrangementen met black metal heeft het genre blijvend getekend.",
+      sv: "Norskt band bildat i Notodden, en av den andra black metal-vågens tongivande gestalter. Sammansmältningen av symfoniska arrangemang och black metal satte varaktiga spår i genren.",
+      nb: "Norsk band stiftet i Notodden, en av de sentrale skikkelsene i black metalens andre bølge. Sammensmeltningen av symfoniske arrangementer og black metal satte varige spor i sjangeren.",
+      fi: "Notoddenissa perustettu norjalainen yhtye, black metalin toisen aallon keskeisiä nimiä. Sinfonisten sovitusten ja black metalin yhdistelmä jätti genreen pysyvän jäljen.",
+      pl: "Norweski zespół założony w Notodden, jedna z czołowych postaci drugiej fali black metalu. Połączenie symfonicznych aranżacji z black metalem trwale odcisnęło się na gatunku.",
+      ru: "Норвежская группа из Нотоддена, одна из ключевых фигур второй волны блэк-метала. Соединение симфонических аранжировок с блэк-металом надолго определило облик жанра.",
+      ja: "ノトデン出身のノルウェーのバンド。ブラックメタル第二波を代表する存在。交響的なアレンジとブラックメタルの融合はジャンルに長く残る刻印を残した。",
+      zh: "来自诺托登的挪威乐队，黑金属第二波浪潮的代表之一。将交响编曲与黑金属结合的做法，为这一流派留下了长久的印记。",
+      ar: "فرقة نرويجية تأسّست في نوتودن، وهي من أبرز وجوه الموجة الثانية للبلاك ميتال. مزجها التوزيعات السيمفونية بالبلاك ميتال ترك أثرًا دائمًا في هذا النوع.",
+    },
     themes: ["Occultisme", "Mythologie nordique", "Nature", "Philosophie"],
     genres: ["black-metal", "symphonic-black-metal"],
     members: [
@@ -373,6 +397,22 @@ export const BANDS: SeedBand[] = [
     countryCode: "NO",
     formedYear: 1986,
     bio: "Groupe norvégien originaire de Kolbotn, d'abord orienté death metal avant de basculer vers un black metal volontairement brut. Le duo Nocturno Culto / Fenriz en constitue le noyau depuis 1991.",
+    bioTranslations: {
+      en: "Norwegian band from Kolbotn, first oriented towards death metal before turning to a deliberately raw black metal. The Nocturno Culto / Fenriz duo has been its core since 1991.",
+      de: "Norwegische Band aus Kolbotn, zunächst dem Death Metal zugewandt, dann einem bewusst rohen Black Metal. Das Duo Nocturno Culto / Fenriz bildet seit 1991 den Kern.",
+      es: "Grupo noruego de Kolbotn, orientado primero al death metal antes de virar hacia un black metal deliberadamente crudo. El dúo Nocturno Culto / Fenriz es su núcleo desde 1991.",
+      pt: "Banda norueguesa de Kolbotn, primeiro voltada para o death metal antes de virar para um black metal deliberadamente cru. O duo Nocturno Culto / Fenriz é o seu núcleo desde 1991.",
+      it: "Gruppo norvegese di Kolbotn, dapprima orientato al death metal prima di virare verso un black metal volutamente grezzo. Il duo Nocturno Culto / Fenriz ne è il nucleo dal 1991.",
+      nl: "Noorse band uit Kolbotn, eerst gericht op death metal en daarna op een bewust rauwe black metal. Het duo Nocturno Culto / Fenriz vormt sinds 1991 de kern.",
+      sv: "Norskt band från Kolbotn, först inriktat på death metal innan det svängde mot en medvetet rå black metal. Duon Nocturno Culto / Fenriz har varit kärnan sedan 1991.",
+      nb: "Norsk band fra Kolbotn, først rettet mot death metal før det svingte mot en bevisst rå black metal. Duoen Nocturno Culto / Fenriz har utgjort kjernen siden 1991.",
+      fi: "Kolbotnista kotoisin oleva norjalainen yhtye, aluksi death metalia ja sittemmin tarkoituksellisen raakaa black metalia. Kaksikko Nocturno Culto / Fenriz on ollut ytimenä vuodesta 1991.",
+      pl: "Norweski zespół z Kolbotn, początkowo grający death metal, później celowo surowy black metal. Duet Nocturno Culto / Fenriz stanowi jego trzon od 1991 roku.",
+      ru: "Норвежская группа из Колботна, начинавшая с дэт-метала и перешедшая к нарочито сырому блэк-металу. Дуэт Nocturno Culto / Fenriz составляет её ядро с 1991 года.",
+      ja: "コルボトン出身のノルウェーのバンド。当初はデスメタル寄りだったが、意図的に荒いブラックメタルへ転じた。1991年以降は Nocturno Culto と Fenriz の二人が核。",
+      zh: "来自科尔博滕的挪威乐队，早期偏向死亡金属，后转向刻意粗粝的黑金属。自 1991 年起，Nocturno Culto 与 Fenriz 二人组即为核心。",
+      ar: "فرقة نرويجية من كولبوتن، اتّجهت أولًا إلى الديث ميتال ثم انتقلت إلى بلاك ميتال خشن عن قصد. ويشكّل الثنائي Nocturno Culto وFenriz نواتها منذ 1991.",
+    },
     themes: ["Misanthropie", "Hiver", "Satanisme", "Contre-culture"],
     genres: ["black-metal"],
     members: [
@@ -436,6 +476,22 @@ export const BANDS: SeedBand[] = [
     countryCode: "GB",
     formedYear: 1990,
     bio: "Groupe anglais de Halifax, l'un des trois piliers du death-doom britannique aux côtés de Paradise Lost et Anathema. Violon et chant clair y côtoient des tempos lents et des textes mélancoliques.",
+    bioTranslations: {
+      en: "English band from Halifax, one of the three pillars of British death-doom alongside Paradise Lost and Anathema. Violin and clean vocals sit next to slow tempos and melancholy lyrics.",
+      de: "Englische Band aus Halifax, eine der drei Säulen des britischen Death-Doom neben Paradise Lost und Anathema. Violine und klarer Gesang treffen dort auf langsame Tempi und schwermütige Texte.",
+      es: "Grupo inglés de Halifax, uno de los tres pilares del death-doom británico junto a Paradise Lost y Anathema. El violín y la voz limpia conviven con tempos lentos y letras melancólicas.",
+      pt: "Banda inglesa de Halifax, um dos três pilares do death-doom britânico ao lado dos Paradise Lost e dos Anathema. Violino e voz limpa convivem com andamentos lentos e letras melancólicas.",
+      it: "Gruppo inglese di Halifax, uno dei tre pilastri del death-doom britannico insieme a Paradise Lost e Anathema. Violino e voce pulita convivono con tempi lenti e testi malinconici.",
+      nl: "Engelse band uit Halifax, een van de drie pijlers van de Britse death-doom naast Paradise Lost en Anathema. Viool en cleane zang gaan er samen met trage tempo's en melancholische teksten.",
+      sv: "Engelskt band från Halifax, en av den brittiska death-doomens tre grundpelare vid sidan av Paradise Lost och Anathema. Fiol och ren sång möter långsamma tempon och melankoliska texter.",
+      nb: "Engelsk band fra Halifax, en av de tre bærebjelkene i britisk death-doom ved siden av Paradise Lost og Anathema. Fiolin og ren sang møter langsomme tempi og melankolske tekster.",
+      fi: "Halifaxista kotoisin oleva englantilainen yhtye, brittiläisen death-doomin kolmas tukipylväs Paradise Lostin ja Anatheman rinnalla. Viulu ja puhdas laulu kohtaavat hitaat tempot ja melankoliset sanoitukset.",
+      pl: "Angielski zespół z Halifaksu, jeden z trzech filarów brytyjskiego death-doomu obok Paradise Lost i Anathemy. Skrzypce i czysty wokal sąsiadują tam z powolnymi tempami i melancholijnymi tekstami.",
+      ru: "Английская группа из Галифакса, один из трёх столпов британского дэт-дума наряду с Paradise Lost и Anathema. Скрипка и чистый вокал соседствуют здесь с медленными темпами и меланхоличными текстами.",
+      ja: "ハリファックス出身のイングランドのバンド。Paradise Lost、Anathema と並ぶ英国デス・ドゥームの三本柱の一つ。ヴァイオリンとクリーンヴォーカルが、遅いテンポと憂いを帯びた詞に寄り添う。",
+      zh: "来自哈利法克斯的英格兰乐队，与 Paradise Lost、Anathema 并称英国死亡末日金属的三大支柱。小提琴与清嗓和缓慢的节奏、忧郁的歌词并行。",
+      ar: "فرقة إنجليزية من هاليفاكس، وأحد أعمدة الديث-دووم البريطاني الثلاثة إلى جانب Paradise Lost وAnathema. يلتقي فيها الكمان والغناء الصافي بإيقاعات بطيئة ونصوص كئيبة.",
+    },
     themes: ["Deuil", "Amour perdu", "Religion", "Mélancolie"],
     genres: ["doom-metal", "death-doom"],
     members: [
@@ -491,6 +547,22 @@ export const BANDS: SeedBand[] = [
     countryCode: "SE",
     formedYear: 1990,
     bio: "Groupe suédois de Göteborg, dont l'album Slaughter of the Soul a défini le death metal mélodique dit « son de Göteborg » et influencé une génération entière de groupes.",
+    bioTranslations: {
+      en: "Swedish band from Gothenburg, whose album Slaughter of the Soul defined the melodic death metal known as the “Gothenburg sound” and shaped a whole generation of bands.",
+      de: "Schwedische Band aus Göteborg, deren Album Slaughter of the Soul den melodischen Death Metal des sogenannten Göteborg-Sounds prägte und eine ganze Generation von Bands beeinflusste.",
+      es: "Grupo sueco de Gotemburgo, cuyo álbum Slaughter of the Soul definió el death metal melódico llamado «sonido de Gotemburgo» e influyó en toda una generación de grupos.",
+      pt: "Banda sueca de Gotemburgo, cujo álbum Slaughter of the Soul definiu o death metal melódico dito «som de Gotemburgo» e influenciou uma geração inteira de bandas.",
+      it: "Gruppo svedese di Göteborg, il cui album Slaughter of the Soul ha definito il death metal melodico detto «suono di Göteborg» e influenzato un'intera generazione di gruppi.",
+      nl: "Zweedse band uit Göteborg, wiens album Slaughter of the Soul de melodieuze death metal van de zogeheten Göteborg-sound bepaalde en een hele generatie bands beïnvloedde.",
+      sv: "Svenskt band från Göteborg vars album Slaughter of the Soul definierade den melodiska death metal som kallas göteborgssoundet och präglade en hel generation band.",
+      nb: "Svensk band fra Göteborg, hvis album Slaughter of the Soul definerte den melodiske death metalen kalt Gøteborg-lyden og preget en hel generasjon band.",
+      fi: "Göteborgista kotoisin oleva ruotsalainen yhtye, jonka albumi Slaughter of the Soul määritteli Göteborgin soundiksi kutsutun melodisen death metalin ja vaikutti kokonaiseen yhtyesukupolveen.",
+      pl: "Szwedzki zespół z Göteborga, którego album Slaughter of the Soul zdefiniował melodyjny death metal zwany brzmieniem göteborskim i ukształtował całe pokolenie zespołów.",
+      ru: "Шведская группа из Гётеборга, чей альбом Slaughter of the Soul определил мелодичный дэт-метал, известный как «гётеборгское звучание», и повлиял на целое поколение групп.",
+      ja: "ヨーテボリ出身のスウェーデンのバンド。アルバム Slaughter of the Soul は「ヨーテボリ・サウンド」と呼ばれるメロディック・デスメタルを決定づけ、一世代分のバンドに影響を与えた。",
+      zh: "来自哥德堡的瑞典乐队，其专辑 Slaughter of the Soul 确立了被称作「哥德堡之声」的旋律死亡金属，影响了整整一代乐队。",
+      ar: "فرقة سويدية من غوتنبرغ، حدّد ألبومها Slaughter of the Soul ملامح الديث ميتال اللحني المعروف بـ«صوت غوتنبرغ» وأثّر في جيل كامل من الفرق.",
+    },
     themes: ["Existentialisme", "Aliénation", "Mort", "Chaos"],
     genres: ["death-metal", "melodic-death-metal"],
     members: [
@@ -550,6 +622,22 @@ export const BANDS: SeedBand[] = [
     formedYear: 1984,
     dissolvedYear: 2008,
     bio: "Groupe suisse issu de la dissolution de Hellhammer. Son approche expérimentale du metal extrême, notamment sur To Mega Therion, a ouvert la voie au black et au death metal européens.",
+    bioTranslations: {
+      en: "Swiss band born out of the break-up of Hellhammer. Its experimental take on extreme metal, notably on To Mega Therion, opened the way for European black and death metal.",
+      de: "Schweizer Band, hervorgegangen aus der Auflösung von Hellhammer. Ihr experimenteller Zugriff auf extremen Metal, besonders auf To Mega Therion, ebnete dem europäischen Black und Death Metal den Weg.",
+      es: "Grupo suizo surgido de la disolución de Hellhammer. Su enfoque experimental del metal extremo, sobre todo en To Mega Therion, abrió el camino al black y al death metal europeos.",
+      pt: "Banda suíça nascida da dissolução dos Hellhammer. A sua abordagem experimental do metal extremo, sobretudo em To Mega Therion, abriu caminho ao black e ao death metal europeus.",
+      it: "Gruppo svizzero nato dallo scioglimento degli Hellhammer. Il suo approccio sperimentale al metal estremo, in particolare su To Mega Therion, ha aperto la via al black e al death metal europei.",
+      nl: "Zwitserse band ontstaan uit de ontbinding van Hellhammer. De experimentele benadering van extreme metal, vooral op To Mega Therion, baande de weg voor Europese black en death metal.",
+      sv: "Schweiziskt band som uppstod ur Hellhammers upplösning. Dess experimentella grepp om extrem metal, särskilt på To Mega Therion, banade väg för europeisk black och death metal.",
+      nb: "Sveitsisk band som oppsto etter oppløsningen av Hellhammer. Den eksperimentelle tilnærmingen til ekstrem metal, særlig på To Mega Therion, banet vei for europeisk black og death metal.",
+      fi: "Sveitsiläinen yhtye, joka syntyi Hellhammerin hajottua. Sen kokeellinen ote äärimetalliin, etenkin levyllä To Mega Therion, raivasi tietä eurooppalaiselle black metalille ja death metalille.",
+      pl: "Szwajcarski zespół powstały po rozpadzie Hellhammer. Jego eksperymentalne podejście do metalu ekstremalnego, zwłaszcza na To Mega Therion, otworzyło drogę europejskiemu black i death metalowi.",
+      ru: "Швейцарская группа, возникшая после распада Hellhammer. Её экспериментальный подход к экстремальному металу, особенно на To Mega Therion, открыл дорогу европейскому блэк- и дэт-металу.",
+      ja: "Hellhammer の解散から生まれたスイスのバンド。とりわけ To Mega Therion における実験的なエクストリーム・メタルの手法が、ヨーロッパのブラックメタルとデスメタルへの道を開いた。",
+      zh: "由 Hellhammer 解散后组成的瑞士乐队。其对极端金属的实验性处理，尤以 To Mega Therion 为最，为欧洲的黑金属与死亡金属开辟了道路。",
+      ar: "فرقة سويسرية وُلدت من حلّ فرقة Hellhammer. مقاربتها التجريبية للميتال المتطرّف، ولا سيما في To Mega Therion، مهّدت الطريق أمام البلاك والديث ميتال الأوروبيين.",
+    },
     themes: ["Mythologie", "Occultisme", "Art", "Décadence"],
     genres: ["thrash-metal", "black-metal"],
     members: [
@@ -606,6 +694,22 @@ export const BANDS: SeedBand[] = [
     countryCode: "GB",
     formedYear: 1988,
     bio: "Groupe anglais de Halifax, pionnier du death-doom puis du gothic metal. Son album Gothic a donné son nom à tout un sous-genre.",
+    bioTranslations: {
+      en: "English band from Halifax, pioneers of death-doom and then of gothic metal. Its album Gothic gave a whole subgenre its name.",
+      de: "Englische Band aus Halifax, Wegbereiter des Death-Doom und später des Gothic Metal. Ihr Album Gothic gab einem ganzen Subgenre den Namen.",
+      es: "Grupo inglés de Halifax, pionero del death-doom y luego del gothic metal. Su álbum Gothic dio nombre a todo un subgénero.",
+      pt: "Banda inglesa de Halifax, pioneira do death-doom e depois do gothic metal. O seu álbum Gothic deu nome a todo um subgénero.",
+      it: "Gruppo inglese di Halifax, pioniere del death-doom e poi del gothic metal. Il suo album Gothic ha dato il nome a un intero sottogenere.",
+      nl: "Engelse band uit Halifax, pionier van de death-doom en daarna van de gothic metal. Het album Gothic gaf een heel subgenre zijn naam.",
+      sv: "Engelskt band från Halifax, pionjärer inom death-doom och därefter gothic metal. Albumet Gothic gav en hel undergenre dess namn.",
+      nb: "Engelsk band fra Halifax, pioner innen death-doom og siden gothic metal. Albumet Gothic ga en hel undersjanger navnet sitt.",
+      fi: "Halifaxista kotoisin oleva englantilainen yhtye, death-doomin ja sittemmin gothic metalin uranuurtaja. Sen albumi Gothic antoi nimen kokonaiselle alalajille.",
+      pl: "Angielski zespół z Halifaksu, pionier death-doomu, a następnie gothic metalu. Jego album Gothic dał nazwę całemu podgatunkowi.",
+      ru: "Английская группа из Галифакса, пионеры дэт-дума, а затем готик-метала. Её альбом Gothic дал имя целому поджанру.",
+      ja: "ハリファックス出身のイングランドのバンド。デス・ドゥーム、のちにゴシックメタルの先駆者。アルバム Gothic はサブジャンルそのものに名を与えた。",
+      zh: "来自哈利法克斯的英格兰乐队，死亡末日金属乃至后来哥特金属的先驱。其专辑 Gothic 为整个子流派命名。",
+      ar: "فرقة إنجليزية من هاليفاكس، رائدة الديث-دووم ثم الغوثيك ميتال. وقد منح ألبومها Gothic اسمه لنوع فرعي بأكمله.",
+    },
     themes: ["Perte", "Désespoir", "Religion", "Introspection"],
     genres: ["doom-metal", "death-doom"],
     members: [

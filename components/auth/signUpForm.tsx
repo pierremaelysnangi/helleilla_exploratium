@@ -76,7 +76,7 @@ export function SignUpForm() {
       {state.error && <AuthError>{state.error}</AuthError>}
 
       <AuthSubmit pending={isPending || !policyOk}>
-        {isPending ? t.account.creating : t.account.signUpTitle}
+        {isPending ? t.account.creating : t.account.createMyAccount}
       </AuthSubmit>
     </form>
   );

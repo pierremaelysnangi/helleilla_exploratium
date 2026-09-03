@@ -106,7 +106,7 @@ export const nl: Dictionary = {
     seeBandPage: "Bekijk de pagina van {band}",
     ambiguousTitle: "Meerdere albums met de titel “{slug}”",
     ambiguousLead:
-      "Deze titel wordt gebruikt door {bands}. Kies degene die je zoekt.",
+      "Meerdere bands hebben onder deze naam iets uitgebracht. Kies degene die je zoekt.",
   },
   releaseType: {
     album: "Album",
@@ -150,7 +150,7 @@ export const nl: Dictionary = {
   },
   festival: {
     title: "Festivals en zalen",
-    lead: "Waar de scene samenkomt: {venues} in {countries}. Data en kaartverkoop liggen bij de organisatie — deze pagina brengt ze alleen in kaart.",
+    lead: "Waar de scene samenkomt: {venues}, {countries}. Data en kaartverkoop liggen bij de organisatie — deze pagina brengt ze alleen in kaart.",
     since: "sinds {year}",
     until: "tot {year}",
     festival: "Festival",
@@ -454,6 +454,8 @@ export const nl: Dictionary = {
     setPassword: "Wachtwoord instellen",
     receiveLink: "Stuur mij de link",
     incompleteLink: "Onvolledige link. {link} om een nieuwe te ontvangen.",
+    createMyAccount: "Mijn account aanmaken",
+    signInAction: "Inloggen",
   },
   pages: {
     aboutTitle: "Over Helleilla Exploratium",
@@ -526,7 +528,7 @@ export const nl: Dictionary = {
     genreEmptyDescription: "Het genre {genre} in de encyclopedie {site}.",
     memberNotFound: "Lid niet gevonden",
     memberDescription: "{member} in de encyclopedie {site}.",
-    membersDescription: "Bezetting van {band}: {count} vastgelegd.",
+    membersDescription: "Bezetting van {band}: {count}.",
     membersFromMusicbrainz: "Bezetting van {band} volgens MusicBrainz.",
   },
   console: {

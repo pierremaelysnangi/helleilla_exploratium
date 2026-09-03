@@ -199,7 +199,7 @@ export const ar: Dictionary = {
       "الغلاف والمعلومات مصدرها المراجع المذكورة لهذه الفرقة. {link}.",
     seeBandPage: "عرض صفحة {band}",
     ambiguousTitle: "عدّة ألبومات بعنوان «{slug}»",
-    ambiguousLead: "هذا العنوان تستعمله {bands}. اختر ما تبحث عنه.",
+    ambiguousLead: "أصدرت عدّة فرق أعمالًا بهذا الاسم. اختر ما تبحث عنه.",
   },
   releaseType: {
     album: "ألبوم",
@@ -240,7 +240,7 @@ export const ar: Dictionary = {
   },
   festival: {
     title: "المهرجانات والقاعات",
-    lead: "حيث يلتقي المشهد: {venues} في {countries}. المواعيد والتذاكر عند المنظّمين — هذه الصفحة تكتفي بإحصائها.",
+    lead: "حيث يلتقي المشهد: {venues}، {countries}. المواعيد والتذاكر عند المنظّمين — هذه الصفحة تكتفي بإحصائها.",
     since: "منذ {year}",
     until: "حتى {year}",
     festival: "مهرجان",
@@ -537,6 +537,8 @@ export const ar: Dictionary = {
     setPassword: "تعيين كلمة المرور",
     receiveLink: "أرسل لي الرابط",
     incompleteLink: "الرابط ناقص. {link} للحصول على رابط جديد.",
+    createMyAccount: "إنشاء حسابي",
+    signInAction: "تسجيل الدخول",
   },
   pages: {
     aboutTitle: "عن Helleilla Exploratium",
@@ -607,7 +609,7 @@ export const ar: Dictionary = {
     genreEmptyDescription: "نوع {genre} في موسوعة {site}.",
     memberNotFound: "العضو غير موجود",
     memberDescription: "{member} في موسوعة {site}.",
-    membersDescription: "تشكيلة {band}: {count} موثّقًا.",
+    membersDescription: "تشكيلة {band}: {count}.",
     membersFromMusicbrainz: "تشكيلة {band} بحسب MusicBrainz.",
   },
   console: {

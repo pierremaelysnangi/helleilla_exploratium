@@ -13,6 +13,7 @@ import { slugParamSchema } from "@/lib/api/schemas";
 import { db } from "@/db";
 import { bands } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { localeQuerySchema, localizeBand } from "@/lib/api/localize";
 
 /**
  * GET /api/bands/by-slug/:slug — groupe + genres par slug.
@@ -23,9 +24,12 @@ import { eq } from "drizzle-orm";
 export const GET = route(
   {
     params: slugParamSchema,
+    // La langue voyage dans la query : deux langues font deux URL,
+    // donc deux entrées de cache distinctes.
+    query: localeQuerySchema,
     rateLimit: { limit: 60, window: 60 },
   },
-  async ({ params }) => {
+  async ({ params, query }) => {
     const row = await db.query.bands.findFirst({
       where: eq(bands.slug, params.slug),
       with: { bandGenres: { with: { genre: true } } },
@@ -39,6 +43,6 @@ export const GET = route(
       name: jg.genre.name,
       slug: jg.genre.slug,
     }));
-    return ok({ ...band, genres });
+    return ok({ ...localizeBand(band, query.locale), genres });
   },
 );

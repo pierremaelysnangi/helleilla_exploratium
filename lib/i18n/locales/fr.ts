@@ -118,7 +118,7 @@ export const fr = {
     seeBandPage: "Voir la fiche de {band}",
     ambiguousTitle: "Plusieurs albums « {slug} »",
     ambiguousLead:
-      "Ce nom de sortie est utilisé par {bands}. Choisissez celui que vous cherchez.",
+      "Plusieurs groupes ont publié une sortie sous ce nom. Choisissez celle que vous cherchez.",
   },
   releaseType: {
     album: "Album",
@@ -163,7 +163,7 @@ export const fr = {
   },
   festival: {
     title: "Festivals et salles",
-    lead: "Où la scène se retrouve : {venues} dans {countries}. Dates et billetterie chez les organisateurs — cette page ne fait que les recenser.",
+    lead: "Où la scène se retrouve : {venues}, {countries}. Dates et billetterie chez les organisateurs — cette page ne fait que les recenser.",
     since: "depuis {year}",
     until: "jusqu'en {year}",
     festival: "Festival",
@@ -467,6 +467,8 @@ export const fr = {
     setPassword: "Définir le mot de passe",
     receiveLink: "Recevoir le lien",
     incompleteLink: "Lien incomplet. {link} pour recevoir un nouveau lien.",
+    createMyAccount: "Créer mon compte",
+    signInAction: "Se connecter",
   },
   pages: {
     aboutTitle: "À propos d'Helleilla Exploratium",
@@ -539,7 +541,7 @@ export const fr = {
     genreEmptyDescription: "Le genre {genre} dans l'encyclopédie {site}.",
     memberNotFound: "Membre introuvable",
     memberDescription: "{member} dans l'encyclopédie {site}.",
-    membersDescription: "Formation de {band} : {count} référencés.",
+    membersDescription: "Formation de {band} : {count}.",
     membersFromMusicbrainz: "Formation de {band} d'après MusicBrainz.",
   },
   console: {

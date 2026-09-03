@@ -48,7 +48,9 @@ export function SignInForm() {
       {state.error && <AuthError>{state.error}</AuthError>}
 
       <AuthSubmit pending={isPending}>
-        {isPending ? t.account.signingIn : t.auth.signIn}
+        {/* Un verbe, pas le libellé du menu : le bouton dit ce qu'il
+            fait, l'onglet dit où l'on est. */}
+        {isPending ? t.account.signingIn : t.account.signInAction}
       </AuthSubmit>
     </form>
   );

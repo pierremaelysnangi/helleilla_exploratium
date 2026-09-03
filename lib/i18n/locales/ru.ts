@@ -172,7 +172,8 @@ export const ru: Dictionary = {
       "Обложка и сведения взяты из источников, указанных для этой группы. {link}.",
     seeBandPage: "Открыть страницу группы {band}",
     ambiguousTitle: "Несколько альбомов под названием «{slug}»",
-    ambiguousLead: "Это название использует {bands}. Выберите нужный.",
+    ambiguousLead:
+      "Под этим названием выпускали релизы несколько групп. Выберите нужный.",
   },
   releaseType: {
     album: "Альбом",
@@ -216,7 +217,7 @@ export const ru: Dictionary = {
   },
   festival: {
     title: "Фестивали и площадки",
-    lead: "Где встречается сцена: {venues} в {countries}. Даты и билеты — у организаторов, эта страница лишь ведёт перечень.",
+    lead: "Где встречается сцена: {venues}, {countries}. Даты и билеты — у организаторов, эта страница лишь ведёт перечень.",
     since: "с {year}",
     until: "до {year}",
     festival: "Фестиваль",
@@ -518,6 +519,8 @@ export const ru: Dictionary = {
     setPassword: "Задать пароль",
     receiveLink: "Прислать ссылку",
     incompleteLink: "Неполная ссылка. {link}, чтобы получить новую.",
+    createMyAccount: "Создать мой аккаунт",
+    signInAction: "Войти",
   },
   pages: {
     aboutTitle: "О проекте Helleilla Exploratium",
@@ -589,7 +592,7 @@ export const ru: Dictionary = {
     genreEmptyDescription: "Жанр {genre} в энциклопедии {site}.",
     memberNotFound: "Участник не найден",
     memberDescription: "{member} в энциклопедии {site}.",
-    membersDescription: "Состав группы {band}: {count} описано.",
+    membersDescription: "Состав группы {band}: {count}.",
     membersFromMusicbrainz: "Состав группы {band} по данным MusicBrainz.",
   },
   console: {

@@ -27,7 +27,7 @@ import { BandCard } from "./bandCard";
 // Filtre par genre partagé (inclusif des sous-genres)
 import { GenreSelect } from "@/components/genres/genreSelect";
 import { z } from "zod";
-import { useT, usePlural } from "@/lib/i18n/client";
+import { useI18n, usePlural } from "@/lib/i18n/client";
 import { interpolate } from "@/lib/i18n/format";
 
 /** Schéma du payload paginé renvoyé par l'API (validation runtime). */
@@ -60,12 +60,14 @@ const PER_PAGE = 20;
  * Les filtres changent -> nouvelle clé de requête -> reset propre des pages.
  */
 export function BandList() {
-  const t = useT();
+  const { t, locale } = useI18n();
   const n = usePlural();
   const [filters, setFilters] = useQueryStates(bandFilters);
 
   const infinite = useInfiniteQuery({
-    queryKey: bandKeys.list({ ...filters, perPage: PER_PAGE }),
+    // La langue entre dans la clé : changer de langue doit recharger les
+    // biographies, pas resservir celles de la précédente.
+    queryKey: bandKeys.list({ ...filters, perPage: PER_PAGE, locale }),
     initialPageParam: 1,
     queryFn: async ({ pageParam, signal }) => {
       const payload = await apiJsonEnvelope("/api/bands", {
@@ -77,6 +79,7 @@ export function BandList() {
           genre: filters.genre || undefined,
           sort: filters.sort,
           order: filters.order,
+          locale,
         },
       });
       return pageSchema.parse(payload);

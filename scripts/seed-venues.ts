@@ -27,6 +27,7 @@ async function main() {
         websiteUrl: venue.websiteUrl ?? null,
         capacity: venue.capacity ?? null,
         description: venue.description ?? null,
+        descriptionTranslations: venue.descriptionTranslations ?? {},
       })
       .onConflictDoUpdate({
         target: venues.slug,
@@ -40,6 +41,7 @@ async function main() {
           websiteUrl: venue.websiteUrl ?? null,
           capacity: venue.capacity ?? null,
           description: venue.description ?? null,
+          descriptionTranslations: venue.descriptionTranslations ?? {},
           updatedAt: new Date(),
         },
       });

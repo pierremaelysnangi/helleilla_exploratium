@@ -60,10 +60,10 @@ function period(
 }
 
 export default async function FestivalsPage() {
-  const [countries, { locale, t, n }] = await Promise.all([
-    listVenuesByCountry(),
-    getTranslations(),
-  ]);
+  // La langue est résolue d'abord : c'est elle qui décide de la
+  // présentation servie pour chaque lieu.
+  const { locale, t, n } = await getTranslations();
+  const countries = await listVenuesByCountry(locale);
 
   const total = countries.reduce((sum, c) => sum + c.venues.length, 0);
 

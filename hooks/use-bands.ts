@@ -43,6 +43,7 @@ import { apiJson } from "./api/client";
 // Fetch RSC partagé : déballe { data } et distingue 404 de panne
 import { fetchPublicOrNull } from "@/lib/api/client";
 import { bandDetailSchema, type BandDetail } from "./api/schemas";
+import type { Locale } from "@/lib/i18n/locales";
 
 /**
  * Options de requête du détail par slug (GET /api/bands/by-slug/:slug).
@@ -67,10 +68,16 @@ export function bandBySlugOptions(slug: string) {
  */
 export async function fetchBandBySlug(
   slug: string,
+  /**
+   * Langue de lecture : la biographie est servie traduite quand elle
+   * l'est. Elle passe par la QUERY et non par un en-tête, pour que deux
+   * langues soient deux entrées de cache distinctes.
+   */
+  locale: Locale,
   init?: { signal?: AbortSignal },
 ): Promise<BandDetail | null> {
   return fetchPublicOrNull(
-    `/api/bands/by-slug/${encodeURIComponent(slug)}`,
+    `/api/bands/by-slug/${encodeURIComponent(slug)}?locale=${locale}`,
     bandDetailSchema,
     { signal: init?.signal },
   );

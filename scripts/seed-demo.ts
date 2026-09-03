@@ -143,6 +143,7 @@ async function seedBands(
         name: band.name,
         slug: band.slug,
         bio: band.bio,
+        bioTranslations: band.bioTranslations,
         countryCode: band.countryCode,
         formedYear: band.formedYear,
         dissolvedYear: band.dissolvedYear ?? null,
@@ -150,7 +151,12 @@ async function seedBands(
       })
       .onConflictDoUpdate({
         target: bands.slug,
-        set: { name: band.name, bio: band.bio, themes: band.themes },
+        set: {
+          name: band.name,
+          bio: band.bio,
+          bioTranslations: band.bioTranslations,
+          themes: band.themes,
+        },
       })
       .returning({ id: bands.id });
 

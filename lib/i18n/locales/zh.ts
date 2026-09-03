@@ -101,7 +101,7 @@ export const zh: Dictionary = {
     sourceNotice: "封面与资料来自本乐队所列的来源。{link}。",
     seeBandPage: "查看 {band} 的页面",
     ambiguousTitle: "有多张名为「{slug}」的作品",
-    ambiguousLead: "这个作品名被 {bands} 使用。请选择你要找的那张。",
+    ambiguousLead: "有多支乐队以此名发行过作品。请选择你要找的那张。",
   },
   releaseType: {
     album: "专辑",
@@ -141,7 +141,7 @@ export const zh: Dictionary = {
   },
   festival: {
     title: "音乐节与场地",
-    lead: "场景聚集之处：{countries}，共 {venues}。日期与票务由主办方发布，本页只作收录。",
+    lead: "场景聚集之处：{venues}，{countries}。日期与票务由主办方发布，本页只作收录。",
     since: "自 {year} 年",
     until: "至 {year} 年",
     festival: "音乐节",
@@ -433,6 +433,8 @@ export const zh: Dictionary = {
     setPassword: "设置密码",
     receiveLink: "把链接发给我",
     incompleteLink: "链接不完整。{link} 以获取新链接。",
+    createMyAccount: "创建我的账号",
+    signInAction: "登录",
   },
   pages: {
     aboutTitle: "关于 Helleilla Exploratium",
@@ -496,7 +498,7 @@ export const zh: Dictionary = {
     genreEmptyDescription: "{site} 百科中的 {genre} 流派。",
     memberNotFound: "未找到成员",
     memberDescription: "{site} 百科中的 {member}。",
-    membersDescription: "{band} 的阵容：已收录 {count}。",
+    membersDescription: "{band} 的阵容：{count}。",
     membersFromMusicbrainz: "据 MusicBrainz 记载的 {band} 阵容。",
   },
   console: {

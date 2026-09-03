@@ -16,6 +16,7 @@ import {
   timestamp,
   index,
   vector,
+  jsonb,
 } from "drizzle-orm/pg-core";
 // Permet d'écrire des expressions SQL brutes (ici pour l'index GIN)
 import { sql } from "drizzle-orm";
@@ -32,8 +33,24 @@ export const bands = pgTable(
     name: text("name").notNull(),
     /** Identifiant lisible pour les URL, unique à l'échelle globale. */
     slug: text("slug").notNull().unique(),
-    /** Biographie du groupe (nullable). */
+    /** Biographie du groupe (nullable), dans sa langue d'origine. */
     bio: text("bio"),
+    /**
+     * Traductions de la biographie, indexées par code de langue.
+     *
+     * Le contenu encyclopédique ne se traduit pas tout seul : il est
+     * écrit par des contributeurs, dans une langue. Plutôt que de le
+     * laisser en français devant un lecteur japonais, la fiche sert la
+     * traduction quand elle existe et le texte d'origine sinon.
+     *
+     * Une colonne JSON plutôt qu'une table dédiée : on lit toujours
+     * l'ensemble d'un coup, avec le groupe, et jamais une traduction
+     * isolée — une jointure n'apporterait rien qu'un aller-retour.
+     */
+    bioTranslations: jsonb("bio_translations")
+      .$type<Record<string, string>>()
+      .notNull()
+      .default({}),
     /** Code pays ISO 3166-1 alpha-2 (ex. « FR », « US »). */
     countryCode: text("country_code"), // ISO 3166-1 alpha-2
     /** Année de formation du groupe. */

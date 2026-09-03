@@ -33,6 +33,14 @@ export type SeedVenue = {
   websiteUrl?: string;
   capacity?: number;
   description?: string;
+  /**
+   * Traductions de la présentation, par code de langue.
+   *
+   * Écrites à la main à partir du texte français : une présentation est
+   * du contenu éditorial, que la règle du projet interdit de faire
+   * produire par une machine.
+   */
+  descriptionTranslations?: Record<string, string>;
 };
 
 export const VENUES: SeedVenue[] = [
@@ -48,6 +56,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 85000,
     description:
       "Né dans un village du Schleswig-Holstein, devenu le rendez-vous metal le plus fréquenté d'Europe. Les billets partent souvent avant l'annonce de la programmation.",
+    descriptionTranslations: {
+      en: "Born in a Schleswig-Holstein village, now the busiest metal gathering in Europe. Tickets often sell out before the line-up is announced.",
+      de: "In einem Dorf in Schleswig-Holstein entstanden, heute das meistbesuchte Metal-Treffen Europas. Die Karten sind oft weg, bevor das Programm bekannt ist.",
+      es: "Nacido en un pueblo de Schleswig-Holstein, hoy la cita metal más concurrida de Europa. Las entradas suelen agotarse antes de anunciarse el cartel.",
+      pt: "Nascido numa aldeia do Schleswig-Holstein, é hoje o encontro metal mais concorrido da Europa. Os bilhetes esgotam-se muitas vezes antes de anunciado o cartaz.",
+      it: "Nato in un villaggio dello Schleswig-Holstein, oggi il raduno metal più frequentato d'Europa. I biglietti finiscono spesso prima dell'annuncio del programma.",
+      nl: "Ontstaan in een dorp in Sleeswijk-Holstein, nu de drukstbezochte metalbijeenkomst van Europa. De kaarten zijn vaak weg voordat de line-up bekend is.",
+      sv: "Uppstod i en by i Schleswig-Holstein och är i dag Europas mest besökta metalträff. Biljetterna tar ofta slut innan programmet offentliggörs.",
+      nb: "Oppsto i en landsby i Schleswig-Holstein, og er i dag Europas mest besøkte metaltreff. Billettene er ofte utsolgt før programmet offentliggjøres.",
+      fi: "Sai alkunsa Schleswig-Holsteinin kylässä ja on nykyään Euroopan vilkkain metallitapahtuma. Liput loppuvat usein ennen esiintyjien julkistamista.",
+      pl: "Narodził się w wiosce w Szlezwiku-Holsztynie, dziś to najliczniej odwiedzany zlot metalowy w Europie. Bilety często znikają przed ogłoszeniem składu.",
+      ru: "Возник в деревне в Шлезвиг-Гольштейне, а сегодня это самый посещаемый метал-сбор Европы. Билеты нередко расходятся до объявления состава.",
+      ja: "シュレースヴィヒ＝ホルシュタインの村で生まれ、今ではヨーロッパで最も人の集まるメタルの催し。出演者の発表を待たずに券が売り切れることも多い。",
+      zh: "起于石勒苏益格-荷尔斯泰因的一个村庄，如今是欧洲人气最旺的金属聚会。门票常在公布阵容之前就已售罄。",
+      ar: "وُلد في قرية بشليسفيغ-هولشتاين، وصار اليوم أكثر مواعيد الميتال ازدحامًا في أوروبا. وكثيرًا ما تنفد التذاكر قبل إعلان قائمة الفرق.",
+    },
   },
   {
     name: "Summer Breeze Open Air",
@@ -70,6 +94,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 8000,
     description:
       "Organisé par le magazine du même nom dans le parc Amphitheater, réputé pour une programmation resserrée et sans seconde scène.",
+    descriptionTranslations: {
+      en: "Run by the magazine of the same name in the Amphitheater park, known for a tight bill and no second stage.",
+      de: "Vom gleichnamigen Magazin im Amphitheater-Park veranstaltet, bekannt für ein knappes Programm ohne zweite Bühne.",
+      es: "Organizado por la revista homónima en el parque Amphitheater, conocido por un cartel ajustado y sin segundo escenario.",
+      pt: "Organizado pela revista homónima no parque Amphitheater, conhecido por um cartaz curto e sem segundo palco.",
+      it: "Organizzato dall'omonima rivista nel parco Amphitheater, noto per un cartellone ristretto e senza seconda scena.",
+      nl: "Georganiseerd door het gelijknamige blad in het Amphitheater-park, bekend om een strak programma zonder tweede podium.",
+      sv: "Arrangeras av tidskriften med samma namn i Amphitheater-parken, känd för ett kort program utan andrascen.",
+      nb: "Arrangeres av magasinet med samme navn i Amphitheater-parken, kjent for et kort program uten andrescene.",
+      fi: "Samannimisen lehden järjestämä Amphitheater-puistossa, tunnettu tiiviistä ohjelmasta ilman toista lavaa.",
+      pl: "Organizowany przez magazyn o tej samej nazwie w parku Amphitheater, znany ze zwięzłego składu bez drugiej sceny.",
+      ru: "Проводится одноимённым журналом в парке Amphitheater; известен сжатой афишей без второй сцены.",
+      ja: "同名の雑誌が Amphitheater 公園で開く。第二ステージを設けない絞った編成で知られる。",
+      zh: "由同名杂志在 Amphitheater 公园举办，以阵容紧凑、不设第二舞台著称。",
+      ar: "تنظّمه المجلة التي تحمل الاسم نفسه في حديقة Amphitheater، ويُعرف ببرنامج مركّز بلا مسرح ثانٍ.",
+    },
   },
   {
     name: "Party.San Metal Open Air",
@@ -82,6 +122,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 12000,
     description:
       "Orienté death et black metal, sur un ancien aérodrome de Thuringe.",
+    descriptionTranslations: {
+      en: "Death and black metal oriented, on a former Thuringian airfield.",
+      de: "Auf Death und Black Metal ausgerichtet, auf einem ehemaligen Flugplatz in Thüringen.",
+      es: "Orientado al death y al black metal, en un antiguo aeródromo de Turingia.",
+      pt: "Voltado para o death e o black metal, num antigo aeródromo da Turíngia.",
+      it: "Orientato al death e al black metal, su un ex aerodromo della Turingia.",
+      nl: "Gericht op death en black metal, op een voormalig vliegveld in Thüringen.",
+      sv: "Inriktat på death och black metal, på ett före detta flygfält i Thüringen.",
+      nb: "Rettet mot death og black metal, på en tidligere flyplass i Thüringen.",
+      fi: "Painottuu death- ja black metaliin, entisellä lentokentällä Thüringenissä.",
+      pl: "Nastawiony na death i black metal, na dawnym lotnisku w Turyngii.",
+      ru: "Ориентирован на дэт- и блэк-метал, на бывшем аэродроме в Тюрингии.",
+      ja: "デスメタルとブラックメタル寄り。テューリンゲンの旧飛行場で行われる。",
+      zh: "偏重死亡金属与黑金属，在图林根一处旧机场举办。",
+      ar: "يميل إلى الديث والبلاك ميتال، ويُقام في مطار سابق بولاية تورينغن.",
+    },
   },
 
   // --- France ---
@@ -96,6 +152,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 60000,
     description:
       "Installé dans le vignoble nantais, il a fait de Clisson une destination annuelle pour toutes les branches du metal, de la plus mélodique à la plus extrême.",
+    descriptionTranslations: {
+      en: "Set among the vineyards near Nantes, it has made Clisson an annual destination for every branch of metal, from the most melodic to the most extreme.",
+      de: "Im Weinbaugebiet bei Nantes gelegen, hat es Clisson zum jährlichen Ziel für alle Zweige des Metal gemacht, vom melodischsten bis zum extremsten.",
+      es: "Instalado en el viñedo de Nantes, ha hecho de Clisson una cita anual para todas las ramas del metal, de la más melódica a la más extrema.",
+      pt: "Instalado na região vinícola de Nantes, fez de Clisson um destino anual para todos os ramos do metal, do mais melódico ao mais extremo.",
+      it: "Immerso nei vigneti di Nantes, ha reso Clisson una meta annuale per tutte le diramazioni del metal, dalla più melodica alla più estrema.",
+      nl: "Gelegen in de wijngaarden bij Nantes, heeft het van Clisson een jaarlijkse bestemming gemaakt voor elke tak van metal, van de meest melodieuze tot de meest extreme.",
+      sv: "Ligger i vindistriktet kring Nantes och har gjort Clisson till en årlig anhalt för metalens alla grenar, från den melodiska till den mest extrema.",
+      nb: "Ligger i vindistriktet ved Nantes og har gjort Clisson til et årlig mål for alle metalens grener, fra den mest melodiske til den mest ekstreme.",
+      fi: "Sijaitsee Nantesin viinialueella ja on tehnyt Clissonista vuosittaisen kohteen metallin kaikille haaroille, melodisimmasta äärimmäisimpään.",
+      pl: "Osadzony wśród winnic pod Nantes, uczynił z Clisson doroczny cel dla wszystkich odnóg metalu, od najbardziej melodyjnych po najskrajniejsze.",
+      ru: "Расположенный среди виноградников под Нантом, он сделал Клисон ежегодной точкой сбора для всех ветвей метала — от самых мелодичных до самых экстремальных.",
+      ja: "ナント近郊のぶどう畑に開かれ、クリソンをメタルのあらゆる系統――最も旋律的なものから最も過激なものまで――が年に一度集まる地に変えた。",
+      zh: "设在南特近郊的葡萄园中，使克利松成为金属各支流每年一度的汇聚之地，从最旋律化到最极端的都在其列。",
+      ar: "يقام في منطقة كروم نانت، وقد جعل من كليسون وجهة سنوية لكل فروع الميتال، من أكثرها لحنية إلى أشدّها تطرّفًا.",
+    },
   },
   {
     name: "Motocultor Festival",
@@ -116,6 +188,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 300,
     description:
       "Petite salle du centre de Paris, l'une des rares à programmer du metal extrême toute l'année.",
+    descriptionTranslations: {
+      en: "A small room in central Paris, one of the few to programme extreme metal all year round.",
+      de: "Kleiner Saal im Zentrum von Paris, einer der wenigen, die das ganze Jahr über extremen Metal programmieren.",
+      es: "Sala pequeña del centro de París, una de las pocas que programa metal extremo todo el año.",
+      pt: "Sala pequena no centro de Paris, uma das poucas a programar metal extremo todo o ano.",
+      it: "Piccola sala nel centro di Parigi, una delle poche a programmare metal estremo tutto l'anno.",
+      nl: "Kleine zaal in het centrum van Parijs, een van de weinige die het hele jaar door extreme metal programmeert.",
+      sv: "Liten lokal i centrala Paris, en av få som programsätter extrem metal året om.",
+      nb: "Lite lokale i Paris sentrum, ett av få som programmerer ekstrem metal hele året.",
+      fi: "Pieni klubi Pariisin keskustassa, yksi harvoista, joka ohjelmoi äärimetallia ympäri vuoden.",
+      pl: "Mały klub w centrum Paryża, jeden z nielicznych grających metal ekstremalny przez cały rok.",
+      ru: "Небольшой зал в центре Парижа, один из немногих, где экстремальный метал звучит круглый год.",
+      ja: "パリ中心部の小さなハコ。極端なメタルを一年を通して組む数少ない場所の一つ。",
+      zh: "巴黎市中心的小型场地，是少数全年编排极端金属演出的场所之一。",
+      ar: "قاعة صغيرة في وسط باريس، وإحدى القاعات النادرة التي تبرمج الميتال المتطرّف طوال السنة.",
+    },
   },
   {
     name: "La Machine du Moulin Rouge",
@@ -139,6 +227,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 3500,
     description:
       "Doom, sludge et musiques lourdes expérimentales. Réputé pour ses commandes de créations jouées une seule fois.",
+    descriptionTranslations: {
+      en: "Doom, sludge and experimental heavy music. Known for commissioning works played only once.",
+      de: "Doom, Sludge und experimentelle schwere Musik. Bekannt für Auftragswerke, die nur ein einziges Mal gespielt werden.",
+      es: "Doom, sludge y músicas pesadas experimentales. Conocido por encargar obras que se tocan una sola vez.",
+      pt: "Doom, sludge e músicas pesadas experimentais. Conhecido por encomendar obras tocadas uma única vez.",
+      it: "Doom, sludge e musiche pesanti sperimentali. Noto per le commissioni di opere suonate una sola volta.",
+      nl: "Doom, sludge en experimentele zware muziek. Bekend om opdrachtwerken die maar één keer worden gespeeld.",
+      sv: "Doom, sludge och experimentell tung musik. Känt för beställningsverk som spelas en enda gång.",
+      nb: "Doom, sludge og eksperimentell tung musikk. Kjent for bestillingsverk som spilles bare én gang.",
+      fi: "Doomia, sludgea ja kokeellista raskasta musiikkia. Tunnetaan tilausteoksista, jotka soitetaan vain kerran.",
+      pl: "Doom, sludge i eksperymentalna muzyka ciężka. Znany z zamówionych utworów wykonywanych tylko raz.",
+      ru: "Дум, сладж и экспериментальная тяжёлая музыка. Известен заказными программами, которые исполняются единожды.",
+      ja: "ドゥーム、スラッジ、実験的なヘヴィ・ミュージック。一度きりの委嘱作品で知られる。",
+      zh: "末日、泥浆与实验性重型音乐。以只演一次的委约作品闻名。",
+      ar: "دووم وسلادج وموسيقى ثقيلة تجريبية. يُعرف بأعمال يكلّف بها خصّيصًا ولا تُعزف إلا مرّة واحدة.",
+    },
   },
   {
     name: "Dynamo Metalfest",
@@ -181,6 +285,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 3000,
     description:
       "Rendez-vous du black metal norvégien pendant le week-end de Pâques, dans plusieurs salles d'Oslo.",
+    descriptionTranslations: {
+      en: "The Norwegian black metal gathering over the Easter weekend, across several Oslo venues.",
+      de: "Das norwegische Black-Metal-Treffen am Osterwochenende, verteilt auf mehrere Osloer Spielstätten.",
+      es: "La cita del black metal noruego durante el fin de semana de Pascua, en varias salas de Oslo.",
+      pt: "O encontro do black metal norueguês no fim de semana da Páscoa, em várias salas de Oslo.",
+      it: "L'appuntamento del black metal norvegese nel fine settimana di Pasqua, in più sale di Oslo.",
+      nl: "De Noorse blackmetalbijeenkomst in het paasweekend, verspreid over meerdere zalen in Oslo.",
+      sv: "Den norska black metal-samlingen under påskhelgen, spridd över flera scener i Oslo.",
+      nb: "Det norske black metal-treffet i påskehelgen, fordelt på flere scener i Oslo.",
+      fi: "Norjalaisen black metalin kohtaamispaikka pääsiäisviikonloppuna, useassa Oslon klubissa.",
+      pl: "Zlot norweskiego black metalu w weekend wielkanocny, w kilku klubach Oslo.",
+      ru: "Сбор норвежского блэк-метала на пасхальных выходных, сразу на нескольких площадках Осло.",
+      ja: "イースターの週末に開かれるノルウェーのブラックメタルの集い。オスロの複数の会場で行われる。",
+      zh: "复活节周末举行的挪威黑金属聚会，分散在奥斯陆的数个场地。",
+      ar: "موعد البلاك ميتال النرويجي في عطلة عيد الفصح، موزّعًا على عدّة قاعات في أوسلو.",
+    },
   },
   {
     name: "Beyond the Gates",
@@ -230,6 +350,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 40000,
     description:
       "En plein centre d'Helsinki, sur l'ancien site industriel de Suvilahti.",
+    descriptionTranslations: {
+      en: "In the middle of Helsinki, on the former Suvilahti industrial site.",
+      de: "Mitten in Helsinki, auf dem ehemaligen Industriegelände Suvilahti.",
+      es: "En pleno centro de Helsinki, en el antiguo recinto industrial de Suvilahti.",
+      pt: "Em pleno centro de Helsínquia, no antigo recinto industrial de Suvilahti.",
+      it: "In pieno centro a Helsinki, sull'ex area industriale di Suvilahti.",
+      nl: "Midden in Helsinki, op het voormalige industrieterrein Suvilahti.",
+      sv: "Mitt i Helsingfors, på det gamla industriområdet Suvilahti.",
+      nb: "Midt i Helsingfors, på det gamle industriområdet Suvilahti.",
+      fi: "Keskellä Helsinkiä, entisellä Suvilahden teollisuusalueella.",
+      pl: "W samym centrum Helsinek, na dawnym terenie przemysłowym Suvilahti.",
+      ru: "В самом центре Хельсинки, на бывшей промышленной площадке Сувилахти.",
+      ja: "ヘルシンキの中心部、旧工業地区スヴィラハティにて。",
+      zh: "位于赫尔辛基市中心，旧苏维拉赫蒂工业区内。",
+      ar: "في قلب هلسنكي، في موقع سوفيلاهتي الصناعي القديم.",
+    },
   },
   {
     name: "Nummirock",
@@ -259,6 +395,22 @@ export const VENUES: SeedVenue[] = [
     foundedYear: 2005,
     description:
       "Dans un fjord de l'est islandais, à onze heures de route de Reykjavík.",
+    descriptionTranslations: {
+      en: "In a fjord in eastern Iceland, eleven hours' drive from Reykjavík.",
+      de: "In einem Fjord im Osten Islands, elf Autostunden von Reykjavík entfernt.",
+      es: "En un fiordo del este de Islandia, a once horas de carretera de Reikiavik.",
+      pt: "Num fiorde do leste da Islândia, a onze horas de estrada de Reiquiavique.",
+      it: "In un fiordo dell'Islanda orientale, a undici ore di strada da Reykjavík.",
+      nl: "In een fjord in het oosten van IJsland, elf uur rijden van Reykjavík.",
+      sv: "I en fjord på Islands östkust, elva timmars bilfärd från Reykjavík.",
+      nb: "I en fjord øst på Island, elleve timers kjøring fra Reykjavík.",
+      fi: "Vuonossa Itä-Islannissa, yhdentoista tunnin ajomatkan päässä Reykjavíkista.",
+      pl: "W fiordzie we wschodniej Islandii, jedenaście godzin jazdy od Reykjavíku.",
+      ru: "В фьорде на востоке Исландии, в одиннадцати часах езды от Рейкьявика.",
+      ja: "アイスランド東部のフィヨルドにて。レイキャヴィークから車で十一時間。",
+      zh: "位于冰岛东部的一处峡湾，距雷克雅未克十一小时车程。",
+      ar: "في مضيق بحري شرقي آيسلندا، على بُعد إحدى عشرة ساعة بالسيارة من ريكيافيك.",
+    },
   },
 
   // --- Royaume-Uni et Irlande ---
@@ -292,6 +444,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 500,
     description:
       "Sous le Worlds End de Camden : passage obligé des tournées metal à Londres depuis trente ans.",
+    descriptionTranslations: {
+      en: "Beneath the World's End in Camden: an unavoidable stop for metal tours in London for thirty years.",
+      de: "Unter dem World's End in Camden: seit dreißig Jahren eine Pflichtstation für Metal-Touren in London.",
+      es: "Bajo el World's End de Camden: parada obligada de las giras metal en Londres desde hace treinta años.",
+      pt: "Por baixo do World's End em Camden: paragem obrigatória das digressões metal em Londres há trinta anos.",
+      it: "Sotto il World's End di Camden: tappa obbligata dei tour metal a Londra da trent'anni.",
+      nl: "Onder de World's End in Camden: al dertig jaar een verplichte halte voor metaltournees in Londen.",
+      sv: "Under World's End i Camden: en obligatorisk anhalt för metalturnéer i London sedan trettio år.",
+      nb: "Under World's End i Camden: en obligatorisk stopp for metalturneer i London i tretti år.",
+      fi: "Camdenin World's Endin alla: pakollinen pysähdys Lontoon metallikiertueilla jo kolmenkymmenen vuoden ajan.",
+      pl: "Pod World's End w Camden: od trzydziestu lat obowiązkowy przystanek metalowych tras w Londynie.",
+      ru: "Под пабом World's End в Камдене: обязательная остановка метал-туров в Лондоне вот уже тридцать лет.",
+      ja: "カムデンの World's End の地下。ロンドンのメタル・ツアーが三十年来かならず通る場所。",
+      zh: "位于卡姆登 World's End 酒吧地下：三十年来伦敦金属巡演必到之处。",
+      ar: "تحت حانة World's End في كامدن: محطة لا تتخطّاها جولات الميتال في لندن منذ ثلاثين عامًا.",
+    },
   },
 
   // --- Europe centrale et du Sud ---
@@ -306,6 +474,22 @@ export const VENUES: SeedVenue[] = [
     capacity: 20000,
     description:
       "Dans la forteresse militaire de Josefov, dont les casemates servent de scènes.",
+    descriptionTranslations: {
+      en: "Inside the Josefov military fortress, whose casemates serve as stages.",
+      de: "In der Militärfestung Josefov, deren Kasematten als Bühnen dienen.",
+      es: "En la fortaleza militar de Josefov, cuyas casamatas hacen de escenarios.",
+      pt: "Na fortaleza militar de Josefov, cujas casamatas servem de palcos.",
+      it: "Nella fortezza militare di Josefov, le cui casematte fanno da palco.",
+      nl: "In het militaire fort van Josefov, waar de kazematten als podia dienen.",
+      sv: "I militärfästningen Josefov, där kasematterna tjänar som scener.",
+      nb: "I militærfestningen Josefov, der kasemattene tjener som scener.",
+      fi: "Josefovin sotilaslinnoituksessa, jonka kasematit toimivat lavoina.",
+      pl: "W twierdzy wojskowej Josefov, której kazamaty służą za sceny.",
+      ru: "В военной крепости Йозефов, казематы которой служат сценами.",
+      ja: "ヨゼフォフの軍事要塞にて。砲郭がそのままステージになる。",
+      zh: "在约瑟夫堡军事要塞内举行，炮垒即为舞台。",
+      ar: "داخل قلعة يوزيفوف العسكرية، حيث تتحوّل أقبيتها المحصّنة إلى مسارح.",
+    },
   },
   {
     name: "Mystic Festival",
@@ -364,6 +548,22 @@ export const VENUES: SeedVenue[] = [
     websiteUrl: "https://www.marylanddeathfest.com",
     description:
       "Le rendez-vous nord-américain du death metal et du grindcore, réparti entre plusieurs salles de Baltimore.",
+    descriptionTranslations: {
+      en: "The North American gathering for death metal and grindcore, spread across several Baltimore venues.",
+      de: "Das nordamerikanische Treffen für Death Metal und Grindcore, verteilt auf mehrere Spielstätten in Baltimore.",
+      es: "La cita norteamericana del death metal y el grindcore, repartida entre varias salas de Baltimore.",
+      pt: "O encontro norte-americano do death metal e do grindcore, repartido por várias salas de Baltimore.",
+      it: "L'appuntamento nordamericano del death metal e del grindcore, distribuito su più sale di Baltimora.",
+      nl: "De Noord-Amerikaanse bijeenkomst voor death metal en grindcore, verspreid over meerdere zalen in Baltimore.",
+      sv: "Den nordamerikanska samlingen för death metal och grindcore, fördelad över flera scener i Baltimore.",
+      nb: "Det nordamerikanske treffet for death metal og grindcore, fordelt på flere scener i Baltimore.",
+      fi: "Pohjois-Amerikan death metalin ja grindcoren kohtaamispaikka, hajautettuna useaan Baltimoren klubiin.",
+      pl: "Północnoamerykański zlot death metalu i grindcore'u, rozłożony na kilka klubów w Baltimore.",
+      ru: "Североамериканский сбор дэт-метала и грайндкора, разнесённый по нескольким площадкам Балтимора.",
+      ja: "北米におけるデスメタルとグラインドコアの集い。ボルチモアの複数の会場に分かれて行われる。",
+      zh: "北美死亡金属与碾核的聚会，分散在巴尔的摩数个场地举行。",
+      ar: "ملتقى أمريكا الشمالية للديث ميتال والغرايندكور، موزّعًا على عدّة قاعات في بالتيمور.",
+    },
   },
   {
     name: "Psycho Las Vegas",
@@ -403,6 +603,22 @@ export const VENUES: SeedVenue[] = [
     websiteUrl: "https://rockinrio.com",
     description:
       "Généraliste, mais dont les éditions ont accueilli les plus grandes affiches metal d'Amérique du Sud.",
+    descriptionTranslations: {
+      en: "A general-audience festival, but one whose editions have hosted the biggest metal bills in South America.",
+      de: "Ein Festival für ein breites Publikum, dessen Ausgaben aber die größten Metal-Besetzungen Südamerikas versammelt haben.",
+      es: "Festival generalista, pero cuyas ediciones han acogido los mayores carteles metal de Sudamérica.",
+      pt: "Festival generalista, mas cujas edições acolheram os maiores cartazes metal da América do Sul.",
+      it: "Festival generalista, ma le cui edizioni hanno ospitato i più grandi cartelloni metal del Sudamerica.",
+      nl: "Een breed festival, maar met edities die de grootste metalaffiches van Zuid-Amerika hebben gehuisvest.",
+      sv: "En bred festival, men vars upplagor har rymt Sydamerikas största metalaffischer.",
+      nb: "En bred festival, men med utgaver som har rommet Sør-Amerikas største metalplakater.",
+      fi: "Yleisfestivaali, jonka esiintyjäkaartiin on silti mahtunut Etelä-Amerikan suurimpia metallinimiä.",
+      pl: "Festiwal ogólny, którego edycje gościły jednak największe metalowe składy Ameryki Południowej.",
+      ru: "Фестиваль широкого профиля, чьи выпуски, однако, собирали самые крупные метал-афиши Южной Америки.",
+      ja: "総合フェスながら、南米で最大級のメタルの顔ぶれを迎えてきた回も多い。",
+      zh: "综合性音乐节，但历届曾集齐南美规模最大的金属阵容。",
+      ar: "مهرجان عام في توجّهه، غير أنّ دوراته استضافت أضخم قوائم الميتال في أمريكا الجنوبية.",
+    },
   },
 
   // --- Asie et Océanie ---
@@ -416,6 +632,22 @@ export const VENUES: SeedVenue[] = [
     websiteUrl: "https://www.loudpark.com",
     description:
       "Principal festival metal japonais, en salle, dans la Saitama Super Arena.",
+    descriptionTranslations: {
+      en: "Japan's main metal festival, held indoors at the Saitama Super Arena.",
+      de: "Japans wichtigstes Metal-Festival, in der Halle der Saitama Super Arena.",
+      es: "El principal festival metal japonés, en recinto cubierto, en el Saitama Super Arena.",
+      pt: "O principal festival metal japonês, em recinto coberto, no Saitama Super Arena.",
+      it: "Il principale festival metal giapponese, al chiuso, alla Saitama Super Arena.",
+      nl: "Het belangrijkste metalfestival van Japan, binnen, in de Saitama Super Arena.",
+      sv: "Japans främsta metalfestival, inomhus i Saitama Super Arena.",
+      nb: "Japans fremste metalfestival, innendørs i Saitama Super Arena.",
+      fi: "Japanin tärkein metallifestivaali, sisätiloissa Saitama Super Arenalla.",
+      pl: "Najważniejszy japoński festiwal metalowy, w hali Saitama Super Arena.",
+      ru: "Главный метал-фестиваль Японии, в закрытом зале Saitama Super Arena.",
+      ja: "日本を代表するメタル・フェス。さいたまスーパーアリーナでの屋内開催。",
+      zh: "日本最主要的金属音乐节，在埼玉超级竞技场室内举行。",
+      ar: "أبرز مهرجانات الميتال في اليابان، ويقام في قاعة سايتاما سوبر أرينا المغلقة.",
+    },
   },
   {
     name: "Wacken Metal Battle Australia",

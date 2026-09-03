@@ -36,10 +36,8 @@ export async function generateMetadata({
   params,
 }: MembersPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [band, { t, n }] = await Promise.all([
-    fetchBandBySlug(slug),
-    getTranslations(),
-  ]);
+  const { t, n, locale } = await getTranslations();
+  const band = await fetchBandBySlug(slug, locale);
   if (!band) return { title: t.meta.bandNotFound, robots: { index: false } };
 
   const documented = await listMembersByBandId(band.id);
@@ -59,9 +57,9 @@ export async function generateMetadata({
 }
 
 export default async function BandMembersPage({ params }: MembersPageProps) {
-  const { t, n } = await getTranslations();
+  const { t, n, locale } = await getTranslations();
   const { slug } = await params;
-  const band = await fetchBandBySlug(slug);
+  const band = await fetchBandBySlug(slug, locale);
 
   if (!band) notFound();
 

@@ -1,0 +1,2 @@
+ALTER TABLE "bands" ADD COLUMN "bio_translations" jsonb DEFAULT '{}'::jsonb NOT NULL;--> statement-breakpoint
+ALTER TABLE "venues" ADD COLUMN "description_translations" jsonb DEFAULT '{}'::jsonb NOT NULL;
