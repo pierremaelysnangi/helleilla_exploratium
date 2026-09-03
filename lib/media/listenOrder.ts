@@ -29,8 +29,21 @@ const RANK: [RegExp, number][] = [
   [/(^|\.)youtu\.be$/, 4],
   [/(^|\.)deezer\.com$/, 5],
   [/(^|\.)music\.apple\.com$/, 6],
+  // Boutiques : à ranger explicitement, faute de quoi leur domaine
+  // inconnu les faisait passer pour le site officiel du groupe.
+  [/(^|\.)itunes\.apple\.com$/, 6],
   [/(^|\.)tidal\.com$/, 6],
-  [/(^|\.)soundcloud\.com$/, 7],
+  [/(^|\.)7digital\.com$/, 7],
+  [/(^|\.)amazon\.[a-z.]+$/, 7],
+  [/(^|\.)qobuz\.com$/, 7],
+  [/(^|\.)beatport\.com$/, 7],
+  [/(^|\.)juno\.co\.uk$/, 7],
+  [/(^|\.)soundcloud\.com$/, 8],
+  [/(^|\.)audiomack\.com$/, 8],
+  [/(^|\.)music\.youtube\.com$/, 4],
+  [/(^|\.)napster\.com$/, 8],
+  [/(^|\.)pandora\.com$/, 8],
+  [/(^|\.)music\.amazon\.[a-z.]+$/, 6],
   // Documentation : utile, mais on n'y écoute pas
   [/(^|\.)discogs\.com$/, 20],
   [/(^|\.)allmusic\.com$/, 21],

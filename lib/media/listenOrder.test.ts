@@ -38,6 +38,17 @@ describe("listenRank", () => {
     );
   });
 
+  it("range les boutiques, qu'un domaine inconnu promouvait à tort", () => {
+    // `itunes.apple.com` n'étant pas répertorié, il tombait dans le
+    // repli « site officiel » et passait devant Bandcamp et Spotify.
+    expect(listenRank("https://itunes.apple.com/album/x")).toBeGreaterThan(
+      listenRank("https://emperor.bandcamp.com/"),
+    );
+    expect(listenRank("https://itunes.apple.com/album/x")).toBeGreaterThan(
+      listenRank("https://open.spotify.com/artist/x"),
+    );
+  });
+
   it("ne met jamais en avant une URL inexploitable", () => {
     expect(listenRank("pas-une-url")).toBeGreaterThan(
       listenRank("https://www.facebook.com/x"),

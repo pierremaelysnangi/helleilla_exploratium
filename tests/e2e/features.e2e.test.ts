@@ -157,11 +157,15 @@ describe("Parcours catalogue (front métier)", () => {
     expect(html).toContain("<title>Albums | Helleilla Exploratium</title>");
   });
 
-  it("GET /genres rend la taxonomie filtrable", async () => {
+  it("GET /genres rend la page de taxonomie", async () => {
+    // Le champ de filtre a été retiré : la recherche globale couvre ce
+    // besoin, et ce second champ repoussait la taxonomie sous la ligne
+    // de flottaison. On vérifie donc le rendu de la page elle-même.
     const res = await fetch(`${BASE_URL}/genres`);
     expect(res.status).toBe(200);
     const html = await res.text();
-    expect(html).toContain("Filtrer les genres");
+    expect(html).toContain("Taxonomie des genres");
+    expect(html).not.toContain("Filtrer les genres");
   });
 
   it("la page détail d'un groupe SSR affiche nom, genres et discographie", async () => {
