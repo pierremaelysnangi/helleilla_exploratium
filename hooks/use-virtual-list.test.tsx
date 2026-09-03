@@ -7,7 +7,8 @@ import type { VirtualInfiniteListProps } from "@/components/shared/virtualInfini
 // Environnement DOM requis par le rendu React
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithI18n as render } from "@/lib/i18n/testing";
 import { shouldLoadMore } from "./use-virtual-list";
 import { VirtualInfiniteList } from "@/components/shared/virtualInfiniteList";
 

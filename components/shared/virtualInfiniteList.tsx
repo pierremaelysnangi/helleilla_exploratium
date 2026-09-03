@@ -15,6 +15,7 @@
 import { useVirtualList, shouldLoadMore } from "@/hooks/use-virtual-list";
 // Effet pour déclencher le chargement au franchissement du seuil
 import { useEffect, useRef } from "react";
+import { useT } from "@/lib/i18n/client";
 
 /** Props de la liste virtualisée. */
 export type VirtualInfiniteListProps<T> = {
@@ -50,6 +51,7 @@ export function VirtualInfiniteList<T>({
   isLoadingMore = false,
   hasMore = false,
 }: VirtualInfiniteListProps<T>) {
+  const t = useT();
   const { parentRef, virtualizer } = useVirtualList({
     count: items.length,
     estimateSize,
@@ -100,7 +102,7 @@ export function VirtualInfiniteList<T>({
           </div>
         ))}
       </div>
-      {hasMore && isLoadingMore && <p>Chargement…</p>}
+      {hasMore && isLoadingMore && <p>{t.catalogue.loading}</p>}
     </div>
   );
 }

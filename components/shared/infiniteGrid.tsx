@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useRef } from "react";
+import { useT } from "@/lib/i18n/client";
 
 export type InfiniteGridProps<T> = {
   items: T[];
@@ -45,6 +46,7 @@ export function InfiniteGrid<T>({
   isLoadingMore = false,
   hasMore = false,
 }: InfiniteGridProps<T>) {
+  const t = useT();
   const sentinel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export function InfiniteGrid<T>({
 
       {isLoadingMore && (
         <p role="status" className="text-muted-foreground text-center text-sm">
-          Chargement…
+          {t.catalogue.loading}
         </p>
       )}
     </div>

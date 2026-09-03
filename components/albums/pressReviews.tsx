@@ -54,7 +54,7 @@ export function PressReviews({ albumId }: { albumId: string }) {
 
   return (
     <section
-      aria-label="Critiques de presse"
+      aria-label={`${t.album.reviews} — ${t.album.press}`}
       className="metal-card flex flex-col gap-4 p-4"
     >
       <div className="flex flex-wrap items-baseline gap-3">

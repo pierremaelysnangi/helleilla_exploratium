@@ -90,7 +90,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {/* flex-1 : le contenu pousse le footer en bas de viewport */}
           <main className="site-container flex-1 py-6">
             {/* Capture les erreurs de rendu des composants clients */}
-            <ErrorBoundary>{children}</ErrorBoundary>
+            <ErrorBoundary
+              labels={{ error: t.common.error, retry: t.common.retry }}
+            >
+              {children}
+            </ErrorBoundary>
           </main>
           <Footer t={t} />
         </Providers>

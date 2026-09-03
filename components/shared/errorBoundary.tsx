@@ -9,7 +9,18 @@
 // Composant classe obligatoire pour componentDidCatch
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-type Props = { children: ReactNode };
+type Props = {
+  children: ReactNode;
+  /**
+   * Libellés traduits, passés en PROP.
+   *
+   * Une frontière d'erreur doit être un composant classe
+   * (`componentDidCatch` n'a pas d'équivalent en hook), et un composant
+   * classe ne peut pas lire le contexte par `useT()`. Le layout, lui,
+   * dispose déjà du dictionnaire.
+   */
+  labels: { error: string; retry: string };
+};
 type State = { error: Error | null };
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -28,17 +39,21 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <div role="alert" className="metal-card m-4 p-6 text-center">
-          <p className="metal-title text-base">Une erreur est survenue</p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            {(this.state.error as Error).message ||
-              "Erreur inattendue pendant l'affichage."}
-          </p>
+          <p className="metal-title text-base">{this.props.labels.error}</p>
+          {/* Le message technique n'est pas traduit : il vient de React
+              ou du réseau, et le traduire le rendrait inutilisable pour
+              qui le rapporterait. */}
+          {(this.state.error as Error).message && (
+            <p className="text-muted-foreground mt-2 text-sm">
+              {(this.state.error as Error).message}
+            </p>
+          )}
           <button
             type="button"
             onClick={() => this.setState({ error: null })}
             className="bg-primary text-primary-foreground mt-4 rounded-md px-4 py-2 text-sm font-semibold tracking-wide uppercase"
           >
-            Réessayer
+            {this.props.labels.retry}
           </button>
         </div>
       );

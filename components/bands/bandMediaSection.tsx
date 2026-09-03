@@ -47,10 +47,7 @@ export function BandMediaSection({ bandId, bandName }: BandMediaSectionProps) {
     info.area || info.memberships.length > 0 || info.genres.length > 0;
 
   return (
-    <section
-      aria-label="Informations et médias externes"
-      className="flex flex-col gap-6"
-    >
+    <section aria-label={t.band.gallery} className="flex flex-col gap-6">
       {/* Indicateur discret de dégradation (une source en panne) */}
       {degraded && (
         <p className="text-muted-foreground text-xs">{t.common.unavailable}</p>
