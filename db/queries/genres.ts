@@ -8,9 +8,9 @@
 // Instance unique de la base de données Drizzle
 import { db } from "@/db";
 // Table `genres` définie dans le schéma
-import { genres } from "@/db/schema";
+import { genres, bandGenres } from "@/db/schema";
 // Opérateurs SQL : égalité, recherche insensible à la casse, test de nullité
-import { eq, ilike, isNull } from "drizzle-orm";
+import { asc, eq, ilike, isNull } from "drizzle-orm";
 
 /**
  * Récupère un genre par son identifiant UUID.
@@ -75,4 +75,22 @@ export async function listGenreSlugs(): Promise<
     .select({ slug: genres.slug, updatedAt: genres.updatedAt })
     .from(genres)
     .limit(5_000);
+}
+
+/**
+ * Genres rattachés à un groupe.
+ *
+ * L'écran d'édition a besoin des seuls identifiants pour pré-cocher la
+ * sélection ; le nom est joint pour que l'appelant puisse aussi les
+ * afficher sans seconde requête.
+ */
+export async function listGenresByBandId(
+  bandId: string,
+): Promise<{ id: string; name: string; slug: string }[]> {
+  return db
+    .select({ id: genres.id, name: genres.name, slug: genres.slug })
+    .from(bandGenres)
+    .innerJoin(genres, eq(genres.id, bandGenres.genreId))
+    .where(eq(bandGenres.bandId, bandId))
+    .orderBy(asc(genres.name));
 }

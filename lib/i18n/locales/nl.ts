@@ -391,6 +391,33 @@ export const nl: Dictionary = {
     typeNameToConfirm: "Typ “{name}”",
     deletionWarning:
       "Verwijderen wist de identiteit en het openbare profiel. Al ingediende bijdragen blijven bestaan maar worden anoniem. Onomkeerbaar.",
+    catalogueEditor: "Catalogus bewerken",
+    catalogueLead:
+      "Een fout gegeven verbeteren, een uitgave aanvullen, een dubbel verwijderen. Inzendingen van bijdragers lopen wel via de beoordelingslijst.",
+    catalogueAccessNotice:
+      "De catalogus rechtstreeks bewerken is voorbehouden aan de moderatie. Bijdragers dienen in met bronnen, wat vastlegt wat wat aantoont.",
+    newBand: "Nieuwe band",
+    newAlbum: "Nieuwe uitgave",
+    bandFields: "Bandgegevens",
+    albumFields: "Gegevens van de uitgave",
+    albumTitle: "Titel",
+    albumSlugHint: "Afgeleid van de titel; alleen binnen de band uniek.",
+    releaseTypeLabel: "Soort uitgave",
+    releaseDate: "Uitgavedatum",
+    coverUrl: "Adres van de hoes",
+    coverUrlHint:
+      "Link naar de oorspronkelijke bron. Er wordt hier geen afbeelding gekopieerd.",
+    themesHint: "Door komma's gescheiden, ten hoogste tien.",
+    trackNumber: "Nr.",
+    trackTitle: "Titel van het nummer",
+    addTrack: "Nummer toevoegen",
+    saved: "Opgeslagen.",
+    viewPublicPage: "Bekijk de publieke pagina",
+    dangerZone: "Verwijderen",
+    deleteBandWarning:
+      "Deze band verwijderen neemt al zijn uitgaven en nummers mee. Ook de meningen erover verdwijnen. Onomkeerbaar.",
+    deleteAlbumWarning:
+      "Deze uitgave verwijderen neemt haar nummers en de meningen erover mee. Onomkeerbaar.",
   },
   contributionStatus: {
     pending: "Wacht op beoordeling",

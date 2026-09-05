@@ -391,6 +391,33 @@ export const pt: Dictionary = {
     typeNameToConfirm: "Escreva «{name}»",
     deletionWarning:
       "A eliminação apaga a identidade e o seu perfil público. As contribuições já submetidas mantêm-se mas passam a anónimas. É irreversível.",
+    catalogueEditor: "Edição do catálogo",
+    catalogueLead:
+      "Corrigir um dado falso, completar um lançamento, retirar um duplicado. As propostas de quem contribui passam pela fila de revisão.",
+    catalogueAccessNotice:
+      "A edição direta do catálogo é reservada à moderação. Quem contribui passa pela ficha com fontes, que guarda o registo do que atesta o quê.",
+    newBand: "Nova banda",
+    newAlbum: "Novo lançamento",
+    bandFields: "Ficha da banda",
+    albumFields: "Ficha do lançamento",
+    albumTitle: "Título",
+    albumSlugHint: "Derivado do título; único apenas dentro da banda.",
+    releaseTypeLabel: "Tipo de lançamento",
+    releaseDate: "Data de lançamento",
+    coverUrl: "Endereço da capa",
+    coverUrlHint:
+      "Ligação para a fonte original. Nenhuma imagem é copiada aqui.",
+    themesHint: "Separados por vírgulas, dez no máximo.",
+    trackNumber: "N.º",
+    trackTitle: "Título da faixa",
+    addTrack: "Adicionar uma faixa",
+    saved: "Guardado.",
+    viewPublicPage: "Ver a página pública",
+    dangerZone: "Eliminação",
+    deleteBandWarning:
+      "Eliminar esta banda leva consigo todos os lançamentos e as suas faixas. As opiniões publicadas sobre ela também desaparecem. É irreversível.",
+    deleteAlbumWarning:
+      "Eliminar este lançamento leva consigo as suas faixas e as opiniões publicadas sobre ele. É irreversível.",
   },
   contributionStatus: {
     pending: "À espera de revisão",

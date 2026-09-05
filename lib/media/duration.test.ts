@@ -9,6 +9,7 @@
 import { describe, it, expect } from "vitest";
 import {
   formatTrackDuration,
+  parseTrackDuration,
   formatTotalDuration,
   totalDurationIso,
 } from "./duration";
@@ -65,5 +66,35 @@ describe("totalDurationIso", () => {
 
   it("renvoie null plutôt qu'une durée nulle", () => {
     expect(totalDurationIso([{ durationMs: null }])).toBeNull();
+  });
+});
+
+describe("parseTrackDuration", () => {
+  it("convertit une saisie « m:ss »", () => {
+    expect(parseTrackDuration("4:31")).toBe(271_000);
+    expect(parseTrackDuration("0:07")).toBe(7_000);
+  });
+
+  it("accepte les durées de plus d'une heure", () => {
+    // Certains albums de doom tiennent en un seul morceau.
+    expect(parseTrackDuration("72:00")).toBe(4_320_000);
+  });
+
+  it("fait l'aller-retour avec le formatage", () => {
+    expect(formatTrackDuration(parseTrackDuration("9:05")!)).toBe("9:05");
+  });
+
+  it("renvoie null sur une saisie vide", () => {
+    expect(parseTrackDuration("")).toBeNull();
+    expect(parseTrackDuration("   ")).toBeNull();
+  });
+
+  it("refuse une forme ambiguë plutôt que de deviner", () => {
+    // « 4:5 » peut vouloir dire 4 min 5 s ou 4 min 50 s : on ne tranche
+    // pas à la place de la personne, on lui signale la faute.
+    expect(parseTrackDuration("4:5")).toBeNull();
+    expect(parseTrackDuration("4:61")).toBeNull();
+    expect(parseTrackDuration("431")).toBeNull();
+    expect(parseTrackDuration("quatre minutes")).toBeNull();
   });
 });

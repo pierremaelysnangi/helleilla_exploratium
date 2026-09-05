@@ -396,6 +396,32 @@ export const sv: Dictionary = {
     typeNameToConfirm: "Skriv ”{name}”",
     deletionWarning:
       "Raderingen tar bort identiteten och dess offentliga profil. Redan inskickade bidrag finns kvar men blir anonyma. Går inte att ångra.",
+    catalogueEditor: "Redigera katalogen",
+    catalogueLead:
+      "Rätta en felaktig uppgift, komplettera en utgåva, ta bort en dubblett. Bidragsgivarnas förslag går däremot via granskningslistan.",
+    catalogueAccessNotice:
+      "Att redigera katalogen direkt är förbehållet moderationen. Bidragsgivare skickar in med källor, vilket håller reda på vad som styrker vad.",
+    newBand: "Nytt band",
+    newAlbum: "Ny utgåva",
+    bandFields: "Uppgifter om bandet",
+    albumFields: "Uppgifter om utgåvan",
+    albumTitle: "Titel",
+    albumSlugHint: "Härledd ur titeln; unik endast inom bandet.",
+    releaseTypeLabel: "Typ av utgåva",
+    releaseDate: "Utgivningsdatum",
+    coverUrl: "Omslagets adress",
+    coverUrlHint: "Länk till originalkällan. Ingen bild kopieras hit.",
+    themesHint: "Åtskilda med komman, högst tio.",
+    trackNumber: "Nr",
+    trackTitle: "Spårets titel",
+    addTrack: "Lägg till spår",
+    saved: "Sparat.",
+    viewPublicPage: "Visa den publika sidan",
+    dangerZone: "Radering",
+    deleteBandWarning:
+      "Att radera bandet tar med sig alla utgåvor och deras spår. Även åsikterna om det försvinner. Går inte att ångra.",
+    deleteAlbumWarning:
+      "Att radera utgåvan tar med sig dess spår och åsikterna om den. Går inte att ångra.",
   },
   contributionStatus: {
     pending: "Väntar på granskning",

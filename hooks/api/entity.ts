@@ -27,6 +27,17 @@ type ListParams = {
   page?: number;
   perPage?: number;
   q?: string;
+  /**
+   * Filtres propres à l'entité — `albumId` pour une tracklist, `bandId`
+   * pour une discographie, `genre` pour le catalogue.
+   *
+   * L'index est volontairement ouvert : ces paramètres partent tels
+   * quels dans la query, et c'est la ROUTE qui les valide par zod. Les
+   * énumérer ici aurait dupliqué chaque schéma de liste dans la
+   * fabrique générique, qui n'a par construction rien à savoir des
+   * entités qu'elle sert.
+   */
+  [filter: string]: string | number | boolean | undefined;
 };
 
 /** Métadonnées de pagination renvoyées par les routes GET de liste. */

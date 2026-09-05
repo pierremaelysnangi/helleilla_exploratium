@@ -399,6 +399,33 @@ export const de: Dictionary = {
     typeNameToConfirm: "„{name}“ eingeben",
     deletionWarning:
       "Das Löschen entfernt die Identität und ihr öffentliches Profil. Bereits eingereichte Beiträge bleiben erhalten, werden aber anonym. Nicht umkehrbar.",
+    catalogueEditor: "Katalog bearbeiten",
+    catalogueLead:
+      "Eine falsche Angabe berichtigen, eine Veröffentlichung ergänzen, ein Duplikat entfernen. Einreichungen von Beitragenden laufen dagegen über die Prüfliste.",
+    catalogueAccessNotice:
+      "Das direkte Bearbeiten des Katalogs ist der Moderation vorbehalten. Beitragende reichen mit Belegen ein, was festhält, was was belegt.",
+    newBand: "Neue Band",
+    newAlbum: "Neue Veröffentlichung",
+    bandFields: "Angaben zur Band",
+    albumFields: "Angaben zur Veröffentlichung",
+    albumTitle: "Titel",
+    albumSlugHint:
+      "Aus dem Titel abgeleitet; nur innerhalb der Band eindeutig.",
+    releaseTypeLabel: "Art der Veröffentlichung",
+    releaseDate: "Erscheinungsdatum",
+    coverUrl: "Adresse des Covers",
+    coverUrlHint: "Link zur Originalquelle. Es wird kein Bild hierher kopiert.",
+    themesHint: "Durch Kommas getrennt, höchstens zehn.",
+    trackNumber: "Nr.",
+    trackTitle: "Titel des Stücks",
+    addTrack: "Titel hinzufügen",
+    saved: "Gespeichert.",
+    viewPublicPage: "Öffentliche Seite ansehen",
+    dangerZone: "Löschen",
+    deleteBandWarning:
+      "Diese Band zu löschen nimmt alle Veröffentlichungen und Titel mit. Auch die Meinungen dazu verschwinden. Nicht umkehrbar.",
+    deleteAlbumWarning:
+      "Diese Veröffentlichung zu löschen nimmt ihre Titel und die Meinungen dazu mit. Nicht umkehrbar.",
   },
   contributionStatus: {
     pending: "Wartet auf Prüfung",

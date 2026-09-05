@@ -374,6 +374,31 @@ export const zh: Dictionary = {
     typeNameToConfirm: "请输入「{name}」",
     deletionWarning:
       "删除会抹去身份及其公开资料。已提交的条目保留，但转为匿名。此操作不可撤销。",
+    catalogueEditor: "编辑目录",
+    catalogueLead: "更正错误、补全作品、清除重复。贡献者的提案则走审核队列。",
+    catalogueAccessNotice:
+      "直接编辑目录仅限审核员。贡献者通过附来源的提交，留下何者佐证何事的记录。",
+    newBand: "新建乐队",
+    newAlbum: "新建作品",
+    bandFields: "乐队信息",
+    albumFields: "作品信息",
+    albumTitle: "标题",
+    albumSlugHint: "由标题生成；仅在乐队内唯一。",
+    releaseTypeLabel: "作品类型",
+    releaseDate: "发行日期",
+    coverUrl: "封面地址",
+    coverUrlHint: "指向原始来源的链接。此处不复制任何图像。",
+    themesHint: "以逗号分隔，最多十个。",
+    trackNumber: "序号",
+    trackTitle: "曲目名称",
+    addTrack: "添加曲目",
+    saved: "已保存。",
+    viewPublicPage: "查看公开页面",
+    dangerZone: "删除",
+    deleteBandWarning:
+      "删除该乐队会一并移除其全部作品与曲目，相关观点也会消失。此操作不可撤销。",
+    deleteAlbumWarning:
+      "删除该作品会一并移除其曲目与相关观点。此操作不可撤销。",
   },
   contributionStatus: {
     pending: "等待审核",

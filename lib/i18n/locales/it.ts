@@ -394,6 +394,33 @@ export const it: Dictionary = {
     typeNameToConfirm: "Scrivi «{name}»",
     deletionWarning:
       "L'eliminazione cancella l'identità e il suo profilo pubblico. I contributi già inviati restano ma diventano anonimi. Azione irreversibile.",
+    catalogueEditor: "Modifica del catalogo",
+    catalogueLead:
+      "Correggere un dato falso, completare un'uscita, togliere un doppione. Le proposte di chi contribuisce passano invece dalla coda di revisione.",
+    catalogueAccessNotice:
+      "La modifica diretta del catalogo è riservata alla moderazione. Chi contribuisce passa dalla scheda con le fonti, che tiene traccia di ciò che attesta cosa.",
+    newBand: "Nuovo gruppo",
+    newAlbum: "Nuova uscita",
+    bandFields: "Scheda del gruppo",
+    albumFields: "Scheda dell'uscita",
+    albumTitle: "Titolo",
+    albumSlugHint: "Derivato dal titolo; unico solo all'interno del gruppo.",
+    releaseTypeLabel: "Tipo di uscita",
+    releaseDate: "Data di uscita",
+    coverUrl: "Indirizzo della copertina",
+    coverUrlHint:
+      "Collegamento alla fonte originale. Qui non viene copiata alcuna immagine.",
+    themesHint: "Separati da virgole, dieci al massimo.",
+    trackNumber: "N.",
+    trackTitle: "Titolo della traccia",
+    addTrack: "Aggiungi una traccia",
+    saved: "Salvato.",
+    viewPublicPage: "Vedi la pagina pubblica",
+    dangerZone: "Eliminazione",
+    deleteBandWarning:
+      "Eliminare questo gruppo porta via tutte le sue uscite e le loro tracce. Anche le opinioni pubblicate su di lui spariscono. È irreversibile.",
+    deleteAlbumWarning:
+      "Eliminare questa uscita porta via le sue tracce e le opinioni pubblicate su di essa. È irreversibile.",
   },
   contributionStatus: {
     pending: "In attesa di revisione",

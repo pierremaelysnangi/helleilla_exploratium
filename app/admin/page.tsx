@@ -86,6 +86,12 @@ export default async function AdminPage() {
           {t.app.manageAccounts}
         </Link>
         <Link
+          href="/admin/catalogue"
+          className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
+        >
+          {t.admin.catalogueEditor}
+        </Link>
+        <Link
           href="/contributions/relecture"
           className="border-border hover:bg-accent/30 rounded-md border px-4 py-2 text-sm font-semibold tracking-wide uppercase"
         >

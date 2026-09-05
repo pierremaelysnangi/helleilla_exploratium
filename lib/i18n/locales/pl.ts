@@ -467,6 +467,32 @@ export const pl: Dictionary = {
     typeNameToConfirm: "Wpisz „{name}”",
     deletionWarning:
       "Usunięcie kasuje tożsamość i jej profil publiczny. Przesłane wcześniej wpisy pozostają, ale stają się anonimowe. Działanie nieodwracalne.",
+    catalogueEditor: "Edycja katalogu",
+    catalogueLead:
+      "Poprawić błędną informację, uzupełnić wydawnictwo, usunąć duplikat. Propozycje współtwórców idą natomiast przez kolejkę weryfikacji.",
+    catalogueAccessNotice:
+      "Bezpośrednia edycja katalogu jest zastrzeżona dla moderacji. Współtwórcy zgłaszają wpisy ze źródłami, co zachowuje ślad tego, co czego dowodzi.",
+    newBand: "Nowy zespół",
+    newAlbum: "Nowe wydawnictwo",
+    bandFields: "Dane zespołu",
+    albumFields: "Dane wydawnictwa",
+    albumTitle: "Tytuł",
+    albumSlugHint: "Wyprowadzony z tytułu; unikalny tylko w obrębie zespołu.",
+    releaseTypeLabel: "Rodzaj wydawnictwa",
+    releaseDate: "Data wydania",
+    coverUrl: "Adres okładki",
+    coverUrlHint: "Odnośnik do źródła. Żaden obraz nie jest tu kopiowany.",
+    themesHint: "Oddzielone przecinkami, najwyżej dziesięć.",
+    trackNumber: "Nr",
+    trackTitle: "Tytuł utworu",
+    addTrack: "Dodaj utwór",
+    saved: "Zapisano.",
+    viewPublicPage: "Zobacz stronę publiczną",
+    dangerZone: "Usuwanie",
+    deleteBandWarning:
+      "Usunięcie zespołu zabiera wszystkie jego wydawnictwa i utwory. Znikają też opinie na jego temat. Nieodwracalne.",
+    deleteAlbumWarning:
+      "Usunięcie wydawnictwa zabiera jego utwory i opinie na jego temat. Nieodwracalne.",
   },
   contributionStatus: {
     pending: "Oczekuje na weryfikację",

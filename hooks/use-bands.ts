@@ -38,8 +38,13 @@ export const useUpdateBand = bandsHooks.useUpdate;
 export const useDeleteBand = bandsHooks.useDelete;
 
 // Lecture publique par slug (pages détail SSR)
-import { queryOptions } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { apiJson } from "./api/client";
+import { setBandGenresSchema } from "@/lib/validations/genre";
 // Fetch RSC partagé : déballe { data } et distingue 404 de panne
 import { fetchPublicOrNull } from "@/lib/api/client";
 import { bandDetailSchema, type BandDetail } from "./api/schemas";
@@ -81,4 +86,27 @@ export async function fetchBandBySlug(
     bandDetailSchema,
     { signal: init?.signal },
   );
+}
+
+/**
+ * Synchronise les genres d'un groupe.
+ *
+ * Hors de `createEntityHooks` : ce n'est pas une mise à jour de champ
+ * mais un REMPLACEMENT complet d'une table de jonction, servi par une
+ * route dédiée (`PUT /api/bands/:id/genres`). Le détail du groupe est
+ * invalidé ensuite, ses genres y étant joints.
+ */
+export function useSyncBandGenres(bandId: string) {
+  const qc = useQueryClient();
+  return useMutation<{ bandId: string; genreIds: string[] }, Error, string[]>({
+    mutationFn: (genreIds) =>
+      apiJson(`/api/bands/${bandId}/genres`, {
+        method: "PUT",
+        body: setBandGenresSchema.parse({ genreIds }),
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: bandKeys.detail(bandId) });
+      void qc.invalidateQueries({ queryKey: ["bands", "by-slug"] });
+    },
+  });
 }

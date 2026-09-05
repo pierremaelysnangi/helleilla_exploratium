@@ -395,6 +395,33 @@ export const nb: Dictionary = {
     typeNameToConfirm: "Skriv «{name}»",
     deletionWarning:
       "Sletting fjerner identiteten og den offentlige profilen. Allerede innsendte bidrag beholdes, men blir anonyme. Kan ikke angres.",
+    catalogueEditor: "Rediger katalogen",
+    catalogueLead:
+      "Rette en feil opplysning, fylle ut en utgivelse, fjerne en dublett. Forslag fra bidragsytere går derimot via gjennomgangslisten.",
+    catalogueAccessNotice:
+      "Å redigere katalogen direkte er forbeholdt moderasjonen. Bidragsytere sender inn med kilder, som holder rede på hva som viser hva.",
+    newBand: "Nytt band",
+    newAlbum: "Ny utgivelse",
+    bandFields: "Opplysninger om bandet",
+    albumFields: "Opplysninger om utgivelsen",
+    albumTitle: "Tittel",
+    albumSlugHint: "Avledet av tittelen; unik bare innenfor bandet.",
+    releaseTypeLabel: "Type utgivelse",
+    releaseDate: "Utgivelsesdato",
+    coverUrl: "Omslagets adresse",
+    coverUrlHint:
+      "Lenke til den opprinnelige kilden. Ingen bilder kopieres hit.",
+    themesHint: "Atskilt med komma, høyst ti.",
+    trackNumber: "Nr.",
+    trackTitle: "Sporets tittel",
+    addTrack: "Legg til spor",
+    saved: "Lagret.",
+    viewPublicPage: "Se den offentlige siden",
+    dangerZone: "Sletting",
+    deleteBandWarning:
+      "Å slette bandet tar med seg alle utgivelser og sporene deres. Også meningene om det forsvinner. Kan ikke angres.",
+    deleteAlbumWarning:
+      "Å slette utgivelsen tar med seg sporene og meningene om den. Kan ikke angres.",
   },
   contributionStatus: {
     pending: "Venter på gjennomgang",

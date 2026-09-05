@@ -395,6 +395,32 @@ export const en: Dictionary = {
     typeNameToConfirm: "Type “{name}”",
     deletionWarning:
       "Deletion erases the identity and its public profile. Contributions already submitted are kept but become anonymous. This cannot be undone.",
+    catalogueEditor: "Catalogue editing",
+    catalogueLead:
+      "Fix a wrong fact, complete a release, remove a duplicate. Submissions from contributors go through the review queue instead.",
+    catalogueAccessNotice:
+      "Editing the catalogue directly is reserved for moderation. Contributors go through the evidence-backed submission, which keeps a record of what proves what.",
+    newBand: "New band",
+    newAlbum: "New release",
+    bandFields: "Band details",
+    albumFields: "Release details",
+    albumTitle: "Title",
+    albumSlugHint: "Derived from the title; unique within the band only.",
+    releaseTypeLabel: "Release type",
+    releaseDate: "Release date",
+    coverUrl: "Cover address",
+    coverUrlHint: "Link to the original source. No image is copied here.",
+    themesHint: "Comma-separated, ten at most.",
+    trackNumber: "No.",
+    trackTitle: "Track title",
+    addTrack: "Add a track",
+    saved: "Saved.",
+    viewPublicPage: "View the public page",
+    dangerZone: "Deletion",
+    deleteBandWarning:
+      "Deleting this band takes every release and track with it. Opinions posted about it go too. This cannot be undone.",
+    deleteAlbumWarning:
+      "Deleting this release takes its tracks and the opinions posted about it. This cannot be undone.",
   },
   contributionStatus: {
     pending: "Awaiting review",

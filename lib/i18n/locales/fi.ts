@@ -394,6 +394,33 @@ export const fi: Dictionary = {
     typeNameToConfirm: "Kirjoita ”{name}”",
     deletionWarning:
       "Poisto pyyhkii henkilöllisyyden ja julkisen profiilin. Jo lähetetyt merkinnät säilyvät mutta muuttuvat nimettömiksi. Peruuttamaton.",
+    catalogueEditor: "Luettelon muokkaus",
+    catalogueLead:
+      "Korjaa virheellinen tieto, täydennä julkaisu, poista kaksoiskappale. Osallistujien ehdotukset kulkevat sen sijaan tarkistusjonon kautta.",
+    catalogueAccessNotice:
+      "Luettelon suora muokkaus on varattu valvonnalle. Osallistujat lähettävät merkintänsä lähteineen, mikä pitää kirjaa siitä, mikä todistaa minkä.",
+    newBand: "Uusi yhtye",
+    newAlbum: "Uusi julkaisu",
+    bandFields: "Yhtyeen tiedot",
+    albumFields: "Julkaisun tiedot",
+    albumTitle: "Nimi",
+    albumSlugHint: "Johdettu nimestä; yksilöllinen vain yhtyeen sisällä.",
+    releaseTypeLabel: "Julkaisun tyyppi",
+    releaseDate: "Julkaisupäivä",
+    coverUrl: "Kansikuvan osoite",
+    coverUrlHint:
+      "Linkki alkuperäiseen lähteeseen. Tänne ei kopioida yhtään kuvaa.",
+    themesHint: "Pilkuin eroteltuina, enintään kymmenen.",
+    trackNumber: "Nro",
+    trackTitle: "Kappaleen nimi",
+    addTrack: "Lisää kappale",
+    saved: "Tallennettu.",
+    viewPublicPage: "Näytä julkinen sivu",
+    dangerZone: "Poisto",
+    deleteBandWarning:
+      "Yhtyeen poistaminen vie mukanaan kaikki sen julkaisut ja kappaleet. Myös siitä kirjoitetut mielipiteet katoavat. Peruuttamatonta.",
+    deleteAlbumWarning:
+      "Julkaisun poistaminen vie mukanaan sen kappaleet ja siitä kirjoitetut mielipiteet. Peruuttamatonta.",
   },
   contributionStatus: {
     pending: "Odottaa tarkistusta",

@@ -385,6 +385,32 @@ export const ja: Dictionary = {
     typeNameToConfirm: "「{name}」と入力",
     deletionWarning:
       "削除すると本人情報と公開プロフィールが消える。提出済みの投稿は残るが匿名になる。取り消せない。",
+    catalogueEditor: "目録の編集",
+    catalogueLead:
+      "誤りを直し、作品を補い、重複を取り除くための画面。投稿者からの提案は査読の列を通る。",
+    catalogueAccessNotice:
+      "目録を直接編集できるのは査読者に限る。投稿者は出典つきの提出を通し、何が何を裏づけるかの記録が残る。",
+    newBand: "新しいバンド",
+    newAlbum: "新しい作品",
+    bandFields: "バンドの情報",
+    albumFields: "作品の情報",
+    albumTitle: "タイトル",
+    albumSlugHint: "タイトルから作られる。バンド内でのみ一意。",
+    releaseTypeLabel: "作品の種類",
+    releaseDate: "発売日",
+    coverUrl: "ジャケットのアドレス",
+    coverUrlHint: "元の出典へのリンク。画像はここに複製しない。",
+    themesHint: "カンマ区切り、十件まで。",
+    trackNumber: "番号",
+    trackTitle: "曲名",
+    addTrack: "曲を追加",
+    saved: "保存した。",
+    viewPublicPage: "公開ページを見る",
+    dangerZone: "削除",
+    deleteBandWarning:
+      "このバンドを削除すると、作品と曲がすべて一緒に消える。寄せられた意見も残らない。取り消せない。",
+    deleteAlbumWarning:
+      "この作品を削除すると、曲と寄せられた意見も一緒に消える。取り消せない。",
   },
   contributionStatus: {
     pending: "査読待ち",

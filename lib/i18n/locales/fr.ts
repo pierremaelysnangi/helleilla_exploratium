@@ -405,6 +405,33 @@ export const fr = {
     typeNameToConfirm: "Saisir « {name} »",
     deletionWarning:
       "La suppression efface l'identité et son profil public. Les contributions déjà soumises sont conservées mais deviennent anonymes. Action irréversible.",
+    catalogueEditor: "Édition du catalogue",
+    catalogueLead:
+      "Corriger une donnée fausse, compléter une sortie, retirer un doublon. Les propositions des contributeurs, elles, passent par la file de relecture.",
+    catalogueAccessNotice:
+      "L'édition directe du catalogue est réservée à la modération. Les contributeurs passent par le dossier à preuves, qui garde la trace de ce qui atteste quoi.",
+    newBand: "Nouveau groupe",
+    newAlbum: "Nouvelle sortie",
+    bandFields: "Fiche du groupe",
+    albumFields: "Fiche de la sortie",
+    albumTitle: "Titre",
+    albumSlugHint: "Dérivé du titre ; unique au sein du groupe seulement.",
+    releaseTypeLabel: "Type de sortie",
+    releaseDate: "Date de sortie",
+    coverUrl: "Adresse de la pochette",
+    coverUrlHint:
+      "Lien vers la source d'origine. Aucune image n'est copiée ici.",
+    themesHint: "Séparés par des virgules, dix au maximum.",
+    trackNumber: "Numéro",
+    trackTitle: "Titre de la piste",
+    addTrack: "Ajouter une piste",
+    saved: "Enregistré.",
+    viewPublicPage: "Voir la page publique",
+    dangerZone: "Suppression",
+    deleteBandWarning:
+      "Supprimer ce groupe emporte toutes ses sorties et leurs pistes. Les avis publiés à son sujet disparaissent aussi. Action irréversible.",
+    deleteAlbumWarning:
+      "Supprimer cette sortie emporte ses pistes et les avis publiés à son sujet. Action irréversible.",
   },
   contributionStatus: {
     pending: "En attente de relecture",
