@@ -40,3 +40,5 @@ export * from "./collections";
 export * from "./pressReviews";
 // Festivals et salles de concert récurrentes, regroupés par pays
 export * from "./venues";
+// Avis publiés sur un groupe ou un album (seul texte hébergé ici)
+export * from "./forum";

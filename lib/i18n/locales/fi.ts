@@ -25,6 +25,7 @@ export const fi: Dictionary = {
     releases: { one: "{n} julkaisu", other: "{n} julkaisua" },
     tracks: { one: "{n} kappale", other: "{n} kappaletta" },
     members: { one: "{n} jäsen", other: "{n} jäsentä" },
+    posts: { one: "{n} mielipide", other: "{n} mielipidettä" },
   },
   nav: {
     home: "Etusivu",
@@ -38,6 +39,7 @@ export const fi: Dictionary = {
     mainNavigation: "Päänavigointi",
     language: "Kieli",
     chooseLanguage: "Valitse kieli",
+    forums: "Foorumit",
   },
   auth: {
     signIn: "Kirjaudu sisään",
@@ -53,7 +55,6 @@ export const fi: Dictionary = {
       "Tervetuloa metallin vapaaseen, nykyaikaiseen ja selkeään yhteisölliseen tietosanakirjaan! Antoisia löytöretkiä",
     explore: "Selaa luetteloa",
     shortcutHint: "Vinkki: {keys} pikahakuun",
-    recentBands: "Viimeksi lisätyt yhtyeet",
     recentAlbums: "Viimeksi kirjatut julkaisut",
     topRated: "Parhaiten arvioidut",
     sections: "Osiot",
@@ -532,6 +533,8 @@ export const fi: Dictionary = {
     memberDescription: "{member} tietosanakirjassa {site}.",
     membersDescription: "Yhtyeen {band} kokoonpano: {count}.",
     membersFromMusicbrainz: "Yhtyeen {band} kokoonpano MusicBrainzin mukaan.",
+    forumsDescription:
+      "Lukijoiden mielipiteet täällä luetelluista yhtyeistä ja levyistä.",
   },
   console: {
     title: "Hetkinen.",
@@ -563,6 +566,30 @@ export const fi: Dictionary = {
     resetAction: "Seuraa alla olevaa linkkiä (voimassa tunnin):",
     resetIgnore: "Jos et pyytänyt tätä, jätä viesti huomiotta.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Mitä ihmiset ajattelevat täällä luetelluista yhtyeistä ja levyistä. Mielipide sitoo kirjoittajaansa, ei tietosanakirjaa.",
+    activeSubjects: "Aktiiviset aiheet",
+    latestPosts: "Uusimmat mielipiteet",
+    empty: "Ei vielä mielipiteitä",
+    emptyDescription:
+      "Kukaan ei ole vielä sanonut mitään. Voit aloittaa yhtyeen tai levyn sivulta.",
+    compose: "Sano mielipiteesi",
+    subject: "Aihe",
+    chooseSubject: "Valitse yhtye tai levy",
+    bodyLabel: "Mielipiteesi",
+    bodyHint: "Vähintään {min} merkkiä, enintään {max}.",
+    publish: "Julkaise",
+    publishing: "Julkaistaan…",
+    signInToPost: "{link} sanoaksesi mielipiteesi.",
+    remove: "Poista",
+    deletedAccount: "Poistettu tili",
+    band: "Yhtye",
+    discuss: "Keskustele siitä",
+    seeAll: "Näytä kaikki",
+    loadMore: "Lataa lisää",
+    moderationNotice:
+      "Mielipiteet kirjoittavat niiden tekijät, jotka voivat myös poistaa ne. Valvonta poistaa sen, mikä ei tänne kuulu.",
   },
   footer: {
     about: "Tietoa hankkeesta",

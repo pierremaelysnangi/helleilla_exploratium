@@ -23,6 +23,7 @@ export const pt: Dictionary = {
     releases: { one: "{n} lançamento", other: "{n} lançamentos" },
     tracks: { one: "{n} faixa", other: "{n} faixas" },
     members: { one: "{n} membro", other: "{n} membros" },
+    posts: { one: "{n} opinião", other: "{n} opiniões" },
   },
   nav: {
     home: "Início",
@@ -36,6 +37,7 @@ export const pt: Dictionary = {
     mainNavigation: "Navegação principal",
     language: "Idioma",
     chooseLanguage: "Escolher idioma",
+    forums: "Fóruns",
   },
   auth: {
     signIn: "Iniciar sessão",
@@ -51,7 +53,6 @@ export const pt: Dictionary = {
       "Bem-vindo à enciclopédia colaborativa do metal: gratuita, moderna e intuitiva! Boa exploração",
     explore: "Explorar o catálogo",
     shortcutHint: "Dica: {keys} para a pesquisa rápida",
-    recentBands: "Últimas bandas adicionadas",
     recentAlbums: "Últimos lançamentos registados",
     topRated: "Melhor avaliados",
     sections: "Secções",
@@ -530,6 +531,8 @@ export const pt: Dictionary = {
     memberDescription: "{member} na enciclopédia {site}.",
     membersDescription: "Formação de {band}: {count}.",
     membersFromMusicbrainz: "Formação de {band} segundo o MusicBrainz.",
+    forumsDescription:
+      "As opiniões dos leitores sobre as bandas e os álbuns reunidos aqui.",
   },
   console: {
     title: "Um momento.",
@@ -562,6 +565,30 @@ export const pt: Dictionary = {
     resetAction: "Siga a ligação abaixo (válida uma hora):",
     resetIgnore: "Se não foi você, ignore este e-mail.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "O que as pessoas pensam das bandas e dos álbuns aqui reunidos. Uma opinião compromete quem a escreve, não a enciclopédia.",
+    activeSubjects: "Temas ativos",
+    latestPosts: "Últimas opiniões",
+    empty: "Ainda sem opiniões",
+    emptyDescription:
+      "Ninguém disse nada ainda. Pode começar a partir da ficha de uma banda ou de um álbum.",
+    compose: "Dar a sua opinião",
+    subject: "Tema",
+    chooseSubject: "Escolha uma banda ou um álbum",
+    bodyLabel: "A sua opinião",
+    bodyHint: "{min} caracteres no mínimo, {max} no máximo.",
+    publish: "Publicar",
+    publishing: "A publicar…",
+    signInToPost: "{link} para dar a sua opinião.",
+    remove: "Retirar",
+    deletedAccount: "Conta eliminada",
+    band: "Banda",
+    discuss: "Falar sobre isto",
+    seeAll: "Ver tudo",
+    loadMore: "Carregar mais",
+    moderationNotice:
+      "As opiniões são escritas por quem as assina, que as pode retirar. A moderação retira o que aqui não tem lugar.",
   },
   footer: {
     about: "Sobre o projeto",

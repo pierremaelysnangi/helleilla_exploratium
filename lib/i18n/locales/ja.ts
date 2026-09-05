@@ -25,6 +25,7 @@ export const ja: Dictionary = {
     releases: { other: "{n} 作品" },
     tracks: { other: "{n} 曲" },
     members: { other: "メンバー {n} 名" },
+    posts: { other: "意見 {n} 件" },
   },
   nav: {
     home: "ホーム",
@@ -38,6 +39,7 @@ export const ja: Dictionary = {
     mainNavigation: "メインナビゲーション",
     language: "言語",
     chooseLanguage: "言語を選択",
+    forums: "フォーラム",
   },
   auth: {
     signIn: "ログイン",
@@ -53,7 +55,6 @@ export const ja: Dictionary = {
       "無料で、新しく、使いやすい――みんなでつくるメタルの百科事典へようこそ。心ゆくまでどうぞ",
     explore: "カタログを見る",
     shortcutHint: "ヒント: {keys} でクイック検索",
-    recentBands: "最近追加されたバンド",
     recentAlbums: "最近登録された作品",
     topRated: "評価の高い作品",
     sections: "セクション",
@@ -519,6 +520,7 @@ export const ja: Dictionary = {
     memberDescription: "百科事典 {site} における {member}。",
     membersDescription: "{band} の編成：{count}。",
     membersFromMusicbrainz: "MusicBrainz による {band} の編成。",
+    forumsDescription: "ここに載るバンドとアルバムについての読者の意見。",
   },
   console: {
     title: "少し待って。",
@@ -549,6 +551,30 @@ export const ja: Dictionary = {
     resetAction: "下のリンクから手続きを（有効期限は一時間）：",
     resetIgnore: "心当たりがなければ、このメールは無視してよい。",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "ここに載っているバンドやアルバムについて、人が思うこと。意見は書いた本人のものであり、百科事典のものではない。",
+    activeSubjects: "動いている話題",
+    latestPosts: "最近の意見",
+    empty: "まだ意見がない",
+    emptyDescription:
+      "まだ誰も書いていない。バンドやアルバムのページから始められる。",
+    compose: "意見を書く",
+    subject: "話題",
+    chooseSubject: "バンドかアルバムを選ぶ",
+    bodyLabel: "あなたの意見",
+    bodyHint: "{min} 文字以上、{max} 文字まで。",
+    publish: "投稿",
+    publishing: "投稿中…",
+    signInToPost: "意見を書くには {link}。",
+    remove: "取り消す",
+    deletedAccount: "削除されたアカウント",
+    band: "バンド",
+    discuss: "これについて話す",
+    seeAll: "すべて見る",
+    loadMore: "もっと読む",
+    moderationNotice:
+      "意見は書いた本人のもので、本人が取り消せる。ここにふさわしくないものは運営が取り除く。",
   },
   footer: {
     about: "このサイトについて",

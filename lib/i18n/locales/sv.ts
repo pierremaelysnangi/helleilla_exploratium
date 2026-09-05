@@ -25,6 +25,7 @@ export const sv: Dictionary = {
     releases: { one: "{n} utgåva", other: "{n} utgåvor" },
     tracks: { one: "{n} spår", other: "{n} spår" },
     members: { one: "{n} medlem", other: "{n} medlemmar" },
+    posts: { one: "{n} åsikt", other: "{n} åsikter" },
   },
   nav: {
     home: "Start",
@@ -38,6 +39,7 @@ export const sv: Dictionary = {
     mainNavigation: "Huvudnavigering",
     language: "Språk",
     chooseLanguage: "Välj språk",
+    forums: "Forum",
   },
   auth: {
     signIn: "Logga in",
@@ -53,7 +55,6 @@ export const sv: Dictionary = {
       "Välkommen till metallens fria, moderna och lättnavigerade gemensamma uppslagsverk! Trevlig upptäcktsfärd",
     explore: "Utforska katalogen",
     shortcutHint: "Tips: {keys} för snabbsökning",
-    recentBands: "Senast tillagda band",
     recentAlbums: "Senast registrerade utgåvor",
     topRated: "Högst betygsatta",
     sections: "Avdelningar",
@@ -532,6 +533,7 @@ export const sv: Dictionary = {
     memberDescription: "{member} i uppslagsverket {site}.",
     membersDescription: "Sättning för {band}: {count}.",
     membersFromMusicbrainz: "Sättning för {band} enligt MusicBrainz.",
+    forumsDescription: "Läsarnas åsikter om banden och skivorna som finns här.",
   },
   console: {
     title: "Vänta lite.",
@@ -562,6 +564,30 @@ export const sv: Dictionary = {
     resetAction: "Följ länken nedan (giltig en timme):",
     resetIgnore: "Om det inte var du kan du bortse från det här mejlet.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Vad folk tycker om banden och skivorna som finns här. En åsikt binder den som skrivit den, inte uppslagsverket.",
+    activeSubjects: "Aktiva ämnen",
+    latestPosts: "Senaste åsikterna",
+    empty: "Inga åsikter ännu",
+    emptyDescription:
+      "Ingen har sagt något ännu. Du kan börja från en band- eller skivsida.",
+    compose: "Säg vad du tycker",
+    subject: "Ämne",
+    chooseSubject: "Välj ett band eller en skiva",
+    bodyLabel: "Din åsikt",
+    bodyHint: "Minst {min} tecken, högst {max}.",
+    publish: "Publicera",
+    publishing: "Publicerar…",
+    signInToPost: "{link} för att säga vad du tycker.",
+    remove: "Ta bort",
+    deletedAccount: "Raderat konto",
+    band: "Band",
+    discuss: "Prata om det",
+    seeAll: "Visa alla",
+    loadMore: "Ladda fler",
+    moderationNotice:
+      "Åsikterna skrivs av dem som står för dem, och de kan ta bort dem. Moderationen tar bort det som inte hör hemma här.",
   },
   footer: {
     about: "Om projektet",

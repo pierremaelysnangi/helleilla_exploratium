@@ -495,3 +495,41 @@ export const TransitionStatusRequestSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("approved") }),
   z.object({ status: z.literal("rejected") }),
 ]);
+
+/**
+ * Sujet d'un avis de forum : un groupe ou un album.
+ *
+ * `bandSlug` n'est renseigné que pour un album — un slug d'album n'est
+ * unique que dans son groupe, et son adresse canonique a donc besoin
+ * des deux segments.
+ */
+export const ForumSubjectSchema = z
+  .object({
+    kind: z.enum(["band", "album"]),
+    name: z.string(),
+    slug: z.string(),
+    bandSlug: z.string().optional(),
+  })
+  .meta({ id: "ForumSubject" });
+
+/** Un avis publié sur un groupe ou un album. */
+export const ForumPostSchema = z
+  .object({
+    id: z.string().uuid(),
+    body: z.string(),
+    createdAt: z.string(),
+    authorId: z.string(),
+    /** `null` lorsque le compte a été supprimé : l'avis reste, anonyme. */
+    authorName: z.string().nullable(),
+    subject: ForumSubjectSchema,
+  })
+  .meta({ id: "ForumPost" });
+
+/** Corps du POST /api/forum : un sujet, et un seul. */
+export const CreateForumPostRequestSchema = z
+  .object({
+    bandId: z.string().uuid().optional(),
+    albumId: z.string().uuid().optional(),
+    body: z.string().min(10).max(4000),
+  })
+  .meta({ id: "CreateForumPostRequest" });

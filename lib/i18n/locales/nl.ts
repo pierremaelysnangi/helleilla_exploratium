@@ -22,6 +22,7 @@ export const nl: Dictionary = {
     releases: { one: "{n} uitgave", other: "{n} uitgaven" },
     tracks: { one: "{n} nummer", other: "{n} nummers" },
     members: { one: "{n} lid", other: "{n} leden" },
+    posts: { one: "{n} mening", other: "{n} meningen" },
   },
   nav: {
     home: "Start",
@@ -35,6 +36,7 @@ export const nl: Dictionary = {
     mainNavigation: "Hoofdnavigatie",
     language: "Taal",
     chooseLanguage: "Taal kiezen",
+    forums: "Forums",
   },
   auth: {
     signIn: "Inloggen",
@@ -50,7 +52,6 @@ export const nl: Dictionary = {
       "Welkom bij de vrije, moderne en overzichtelijke gezamenlijke metal­encyclopedie! Veel ontdekplezier",
     explore: "Blader door de catalogus",
     shortcutHint: "Tip: {keys} voor snel zoeken",
-    recentBands: "Onlangs toegevoegde bands",
     recentAlbums: "Laatst opgenomen uitgaven",
     topRated: "Best beoordeeld",
     sections: "Onderdelen",
@@ -530,6 +531,8 @@ export const nl: Dictionary = {
     memberDescription: "{member} in de encyclopedie {site}.",
     membersDescription: "Bezetting van {band}: {count}.",
     membersFromMusicbrainz: "Bezetting van {band} volgens MusicBrainz.",
+    forumsDescription:
+      "De meningen van lezers over de bands en albums die hier staan.",
   },
   console: {
     title: "Even wachten.",
@@ -562,6 +565,30 @@ export const nl: Dictionary = {
     resetAction: "Volg de link hieronder (een uur geldig):",
     resetIgnore: "Heb je dit niet aangevraagd, negeer dan deze e-mail.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Wat mensen vinden van de bands en albums die hier staan. Een mening bindt wie haar schrijft, niet de encyclopedie.",
+    activeSubjects: "Actieve onderwerpen",
+    latestPosts: "Recente meningen",
+    empty: "Nog geen meningen",
+    emptyDescription:
+      "Niemand heeft nog iets gezegd. Je kunt beginnen vanaf een band- of albumpagina.",
+    compose: "Zeg wat je vindt",
+    subject: "Onderwerp",
+    chooseSubject: "Kies een band of een album",
+    bodyLabel: "Jouw mening",
+    bodyHint: "Minstens {min} tekens, hoogstens {max}.",
+    publish: "Plaatsen",
+    publishing: "Bezig met plaatsen…",
+    signInToPost: "{link} om te zeggen wat je vindt.",
+    remove: "Verwijderen",
+    deletedAccount: "Verwijderd account",
+    band: "Band",
+    discuss: "Erover praten",
+    seeAll: "Alles bekijken",
+    loadMore: "Meer laden",
+    moderationNotice:
+      "Meningen zijn van hun schrijvers, die ze kunnen verwijderen. De moderatie verwijdert wat hier niet thuishoort.",
   },
   footer: {
     about: "Over het project",

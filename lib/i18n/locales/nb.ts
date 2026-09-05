@@ -25,6 +25,7 @@ export const nb: Dictionary = {
     releases: { one: "{n} utgivelse", other: "{n} utgivelser" },
     tracks: { one: "{n} spor", other: "{n} spor" },
     members: { one: "{n} medlem", other: "{n} medlemmer" },
+    posts: { one: "{n} mening", other: "{n} meninger" },
   },
   nav: {
     home: "Forsiden",
@@ -38,6 +39,7 @@ export const nb: Dictionary = {
     mainNavigation: "Hovednavigasjon",
     language: "Språk",
     chooseLanguage: "Velg språk",
+    forums: "Forum",
   },
   auth: {
     signIn: "Logg inn",
@@ -53,7 +55,6 @@ export const nb: Dictionary = {
       "Velkommen til metallens frie, moderne og oversiktlige felles oppslagsverk! God utforsking",
     explore: "Utforsk katalogen",
     shortcutHint: "Tips: {keys} for hurtigsøk",
-    recentBands: "Sist lagt til band",
     recentAlbums: "Sist registrerte utgivelser",
     topRated: "Best vurdert",
     sections: "Deler",
@@ -532,6 +533,7 @@ export const nb: Dictionary = {
     memberDescription: "{member} i oppslagsverket {site}.",
     membersDescription: "Besetning for {band}: {count}.",
     membersFromMusicbrainz: "Besetning for {band} ifølge MusicBrainz.",
+    forumsDescription: "Lesernes meninger om bandene og platene som står her.",
   },
   console: {
     title: "Vent litt.",
@@ -562,6 +564,30 @@ export const nb: Dictionary = {
     resetAction: "Følg lenken under (gyldig i én time):",
     resetIgnore: "Var det ikke deg, kan du se bort fra denne e-posten.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Hva folk mener om bandene og platene som står her. En mening forplikter den som skriver den, ikke oppslagsverket.",
+    activeSubjects: "Aktive emner",
+    latestPosts: "Siste meninger",
+    empty: "Ingen meninger ennå",
+    emptyDescription:
+      "Ingen har sagt noe ennå. Du kan begynne fra en band- eller plateside.",
+    compose: "Si hva du mener",
+    subject: "Emne",
+    chooseSubject: "Velg et band eller en plate",
+    bodyLabel: "Din mening",
+    bodyHint: "Minst {min} tegn, høyst {max}.",
+    publish: "Publiser",
+    publishing: "Publiserer…",
+    signInToPost: "{link} for å si hva du mener.",
+    remove: "Fjern",
+    deletedAccount: "Slettet konto",
+    band: "Band",
+    discuss: "Snakk om det",
+    seeAll: "Se alle",
+    loadMore: "Last flere",
+    moderationNotice:
+      "Meningene skrives av dem som står for dem, og de kan fjerne dem. Moderasjonen fjerner det som ikke hører hjemme her.",
   },
   footer: {
     about: "Om prosjektet",

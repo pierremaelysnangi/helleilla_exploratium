@@ -28,6 +28,7 @@ export const de: Dictionary = {
     releases: { one: "{n} Veröffentlichung", other: "{n} Veröffentlichungen" },
     tracks: { one: "{n} Titel", other: "{n} Titel" },
     members: { one: "{n} Mitglied", other: "{n} Mitglieder" },
+    posts: { one: "{n} Meinung", other: "{n} Meinungen" },
   },
   nav: {
     home: "Startseite",
@@ -41,6 +42,7 @@ export const de: Dictionary = {
     mainNavigation: "Hauptnavigation",
     language: "Sprache",
     chooseLanguage: "Sprache wählen",
+    forums: "Foren",
   },
   auth: {
     signIn: "Anmelden",
@@ -56,7 +58,6 @@ export const de: Dictionary = {
       "Willkommen bei der freien, modernen und übersichtlichen Gemeinschafts­enzyklopädie des Metal! Viel Freude beim Stöbern",
     explore: "Katalog erkunden",
     shortcutHint: "Tipp: {keys} für die Schnellsuche",
-    recentBands: "Zuletzt hinzugefügte Bands",
     recentAlbums: "Zuletzt erfasste Veröffentlichungen",
     topRated: "Am besten bewertet",
     sections: "Bereiche",
@@ -536,6 +537,8 @@ export const de: Dictionary = {
     memberDescription: "{member} in der Enzyklopädie {site}.",
     membersDescription: "Besetzung von {band}: {count}.",
     membersFromMusicbrainz: "Besetzung von {band} laut MusicBrainz.",
+    forumsDescription:
+      "Meinungen der Lesenden zu den verzeichneten Bands und Alben.",
   },
   console: {
     title: "Einen Moment.",
@@ -569,6 +572,30 @@ export const de: Dictionary = {
     resetAction: "Folge dem Link unten (eine Stunde gültig):",
     resetIgnore: "Kommt die Anfrage nicht von dir, ignoriere diese E-Mail.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Was die Leute von den hier verzeichneten Bands und Alben halten. Eine Meinung bindet, wer sie schreibt, nicht die Enzyklopädie.",
+    activeSubjects: "Aktive Themen",
+    latestPosts: "Neueste Meinungen",
+    empty: "Noch keine Meinungen",
+    emptyDescription:
+      "Bisher hat niemand etwas gesagt. Du kannst auf einer Band- oder Albumseite anfangen.",
+    compose: "Sag deine Meinung",
+    subject: "Thema",
+    chooseSubject: "Band oder Album wählen",
+    bodyLabel: "Deine Meinung",
+    bodyHint: "Mindestens {min} Zeichen, höchstens {max}.",
+    publish: "Veröffentlichen",
+    publishing: "Wird veröffentlicht…",
+    signInToPost: "{link}, um deine Meinung zu sagen.",
+    remove: "Entfernen",
+    deletedAccount: "Gelöschtes Konto",
+    band: "Band",
+    discuss: "Darüber reden",
+    seeAll: "Alle ansehen",
+    loadMore: "Mehr laden",
+    moderationNotice:
+      "Meinungen werden von ihren Verfassenden geschrieben, die sie auch entfernen können. Die Moderation entfernt, was hier nichts zu suchen hat.",
   },
   footer: {
     about: "Über das Projekt",

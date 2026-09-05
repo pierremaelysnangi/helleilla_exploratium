@@ -90,6 +90,12 @@ export const ru: Dictionary = {
       many: "{n} участников",
       other: "{n} участника",
     },
+    posts: {
+      one: "{n} мнение",
+      few: "{n} мнения",
+      many: "{n} мнений",
+      other: "{n} мнения",
+    },
   },
   nav: {
     home: "Главная",
@@ -103,6 +109,7 @@ export const ru: Dictionary = {
     mainNavigation: "Основная навигация",
     language: "Язык",
     chooseLanguage: "Выбрать язык",
+    forums: "Форумы",
   },
   auth: {
     signIn: "Войти",
@@ -118,7 +125,6 @@ export const ru: Dictionary = {
       "Добро пожаловать в свободную, современную и понятную совместную энциклопедию метала! Приятных находок",
     explore: "Смотреть каталог",
     shortcutHint: "Подсказка: {keys} — быстрый поиск",
-    recentBands: "Недавно добавленные группы",
     recentAlbums: "Последние внесённые издания",
     topRated: "С самыми высокими оценками",
     sections: "Разделы",
@@ -594,6 +600,7 @@ export const ru: Dictionary = {
     memberDescription: "{member} в энциклопедии {site}.",
     membersDescription: "Состав группы {band}: {count}.",
     membersFromMusicbrainz: "Состав группы {band} по данным MusicBrainz.",
+    forumsDescription: "Мнения читателей о собранных здесь группах и альбомах.",
   },
   console: {
     title: "Минуту.",
@@ -625,6 +632,30 @@ export const ru: Dictionary = {
     resetAction: "Перейдите по ссылке ниже (действует один час):",
     resetIgnore: "Если запрос не ваш, просто не отвечайте на это письмо.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Что люди думают о группах и альбомах, собранных здесь. Мнение обязывает того, кто его написал, а не энциклопедию.",
+    activeSubjects: "Живые темы",
+    latestPosts: "Последние мнения",
+    empty: "Мнений пока нет",
+    emptyDescription:
+      "Никто ещё ничего не написал. Начать можно со страницы группы или альбома.",
+    compose: "Высказаться",
+    subject: "Тема",
+    chooseSubject: "Выберите группу или альбом",
+    bodyLabel: "Ваше мнение",
+    bodyHint: "Не менее {min} символов, не более {max}.",
+    publish: "Опубликовать",
+    publishing: "Публикация…",
+    signInToPost: "{link}, чтобы высказаться.",
+    remove: "Убрать",
+    deletedAccount: "Учётная запись удалена",
+    band: "Группа",
+    discuss: "Обсудить",
+    seeAll: "Смотреть всё",
+    loadMore: "Показать ещё",
+    moderationNotice:
+      "Мнения пишут их авторы, они же могут их убрать. Модерация убирает то, чему здесь не место.",
   },
   footer: {
     about: "О проекте",

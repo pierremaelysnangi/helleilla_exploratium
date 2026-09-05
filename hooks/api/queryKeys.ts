@@ -70,3 +70,19 @@ export const mediaKeys = {
   /** Média-complet d'un groupe par identifiant. */
   band: (id: string) => ["media", "band", id] as const,
 };
+
+/**
+ * Clés du forum.
+ *
+ * Hors de `entityKeys` : il n'y a pas de détail par identifiant, mais un
+ * fil général et un fil par sujet, qui doivent s'invalider ensemble
+ * après publication — un avis apparaît dans les deux.
+ */
+export const forumKeys = {
+  all: ["forum"] as const,
+  /** Toutes les listes d'avis, filtres compris. */
+  lists: () => ["forum", "list"] as const,
+  /** Un fil précis : général si le sujet est absent. */
+  list: (filters: Record<string, unknown>) =>
+    ["forum", "list", filters] as const,
+};

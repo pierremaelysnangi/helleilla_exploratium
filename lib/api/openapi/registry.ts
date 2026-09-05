@@ -89,6 +89,11 @@ export function buildDocument(): ReturnType<typeof createDocument> {
       { name: "tracks", description: "Morceaux rattachés à un album." },
       { name: "genres", description: "Taxonomie des genres et sous-genres." },
       { name: "search", description: "Recherche plein texte via Meilisearch." },
+      {
+        name: "forum",
+        description:
+          "Avis publiés par les lecteurs sur un groupe ou un album. Seul texte hébergé ici, et le seul qui n'engage que son auteur.",
+      },
     ],
     components: {
       securitySchemes: {

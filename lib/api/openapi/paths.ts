@@ -31,6 +31,8 @@ import {
   MemberSchema,
   BandMembershipSchema,
   RatingSummarySchema,
+  ForumPostSchema,
+  CreateForumPostRequestSchema,
   CollectionEntrySchema,
   AlbumDetailSchema,
   GenreDetailSchema,
@@ -681,5 +683,58 @@ registerPath("/api/contributions/{id}", "patch", {
   responses: {
     200: jsonOk(ContributionSchema),
     ...pick(401, 403, 404, 422, 429, 500, 503),
+  },
+});
+
+// ---------------------------------------------------------------------
+// Forum : avis publiés sur un groupe ou un album.
+//
+// La lecture est publique — une discussion sans lecteur n'a pas d'objet.
+// L'écriture demande une session, mais pas le rôle contributeur : donner
+// son avis n'est pas alimenter l'encyclopédie.
+// ---------------------------------------------------------------------
+
+registerPath("/api/forum", "get", {
+  tags: ["forum"],
+  summary: "Fil d'avis, général ou filtré sur un sujet",
+  description:
+    "Sans `bandId` ni `albumId`, renvoie le fil général du plus récent au plus ancien.",
+  requestParams: {
+    query: PaginationQuerySchema.extend({
+      bandId: z.string().uuid().optional(),
+      albumId: z.string().uuid().optional(),
+    }),
+  },
+  responses: {
+    200: jsonOk(
+      z.object({ data: z.array(ForumPostSchema), meta: PaginatedMetaSchema }),
+    ),
+    ...pick(422, 429, 500),
+  },
+});
+
+registerPath("/api/forum", "post", {
+  tags: ["forum"],
+  summary: "Publie un avis sur un groupe ou un album",
+  description:
+    "Exactement un sujet : `bandId` OU `albumId`. Le refus est validé côté serveur et par une contrainte en base.",
+  security: [{ sessionCookie: [] }],
+  requestBody: json(CreateForumPostRequestSchema),
+  responses: {
+    201: jsonOk(ForumPostSchema, "Créé"),
+    ...pick(401, 403, 404, 422, 429, 500),
+  },
+});
+
+registerPath("/api/forum/{id}", "delete", {
+  tags: ["forum"],
+  summary: "Retire un avis",
+  description:
+    "Réservé à l'auteur de l'avis et à la modération. Un avis ne se modifie pas : réécrire un message déjà lu changerait le sens d'une discussion après coup.",
+  security: [{ sessionCookie: [] }],
+  requestParams: { path: UuidParamSchema },
+  responses: {
+    200: jsonOk(z.object({ deleted: z.boolean() })),
+    ...pick(401, 403, 404, 422, 429, 500),
   },
 });

@@ -16,6 +16,7 @@ import { genres, bandGenres } from "./genres";
 import { labels } from "./labels";
 import { members, bandMembers, albumLineups } from "./members";
 import { ratings, userAlbums } from "./collections";
+import { forumPosts } from "./forum";
 
 /**
  * Un groupe possède plusieurs albums et plusieurs entrées dans la table
@@ -25,6 +26,7 @@ export const bandsRelations = relations(bands, ({ many }) => ({
   albums: many(albums),
   bandGenres: many(bandGenres),
   bandMembers: many(bandMembers),
+  forumPosts: many(forumPosts),
 }));
 
 /**
@@ -37,6 +39,7 @@ export const albumsRelations = relations(albums, ({ one, many }) => ({
   lineup: many(albumLineups),
   ratings: many(ratings),
   userAlbums: many(userAlbums),
+  forumPosts: many(forumPosts),
 }));
 
 /**
@@ -114,4 +117,17 @@ export const ratingsRelations = relations(ratings, ({ one }) => ({
  */
 export const userAlbumsRelations = relations(userAlbums, ({ one }) => ({
   album: one(albums, { fields: [userAlbums.albumId], references: [albums.id] }),
+}));
+
+/**
+ * Un avis de forum porte sur un groupe OU un album : les deux relations
+ * sont déclarées, une seule est renseignée à la fois (contrainte
+ * `forum_posts_one_subject`).
+ */
+export const forumPostsRelations = relations(forumPosts, ({ one }) => ({
+  band: one(bands, { fields: [forumPosts.bandId], references: [bands.id] }),
+  album: one(albums, {
+    fields: [forumPosts.albumId],
+    references: [albums.id],
+  }),
 }));

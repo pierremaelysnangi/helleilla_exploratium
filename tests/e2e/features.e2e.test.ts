@@ -150,6 +150,35 @@ describe("Parcours catalogue (front métier)", () => {
     expect(html).toContain('aria-current="page"');
   });
 
+  it("GET /forums rend la page des avis", async () => {
+    // Le fil lui-même se rend côté client (pagination progressive) : ce
+    // qui est vérifié ici, c'est le SSR de l'en-tête et de son propos.
+    const res = await fetch(`${BASE_URL}/forums`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("<title>Forums | Helleilla Exploratium</title>");
+    expect(html).toContain("Un avis engage celui qui l");
+  });
+
+  it("GET /api/forum renvoie un fil paginé sans authentification", async () => {
+    // La lecture est publique par construction : une discussion sans
+    // lecteur n'a pas d'objet.
+    const res = await fetch(`${BASE_URL}/api/forum?perPage=5`);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(Array.isArray(json.data)).toBe(true);
+    expect(json.meta).toHaveProperty("totalPages");
+  });
+
+  it("POST /api/forum refuse un anonyme", async () => {
+    const res = await fetch(`${BASE_URL}/api/forum`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ body: "Un avis sans compte ne passe pas." }),
+    });
+    expect(res.status).toBe(401);
+  });
+
   it("GET /albums rend la page catalogue albums", async () => {
     const res = await fetch(`${BASE_URL}/albums`);
     expect(res.status).toBe(200);

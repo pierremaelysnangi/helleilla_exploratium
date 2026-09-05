@@ -34,6 +34,7 @@ export const fr = {
     releases: { one: "{n} sortie", other: "{n} sorties" },
     tracks: { one: "{n} piste", other: "{n} pistes" },
     members: { one: "{n} membre", other: "{n} membres" },
+    posts: { one: "{n} avis", other: "{n} avis" },
   },
   nav: {
     home: "Accueil",
@@ -47,6 +48,7 @@ export const fr = {
     mainNavigation: "Navigation principale",
     language: "Langue",
     chooseLanguage: "Choisir la langue",
+    forums: "Forums",
   },
   auth: {
     signIn: "Connexion",
@@ -62,7 +64,6 @@ export const fr = {
       "Bienvenue sur l'encyclopédie collaborative, gratuite, modernisée et intuitive sur la musique metal ! Bonne exploration à tous",
     explore: "Explorer le catalogue",
     shortcutHint: "Astuce : {keys} pour la recherche rapide",
-    recentBands: "Derniers groupes ajoutés",
     recentAlbums: "Dernières sorties référencées",
     topRated: "Les mieux notés",
     sections: "Sections",
@@ -543,6 +544,8 @@ export const fr = {
     memberDescription: "{member} dans l'encyclopédie {site}.",
     membersDescription: "Formation de {band} : {count}.",
     membersFromMusicbrainz: "Formation de {band} d'après MusicBrainz.",
+    forumsDescription:
+      "Les avis des lecteurs sur les groupes et les albums référencés.",
   },
   console: {
     title: "Un instant.",
@@ -576,6 +579,30 @@ export const fr = {
     resetIgnore:
       "Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Ce que les gens pensent des groupes et des albums référencés ici. Un avis engage celui qui l'écrit, pas l'encyclopédie.",
+    activeSubjects: "Sujets actifs",
+    latestPosts: "Derniers avis",
+    empty: "Aucun avis pour l'instant",
+    emptyDescription:
+      "Personne n'a encore donné son avis. Vous pouvez commencer depuis la fiche d'un groupe ou d'un album.",
+    compose: "Donner votre avis",
+    subject: "Sujet",
+    chooseSubject: "Choisir un groupe ou un album",
+    bodyLabel: "Votre avis",
+    bodyHint: "{min} caractères minimum, {max} au maximum.",
+    publish: "Publier",
+    publishing: "Publication…",
+    signInToPost: "{link} pour donner votre avis.",
+    remove: "Retirer",
+    deletedAccount: "Compte supprimé",
+    band: "Groupe",
+    discuss: "En discuter",
+    seeAll: "Tout voir",
+    loadMore: "Charger plus",
+    moderationNotice:
+      "Les avis sont écrits par leurs auteurs, qui peuvent les retirer. La modération retire ce qui n'a pas sa place ici.",
   },
   footer: {
     about: "À propos",

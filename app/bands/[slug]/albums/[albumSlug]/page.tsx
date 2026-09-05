@@ -31,6 +31,7 @@ import { getTranslations } from "@/lib/i18n/server";
 import { interpolate } from "@/lib/i18n/format";
 import { rich } from "@/lib/i18n/rich";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { ForumSection } from "@/components/forum/forumSection";
 // Fond de page : la pochette, très adoucie
 import { AlbumBackdrop } from "@/components/media/mediaBackdrop";
 
@@ -219,6 +220,8 @@ export default async function AlbumDetailPage({ params }: AlbumPageProps) {
       {/* Provenance des visuels : la phrase entière vit dans le
           dictionnaire, le lien étant inséré là où chaque langue le
           place. */}
+      <ForumSection albumId={album.id} />
+
       <p className="text-muted-foreground text-xs">
         {rich(t.album.sourceNotice, {
           link: (

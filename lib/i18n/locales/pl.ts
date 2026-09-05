@@ -90,6 +90,12 @@ export const pl: Dictionary = {
       many: "{n} członków",
       other: "{n} członka",
     },
+    posts: {
+      one: "{n} opinia",
+      few: "{n} opinie",
+      many: "{n} opinii",
+      other: "{n} opinii",
+    },
   },
   nav: {
     home: "Strona główna",
@@ -103,6 +109,7 @@ export const pl: Dictionary = {
     mainNavigation: "Nawigacja główna",
     language: "Język",
     chooseLanguage: "Wybierz język",
+    forums: "Fora",
   },
   auth: {
     signIn: "Zaloguj się",
@@ -118,7 +125,6 @@ export const pl: Dictionary = {
       "Witaj w wolnej, nowoczesnej i przejrzystej encyklopedii metalu tworzonej wspólnie! Udanych odkryć",
     explore: "Przeglądaj katalog",
     shortcutHint: "Wskazówka: {keys} — szybkie wyszukiwanie",
-    recentBands: "Ostatnio dodane zespoły",
     recentAlbums: "Ostatnio dodane wydawnictwa",
     topRated: "Najwyżej oceniane",
     sections: "Działy",
@@ -598,6 +604,8 @@ export const pl: Dictionary = {
     memberDescription: "{member} w encyklopedii {site}.",
     membersDescription: "Skład zespołu {band}: {count}.",
     membersFromMusicbrainz: "Skład zespołu {band} według MusicBrainz.",
+    forumsDescription:
+      "Opinie czytelników o zebranych tu zespołach i albumach.",
   },
   console: {
     title: "Chwileczkę.",
@@ -629,6 +637,30 @@ export const pl: Dictionary = {
     resetAction: "Kliknij poniższy odnośnik (ważny godzinę):",
     resetIgnore: "Jeśli to nie ty, zignoruj tę wiadomość.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Co ludzie sądzą o zespołach i albumach zebranych tutaj. Opinia zobowiązuje tego, kto ją pisze, a nie encyklopedię.",
+    activeSubjects: "Aktywne tematy",
+    latestPosts: "Najnowsze opinie",
+    empty: "Jeszcze żadnych opinii",
+    emptyDescription:
+      "Nikt jeszcze nic nie napisał. Możesz zacząć ze strony zespołu lub albumu.",
+    compose: "Napisz opinię",
+    subject: "Temat",
+    chooseSubject: "Wybierz zespół albo album",
+    bodyLabel: "Twoja opinia",
+    bodyHint: "Co najmniej {min} znaków, najwyżej {max}.",
+    publish: "Opublikuj",
+    publishing: "Publikowanie…",
+    signInToPost: "{link}, aby napisać opinię.",
+    remove: "Usuń",
+    deletedAccount: "Konto usunięte",
+    band: "Zespół",
+    discuss: "Porozmawiaj o tym",
+    seeAll: "Zobacz wszystko",
+    loadMore: "Wczytaj więcej",
+    moderationNotice:
+      "Opinie piszą ich autorzy i to oni mogą je usunąć. Moderacja usuwa to, co nie ma tu miejsca.",
   },
   footer: {
     about: "O projekcie",

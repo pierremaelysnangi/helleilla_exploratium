@@ -27,6 +27,7 @@ export const es: Dictionary = {
     releases: { one: "{n} lanzamiento", other: "{n} lanzamientos" },
     tracks: { one: "{n} pista", other: "{n} pistas" },
     members: { one: "{n} miembro", other: "{n} miembros" },
+    posts: { one: "{n} opinión", other: "{n} opiniones" },
   },
   nav: {
     home: "Inicio",
@@ -40,6 +41,7 @@ export const es: Dictionary = {
     mainNavigation: "Navegación principal",
     language: "Idioma",
     chooseLanguage: "Elegir idioma",
+    forums: "Foros",
   },
   auth: {
     signIn: "Iniciar sesión",
@@ -55,7 +57,6 @@ export const es: Dictionary = {
       "¡Bienvenido a la enciclopedia colaborativa del metal: gratuita, moderna e intuitiva! Que disfrutes la exploración",
     explore: "Explorar el catálogo",
     shortcutHint: "Consejo: {keys} para la búsqueda rápida",
-    recentBands: "Últimos grupos añadidos",
     recentAlbums: "Últimas ediciones registradas",
     topRated: "Mejor valorados",
     sections: "Secciones",
@@ -538,6 +539,8 @@ export const es: Dictionary = {
     memberDescription: "{member} en la enciclopedia {site}.",
     membersDescription: "Formación de {band}: {count}.",
     membersFromMusicbrainz: "Formación de {band} según MusicBrainz.",
+    forumsDescription:
+      "Las opiniones de los lectores sobre los grupos y álbumes recogidos.",
   },
   console: {
     title: "Un momento.",
@@ -570,6 +573,30 @@ export const es: Dictionary = {
     resetAction: "Sigue el enlace de abajo (válido una hora):",
     resetIgnore: "Si no has sido tú, ignora este correo.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Lo que la gente piensa de los grupos y los álbumes recogidos aquí. Una opinión compromete a quien la escribe, no a la enciclopedia.",
+    activeSubjects: "Temas activos",
+    latestPosts: "Últimas opiniones",
+    empty: "Ninguna opinión todavía",
+    emptyDescription:
+      "Nadie ha dicho nada aún. Puedes empezar desde la ficha de un grupo o de un álbum.",
+    compose: "Da tu opinión",
+    subject: "Tema",
+    chooseSubject: "Elige un grupo o un álbum",
+    bodyLabel: "Tu opinión",
+    bodyHint: "{min} caracteres como mínimo, {max} como máximo.",
+    publish: "Publicar",
+    publishing: "Publicando…",
+    signInToPost: "{link} para dar tu opinión.",
+    remove: "Quitar",
+    deletedAccount: "Cuenta eliminada",
+    band: "Grupo",
+    discuss: "Hablar de ello",
+    seeAll: "Ver todo",
+    loadMore: "Cargar más",
+    moderationNotice:
+      "Las opiniones las escriben sus autores, que pueden retirarlas. La moderación retira lo que no tiene cabida aquí.",
   },
   footer: {
     about: "Acerca del proyecto",

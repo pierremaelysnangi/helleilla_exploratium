@@ -23,7 +23,8 @@ import type { AdminUserRow, UserRole } from "@/hooks/api/schemas";
 import { RoleBadge, ROLE_ORDER, roleLabel } from "./roleBadge";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useT, usePlural } from "@/lib/i18n/client";
+import { useI18n, usePlural } from "@/lib/i18n/client";
+import { formatShortDate } from "@/lib/i18n/dates";
 import { interpolate } from "@/lib/i18n/format";
 
 type UsersTableProps = {
@@ -32,16 +33,8 @@ type UsersTableProps = {
 };
 
 /** Formate une date ISO en date courte. */
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
 export function UsersTable({ currentUserId }: UsersTableProps) {
-  const t = useT();
+  const { t } = useI18n();
   const n = usePlural();
   const [q, setQ] = useState("");
   const [role, setRole] = useState<UserRole | "">("");
@@ -164,7 +157,7 @@ function UserRow({
   account: AdminUserRow;
   isSelf: boolean;
 }) {
-  const t = useT();
+  const { t, locale } = useI18n();
   const [confirming, setConfirming] = useState(false);
   const [confirmName, setConfirmName] = useState("");
 
@@ -192,7 +185,7 @@ function UserRow({
             {account.email}
             {!account.emailVerified && ` · ${t.admin.emailUnverified}`}
             {` · ${interpolate(t.admin.registeredOn, {
-              date: formatDate(account.createdAt),
+              date: formatShortDate(locale, account.createdAt),
             })}`}
           </p>
         </div>

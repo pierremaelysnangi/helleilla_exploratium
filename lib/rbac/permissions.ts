@@ -9,7 +9,7 @@ import type { Role } from "./roles";
 
 // Ressources gérées par l'app
 export type Resource =
-  "band" | "album" | "track" | "genre" | "user" | "contribution";
+  "band" | "album" | "track" | "genre" | "user" | "contribution" | "forum";
 // Actions applicables à chaque ressource
 export type Action = "create" | "read" | "update" | "delete" | "moderate";
 
@@ -25,6 +25,10 @@ export const PERMISSIONS: PermissionMatrix = {
     genre: ["read"],
     // Un utilisateur connecté peut suivre ses propres contributions
     contribution: ["read"],
+    // Donner son avis ne demande pas le rôle contributeur : c'est une
+    // opinion, pas une fiche encyclopédique. La suppression du sien est
+    // vérifiée sur l'auteur, pas sur la matrice.
+    forum: ["read", "create"],
   },
   contributor: {
     band: ["read", "create", "update"],
@@ -33,6 +37,7 @@ export const PERMISSIONS: PermissionMatrix = {
     genre: ["read"],
     // Soumettre des contributions et compléter les preuves demandées
     contribution: ["read", "create", "update"],
+    forum: ["read", "create"],
   },
   moderator: {
     band: ["read", "create", "update", "delete", "moderate"],
@@ -41,6 +46,8 @@ export const PERMISSIONS: PermissionMatrix = {
     genre: ["read", "create", "update"],
     // Relecture de la file complète : demandes de preuves, approbations
     contribution: ["read", "create", "update", "moderate"],
+    // La modération retire un avis d'autrui ; elle n'en modifie aucun.
+    forum: ["read", "create", "delete", "moderate"],
   },
   admin: {
     band: ["read", "create", "update", "delete", "moderate"],
@@ -50,6 +57,7 @@ export const PERMISSIONS: PermissionMatrix = {
     user: ["read", "update", "delete", "moderate"],
     // Rejet terminal manuel réservé aux admins
     contribution: ["read", "create", "update", "moderate", "delete"],
+    forum: ["read", "create", "delete", "moderate"],
   },
 };
 

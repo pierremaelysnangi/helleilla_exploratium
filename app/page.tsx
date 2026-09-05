@@ -7,14 +7,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 // Lectures directes : l'accueil est un Server Component, repasser par
 // l'API n'ajouterait qu'un aller-retour pour des données publiques.
-import {
-  listRecentAlbums,
-  listRecentBands,
-  listTopRatedAlbums,
-} from "@/db/queries/widgets";
+import { listRecentAlbums, listTopRatedAlbums } from "@/db/queries/widgets";
+import { listRecentForumPosts } from "@/db/queries/forum";
 import { RecentAlbums } from "@/components/widgets/recentAlbums";
-import { RecentBands } from "@/components/widgets/recentBands";
 import { TopRatedAlbums } from "@/components/widgets/topRatedAlbums";
+import { LatestForumPosts } from "@/components/widgets/latestForumPosts";
 import { SITE_NAME } from "@/lib/site";
 import { getTranslations } from "@/lib/i18n/server";
 import { rich } from "@/lib/i18n/rich";
@@ -64,21 +61,21 @@ export const revalidate = 300;
  */
 async function loadWidgets() {
   try {
-    const [recentBands, recentAlbums, topRated] = await Promise.all([
-      listRecentBands(4),
+    const [recentAlbums, topRated, forumPosts] = await Promise.all([
       listRecentAlbums(8),
       listTopRatedAlbums(5),
+      listRecentForumPosts(4),
     ]);
-    return { recentBands, recentAlbums, topRated };
+    return { recentAlbums, topRated, forumPosts };
   } catch (err) {
     console.error("[accueil] Widgets indisponibles :", err);
-    return { recentBands: [], recentAlbums: [], topRated: [] };
+    return { recentAlbums: [], topRated: [], forumPosts: [] };
   }
 }
 
 export default async function HomePage() {
-  const { recentBands, recentAlbums, topRated } = await loadWidgets();
-  const { t, n } = await getTranslations();
+  const { recentAlbums, topRated, forumPosts } = await loadWidgets();
+  const { t, n, locale } = await getTranslations();
   const sections = sectionsOf(t);
 
   return (
@@ -139,7 +136,7 @@ export default async function HomePage() {
           plutôt que d'afficher une section vide. */}
       <RecentAlbums albums={recentAlbums} title={t.home.recentAlbums} />
       <TopRatedAlbums albums={topRated} t={t} n={n} />
-      <RecentBands bands={recentBands} title={t.home.recentBands} />
+      <LatestForumPosts posts={forumPosts} t={t} locale={locale} />
     </div>
   );
 }

@@ -27,6 +27,7 @@ export const en: Dictionary = {
     releases: { one: "{n} release", other: "{n} releases" },
     tracks: { one: "{n} track", other: "{n} tracks" },
     members: { one: "{n} member", other: "{n} members" },
+    posts: { one: "{n} opinion", other: "{n} opinions" },
   },
   nav: {
     home: "Home",
@@ -40,6 +41,7 @@ export const en: Dictionary = {
     mainNavigation: "Main navigation",
     language: "Language",
     chooseLanguage: "Choose language",
+    forums: "Forums",
   },
   auth: {
     signIn: "Sign in",
@@ -55,7 +57,6 @@ export const en: Dictionary = {
       "Welcome to the free, modern and easy-going collaborative encyclopedia of metal! Enjoy the ride",
     explore: "Browse the catalogue",
     shortcutHint: "Tip: {keys} for quick search",
-    recentBands: "Recently added bands",
     recentAlbums: "Latest releases listed",
     topRated: "Highest rated",
     sections: "Sections",
@@ -531,6 +532,7 @@ export const en: Dictionary = {
     memberDescription: "{member} in the {site} encyclopedia.",
     membersDescription: "Line-up of {band}: {count}.",
     membersFromMusicbrainz: "Line-up of {band} according to MusicBrainz.",
+    forumsDescription: "Readers' opinions on the bands and albums listed here.",
   },
   console: {
     title: "Hold on.",
@@ -561,6 +563,30 @@ export const en: Dictionary = {
     resetAction: "Follow the link below (valid for one hour):",
     resetIgnore: "If you did not make this request, ignore this email.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "What people think of the bands and albums listed here. An opinion binds the person who wrote it, not the encyclopedia.",
+    activeSubjects: "Active subjects",
+    latestPosts: "Latest opinions",
+    empty: "No opinions yet",
+    emptyDescription:
+      "Nobody has said anything yet. You can start from a band or album page.",
+    compose: "Have your say",
+    subject: "Subject",
+    chooseSubject: "Pick a band or an album",
+    bodyLabel: "Your opinion",
+    bodyHint: "{min} characters minimum, {max} maximum.",
+    publish: "Publish",
+    publishing: "Publishing…",
+    signInToPost: "{link} to have your say.",
+    remove: "Remove",
+    deletedAccount: "Deleted account",
+    band: "Band",
+    discuss: "Discuss it",
+    seeAll: "See all",
+    loadMore: "Load more",
+    moderationNotice:
+      "Opinions are written by their authors, who can remove them. Moderation removes what does not belong here.",
   },
   footer: {
     about: "About",

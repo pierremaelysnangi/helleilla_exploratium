@@ -51,4 +51,22 @@ describe("RBAC permissions matrix", () => {
     expect(can("moderator", "contribution", "delete")).toBe(false);
     expect(can("admin", "contribution", "delete")).toBe(true);
   });
+
+  it("ouvre le forum à tout compte connecté", () => {
+    // Volontairement plus permissif que le reste de l'application :
+    // donner son avis n'est pas contribuer à l'encyclopédie, et exiger
+    // le rôle contributeur viderait la page de ses lecteurs.
+    expect(can("user", "forum", "create")).toBe(true);
+    expect(can("contributor", "forum", "create")).toBe(true);
+  });
+
+  it("réserve le retrait de l'avis d'autrui à la modération", () => {
+    // Retirer le SIEN reste possible : ce droit-là ne se lit pas dans la
+    // matrice mais dans le lien entre la personne et la ligne, vérifié
+    // par la route.
+    expect(can("user", "forum", "delete")).toBe(false);
+    expect(can("contributor", "forum", "delete")).toBe(false);
+    expect(can("moderator", "forum", "delete")).toBe(true);
+    expect(can("admin", "forum", "delete")).toBe(true);
+  });
 });

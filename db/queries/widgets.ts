@@ -19,32 +19,6 @@ import { db } from "@/db";
 import { albums, bands, ratings } from "@/db/schema";
 import { avg, count, desc, eq, gte, sql } from "drizzle-orm";
 
-/** Derniers groupes ajoutés au catalogue. */
-export async function listRecentBands(limit = 6) {
-  const rows = await db
-    .select({
-      id: bands.id,
-      name: bands.name,
-      slug: bands.slug,
-      bio: bands.bio,
-      countryCode: bands.countryCode,
-      formedYear: bands.formedYear,
-      dissolvedYear: bands.dissolvedYear,
-      imageUrl: bands.imageUrl,
-      createdAt: bands.createdAt,
-      updatedAt: bands.updatedAt,
-    })
-    .from(bands)
-    .orderBy(desc(bands.createdAt))
-    .limit(limit);
-
-  return rows.map((row) => ({
-    ...row,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-  }));
-}
-
 /** Dernières sorties ajoutées, avec le slug du groupe (lien canonique). */
 export async function listRecentAlbums(limit = 8) {
   const rows = await db

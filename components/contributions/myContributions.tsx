@@ -22,21 +22,13 @@ import {
 } from "./evidenceFields";
 import { EmptyState } from "@/components/shared/emptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useT, usePlural } from "@/lib/i18n/client";
+import { useI18n, usePlural } from "@/lib/i18n/client";
+import { formatLongDate } from "@/lib/i18n/dates";
 import { interpolate } from "@/lib/i18n/format";
 
 /** Formate une date ISO en date lisible, ou tiret si absente. */
-function formatDate(iso?: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 export function MyContributions() {
-  const t = useT();
+  const { t } = useI18n();
   const contributions = useMyContributions();
 
   if (contributions.isPending) {
@@ -82,7 +74,7 @@ export function MyContributions() {
 
 /** Fiche d'un dossier, avec réponse inline si des preuves sont demandées. */
 function ContributionCard({ contribution }: { contribution: ContributionRow }) {
-  const t = useT();
+  const { t, locale } = useI18n();
   const n = usePlural();
   const [answering, setAnswering] = useState(false);
   const [drafts, setDrafts] = useState<EvidenceDraft[]>([emptyEvidence()]);
@@ -107,7 +99,7 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
 
       <p className="text-muted-foreground text-xs">
         {`${interpolate(t.contributions.submittedOn, {
-          date: formatDate(contribution.createdAt),
+          date: formatLongDate(locale, contribution.createdAt),
         })} · ${n(t.count.evidence, contribution.evidence.length)}`}
       </p>
 
@@ -121,7 +113,7 @@ function ContributionCard({ contribution }: { contribution: ContributionRow }) {
           {contribution.deadlineAt && (
             <p className="text-muted-foreground mt-2 text-xs">
               {interpolate(t.contributions.deadlineNotice, {
-                date: formatDate(contribution.deadlineAt),
+                date: formatLongDate(locale, contribution.deadlineAt),
                 reminder: contribution.reminderCount,
               })}
             </p>

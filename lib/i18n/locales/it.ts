@@ -22,6 +22,7 @@ export const it: Dictionary = {
     releases: { one: "{n} uscita", other: "{n} uscite" },
     tracks: { one: "{n} traccia", other: "{n} tracce" },
     members: { one: "{n} membro", other: "{n} membri" },
+    posts: { one: "{n} opinione", other: "{n} opinioni" },
   },
   nav: {
     home: "Home",
@@ -35,6 +36,7 @@ export const it: Dictionary = {
     mainNavigation: "Navigazione principale",
     language: "Lingua",
     chooseLanguage: "Scegli la lingua",
+    forums: "Forum",
   },
   auth: {
     signIn: "Accedi",
@@ -50,7 +52,6 @@ export const it: Dictionary = {
       "Benvenuto nell'enciclopedia collaborativa del metal: gratuita, moderna e intuitiva! Buona esplorazione",
     explore: "Esplora il catalogo",
     shortcutHint: "Suggerimento: {keys} per la ricerca rapida",
-    recentBands: "Ultimi gruppi aggiunti",
     recentAlbums: "Ultime uscite registrate",
     topRated: "I più votati",
     sections: "Sezioni",
@@ -532,6 +533,8 @@ export const it: Dictionary = {
     memberDescription: "{member} nell'enciclopedia {site}.",
     membersDescription: "Formazione di {band}: {count}.",
     membersFromMusicbrainz: "Formazione di {band} secondo MusicBrainz.",
+    forumsDescription:
+      "Le opinioni dei lettori sui gruppi e sugli album raccolti qui.",
   },
   console: {
     title: "Un momento.",
@@ -563,6 +566,30 @@ export const it: Dictionary = {
     resetAction: "Segui il link qui sotto (valido un'ora):",
     resetIgnore: "Se non sei stato tu, ignora questa e-mail.",
     signature: "— {site}",
+  },
+  forum: {
+    lead: "Che cosa pensa la gente dei gruppi e degli album raccolti qui. Un'opinione impegna chi la scrive, non l'enciclopedia.",
+    activeSubjects: "Argomenti attivi",
+    latestPosts: "Ultime opinioni",
+    empty: "Ancora nessuna opinione",
+    emptyDescription:
+      "Nessuno ha ancora detto niente. Puoi iniziare dalla scheda di un gruppo o di un album.",
+    compose: "Di' la tua",
+    subject: "Argomento",
+    chooseSubject: "Scegli un gruppo o un album",
+    bodyLabel: "La tua opinione",
+    bodyHint: "{min} caratteri minimo, {max} massimo.",
+    publish: "Pubblica",
+    publishing: "Pubblicazione…",
+    signInToPost: "{link} per dire la tua.",
+    remove: "Togli",
+    deletedAccount: "Account eliminato",
+    band: "Gruppo",
+    discuss: "Parlarne",
+    seeAll: "Vedi tutto",
+    loadMore: "Carica altro",
+    moderationNotice:
+      "Le opinioni sono scritte da chi le firma, che può toglierle. La moderazione toglie ciò che qui non ha posto.",
   },
   footer: {
     about: "Il progetto",

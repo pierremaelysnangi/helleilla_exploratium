@@ -310,3 +310,38 @@ export const bandMediaSchema = z.object({
 });
 
 export type BandMedia = z.infer<typeof bandMediaSchema>;
+
+/**
+ * Sujet d'un avis de forum, résolu par l'API.
+ *
+ * Union discriminée : l'URL d'un album exige le slug de son groupe, pas
+ * celle d'un groupe. Un objet à champs facultatifs aurait laissé au
+ * rendu la charge de deviner lequel est renseigné.
+ */
+export const forumSubjectSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("band"),
+    name: z.string(),
+    slug: z.string(),
+  }),
+  z.object({
+    kind: z.literal("album"),
+    name: z.string(),
+    slug: z.string(),
+    bandSlug: z.string(),
+  }),
+]);
+
+/** Un avis tel que renvoyé par GET /api/forum. */
+export const forumPostSchema = z.object({
+  id: z.uuid(),
+  body: z.string(),
+  createdAt: z.string(),
+  authorId: z.string(),
+  /** `null` quand le compte a été supprimé : l'avis reste, anonyme. */
+  authorName: z.string().nullable(),
+  subject: forumSubjectSchema,
+});
+
+export type ForumSubject = z.infer<typeof forumSubjectSchema>;
+export type ForumPost = z.infer<typeof forumPostSchema>;

@@ -19,6 +19,7 @@ import { BandHeader } from "@/components/bands/bandHeader";
 import { BandBackdrop } from "@/components/media/mediaBackdrop";
 import { BandMediaSection } from "@/components/bands/bandMediaSection";
 import { DiscographySections } from "@/components/bands/discographySections";
+import { ForumSection } from "@/components/forum/forumSection";
 // Chargement serveur de la discographie complète
 import { fetchDiscography } from "@/lib/api/discography";
 import { getTranslations } from "@/lib/i18n/server";
@@ -135,6 +136,10 @@ export default async function BandDetailPage({ params }: BandDetailPageProps) {
           bandImageUrl={band.imageUrl}
         />
       </section>
+
+      {/* La discussion vit sur la fiche : on écrit son avis là où on
+          vient de lire, pas dans un formulaire détaché du sujet. */}
+      <ForumSection bandId={band.id} />
     </article>
   );
 }
