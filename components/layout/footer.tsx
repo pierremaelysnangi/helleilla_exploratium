@@ -27,6 +27,7 @@ const COLUMNS: {
       { href: "/albums", label: (t) => t.nav.albums },
       { href: "/genres", label: (t) => t.nav.genres },
       { href: "/forums", label: (t) => t.nav.forums },
+      { href: "/presse", label: (t) => t.nav.press },
       { href: "/search", label: (t) => t.nav.search },
     ],
   },

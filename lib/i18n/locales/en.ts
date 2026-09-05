@@ -28,6 +28,7 @@ export const en: Dictionary = {
     tracks: { one: "{n} track", other: "{n} tracks" },
     members: { one: "{n} member", other: "{n} members" },
     posts: { one: "{n} opinion", other: "{n} opinions" },
+    outlets: { one: "{n} outlet", other: "{n} outlets" },
   },
   nav: {
     home: "Home",
@@ -42,6 +43,7 @@ export const en: Dictionary = {
     language: "Language",
     chooseLanguage: "Choose language",
     forums: "Forums",
+    press: "Press",
   },
   auth: {
     signIn: "Sign in",
@@ -559,6 +561,8 @@ export const en: Dictionary = {
     membersDescription: "Line-up of {band}: {count}.",
     membersFromMusicbrainz: "Line-up of {band} according to MusicBrainz.",
     forumsDescription: "Readers' opinions on the bands and albums listed here.",
+    pressDescription:
+      "The metal scene's press and media, country by country, with a link to every newsroom.",
   },
   console: {
     title: "Hold on.",
@@ -613,6 +617,20 @@ export const en: Dictionary = {
     loadMore: "Load more",
     moderationNotice:
       "Opinions are written by their authors, who can remove them. Moderation removes what does not belong here.",
+  },
+  press: {
+    title: "Press and media",
+    lead: "Who writes about this music: {outlets}, {countries}. We point to them and reproduce nothing — an article belongs to whoever wrote it.",
+    visit: "Read",
+    notice:
+      "This list makes no claim to cover the metal press; it offers entry points whose address has been checked.",
+  },
+  outletKind: {
+    webzine: "Webzine",
+    magazine: "Magazine",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Video",
   },
   footer: {
     about: "About",

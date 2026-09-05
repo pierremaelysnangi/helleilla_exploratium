@@ -35,6 +35,7 @@ export const fr = {
     tracks: { one: "{n} piste", other: "{n} pistes" },
     members: { one: "{n} membre", other: "{n} membres" },
     posts: { one: "{n} avis", other: "{n} avis" },
+    outlets: { one: "{n} média", other: "{n} médias" },
   },
   nav: {
     home: "Accueil",
@@ -49,6 +50,7 @@ export const fr = {
     language: "Langue",
     chooseLanguage: "Choisir la langue",
     forums: "Forums",
+    press: "Presse",
   },
   auth: {
     signIn: "Connexion",
@@ -573,6 +575,8 @@ export const fr = {
     membersFromMusicbrainz: "Formation de {band} d'après MusicBrainz.",
     forumsDescription:
       "Les avis des lecteurs sur les groupes et les albums référencés.",
+    pressDescription:
+      "La presse et les médias de la scène metal, pays par pays, avec le lien vers chaque rédaction.",
   },
   console: {
     title: "Un instant.",
@@ -630,6 +634,20 @@ export const fr = {
     loadMore: "Charger plus",
     moderationNotice:
       "Les avis sont écrits par leurs auteurs, qui peuvent les retirer. La modération retire ce qui n'a pas sa place ici.",
+  },
+  press: {
+    title: "Presse et médias",
+    lead: "Qui écrit sur cette musique : {outlets}, {countries}. On renvoie chez eux, on ne reprend rien — un article appartient à qui l'a écrit.",
+    visit: "Consulter",
+    notice:
+      "Cette liste ne prétend pas couvrir la presse metal, seulement offrir des points d'entrée dont l'adresse a été vérifiée.",
+  },
+  outletKind: {
+    webzine: "Webzine",
+    magazine: "Magazine",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Vidéo",
   },
   footer: {
     about: "À propos",

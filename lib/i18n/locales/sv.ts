@@ -26,6 +26,7 @@ export const sv: Dictionary = {
     tracks: { one: "{n} spår", other: "{n} spår" },
     members: { one: "{n} medlem", other: "{n} medlemmar" },
     posts: { one: "{n} åsikt", other: "{n} åsikter" },
+    outlets: { one: "{n} medium", other: "{n} medier" },
   },
   nav: {
     home: "Start",
@@ -40,6 +41,7 @@ export const sv: Dictionary = {
     language: "Språk",
     chooseLanguage: "Välj språk",
     forums: "Forum",
+    press: "Press",
   },
   auth: {
     signIn: "Logga in",
@@ -560,6 +562,8 @@ export const sv: Dictionary = {
     membersDescription: "Sättning för {band}: {count}.",
     membersFromMusicbrainz: "Sättning för {band} enligt MusicBrainz.",
     forumsDescription: "Läsarnas åsikter om banden och skivorna som finns här.",
+    pressDescription:
+      "Metalscenens press och medier, land för land, med länk till varje redaktion.",
   },
   console: {
     title: "Vänta lite.",
@@ -614,6 +618,20 @@ export const sv: Dictionary = {
     loadMore: "Ladda fler",
     moderationNotice:
       "Åsikterna skrivs av dem som står för dem, och de kan ta bort dem. Moderationen tar bort det som inte hör hemma här.",
+  },
+  press: {
+    title: "Press och media",
+    lead: "Vilka som skriver om den här musiken: {outlets}, {countries}. Vi hänvisar dit och återger ingenting — en artikel tillhör den som skrev den.",
+    visit: "Läs",
+    notice:
+      "Listan gör inte anspråk på att täcka metalpressen, bara att ge ingångar vars adress är kontrollerad.",
+  },
+  outletKind: {
+    webzine: "Webbtidning",
+    magazine: "Tidskrift",
+    radio: "Radio",
+    podcast: "Podd",
+    video: "Video",
   },
   footer: {
     about: "Om projektet",

@@ -26,6 +26,7 @@ export const nb: Dictionary = {
     tracks: { one: "{n} spor", other: "{n} spor" },
     members: { one: "{n} medlem", other: "{n} medlemmer" },
     posts: { one: "{n} mening", other: "{n} meninger" },
+    outlets: { one: "{n} medium", other: "{n} medier" },
   },
   nav: {
     home: "Forsiden",
@@ -40,6 +41,7 @@ export const nb: Dictionary = {
     language: "Språk",
     chooseLanguage: "Velg språk",
     forums: "Forum",
+    press: "Presse",
   },
   auth: {
     signIn: "Logg inn",
@@ -561,6 +563,8 @@ export const nb: Dictionary = {
     membersDescription: "Besetning for {band}: {count}.",
     membersFromMusicbrainz: "Besetning for {band} ifølge MusicBrainz.",
     forumsDescription: "Lesernes meninger om bandene og platene som står her.",
+    pressDescription:
+      "Metalmiljøets presse og medier, land for land, med lenke til hver redaksjon.",
   },
   console: {
     title: "Vent litt.",
@@ -615,6 +619,20 @@ export const nb: Dictionary = {
     loadMore: "Last flere",
     moderationNotice:
       "Meningene skrives av dem som står for dem, og de kan fjerne dem. Moderasjonen fjerner det som ikke hører hjemme her.",
+  },
+  press: {
+    title: "Presse og medier",
+    lead: "Hvem som skriver om denne musikken: {outlets}, {countries}. Vi viser dit og gjengir ingenting — en artikkel tilhører den som skrev den.",
+    visit: "Les",
+    notice:
+      "Listen gjør ikke krav på å dekke metalpressen, bare å gi innganger med kontrollert adresse.",
+  },
+  outletKind: {
+    webzine: "Nettmagasin",
+    magazine: "Magasin",
+    radio: "Radio",
+    podcast: "Podkast",
+    video: "Video",
   },
   footer: {
     about: "Om prosjektet",

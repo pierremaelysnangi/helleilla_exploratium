@@ -26,6 +26,7 @@ export const fi: Dictionary = {
     tracks: { one: "{n} kappale", other: "{n} kappaletta" },
     members: { one: "{n} jäsen", other: "{n} jäsentä" },
     posts: { one: "{n} mielipide", other: "{n} mielipidettä" },
+    outlets: { one: "{n} media", other: "{n} mediaa" },
   },
   nav: {
     home: "Etusivu",
@@ -40,6 +41,7 @@ export const fi: Dictionary = {
     language: "Kieli",
     chooseLanguage: "Valitse kieli",
     forums: "Foorumit",
+    press: "Media",
   },
   auth: {
     signIn: "Kirjaudu sisään",
@@ -562,6 +564,8 @@ export const fi: Dictionary = {
     membersFromMusicbrainz: "Yhtyeen {band} kokoonpano MusicBrainzin mukaan.",
     forumsDescription:
       "Lukijoiden mielipiteet täällä luetelluista yhtyeistä ja levyistä.",
+    pressDescription:
+      "Metalliskenen lehdistö ja mediat maittain, linkki jokaiseen toimitukseen.",
   },
   console: {
     title: "Hetkinen.",
@@ -617,6 +621,20 @@ export const fi: Dictionary = {
     loadMore: "Lataa lisää",
     moderationNotice:
       "Mielipiteet kirjoittavat niiden tekijät, jotka voivat myös poistaa ne. Valvonta poistaa sen, mikä ei tänne kuulu.",
+  },
+  press: {
+    title: "Lehdistö ja mediat",
+    lead: "Ketkä kirjoittavat tästä musiikista: {outlets}, {countries}. Ohjaamme heidän luokseen emmekä toista mitään — juttu kuuluu sille, joka sen kirjoitti.",
+    visit: "Lue",
+    notice:
+      "Luettelo ei väitä kattavansa metallilehdistöä, vaan tarjoaa sisäänkäyntejä, joiden osoite on tarkistettu.",
+  },
+  outletKind: {
+    webzine: "Verkkolehti",
+    magazine: "Lehti",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Video",
   },
   footer: {
     about: "Tietoa hankkeesta",

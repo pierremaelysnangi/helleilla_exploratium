@@ -42,3 +42,5 @@ export * from "./pressReviews";
 export * from "./venues";
 // Avis publiés sur un groupe ou un album (seul texte hébergé ici)
 export * from "./forum";
+// Presse et médias de la scène, recensés et renvoyés, jamais recopiés
+export * from "./mediaOutlets";

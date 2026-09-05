@@ -96,6 +96,12 @@ export const ru: Dictionary = {
       many: "{n} мнений",
       other: "{n} мнения",
     },
+    outlets: {
+      one: "{n} издание",
+      few: "{n} издания",
+      many: "{n} изданий",
+      other: "{n} издания",
+    },
   },
   nav: {
     home: "Главная",
@@ -110,6 +116,7 @@ export const ru: Dictionary = {
     language: "Язык",
     chooseLanguage: "Выбрать язык",
     forums: "Форумы",
+    press: "Пресса",
   },
   auth: {
     signIn: "Войти",
@@ -628,6 +635,8 @@ export const ru: Dictionary = {
     membersDescription: "Состав группы {band}: {count}.",
     membersFromMusicbrainz: "Состав группы {band} по данным MusicBrainz.",
     forumsDescription: "Мнения читателей о собранных здесь группах и альбомах.",
+    pressDescription:
+      "Пресса и медиа метал-сцены по странам, со ссылкой на каждую редакцию.",
   },
   console: {
     title: "Минуту.",
@@ -683,6 +692,20 @@ export const ru: Dictionary = {
     loadMore: "Показать ещё",
     moderationNotice:
       "Мнения пишут их авторы, они же могут их убрать. Модерация убирает то, чему здесь не место.",
+  },
+  press: {
+    title: "Пресса и медиа",
+    lead: "Кто пишет об этой музыке: {outlets}, {countries}. Мы отсылаем к ним и ничего не перепечатываем — текст принадлежит тому, кто его написал.",
+    visit: "Читать",
+    notice:
+      "Список не претендует на охват метал-прессы, он лишь даёт точки входа с проверенным адресом.",
+  },
+  outletKind: {
+    webzine: "Веб-журнал",
+    magazine: "Журнал",
+    radio: "Радио",
+    podcast: "Подкаст",
+    video: "Видео",
   },
   footer: {
     about: "О проекте",

@@ -24,6 +24,7 @@ export const zh: Dictionary = {
     tracks: { other: "{n} 首曲目" },
     members: { other: "{n} 位成员" },
     posts: { other: "{n} 条观点" },
+    outlets: { other: "{n} 家媒体" },
   },
   nav: {
     home: "首页",
@@ -38,6 +39,7 @@ export const zh: Dictionary = {
     language: "语言",
     chooseLanguage: "选择语言",
     forums: "论坛",
+    press: "媒体",
   },
   auth: {
     signIn: "登录",
@@ -527,6 +529,7 @@ export const zh: Dictionary = {
     membersDescription: "{band} 的阵容：{count}。",
     membersFromMusicbrainz: "据 MusicBrainz 记载的 {band} 阵容。",
     forumsDescription: "读者对这里收录的乐队与专辑的看法。",
+    pressDescription: "金属场景的媒体与刊物，按国家排列，并附各编辑部链接。",
   },
   console: {
     title: "请稍等。",
@@ -580,6 +583,19 @@ export const zh: Dictionary = {
     loadMore: "加载更多",
     moderationNotice:
       "观点由作者本人写下，也可由本人撤下。不适合出现在这里的内容由审核移除。",
+  },
+  press: {
+    title: "媒体与刊物",
+    lead: "谁在写这类音乐：{outlets}，{countries}。我们只作指引，不转载任何内容——文章属于写下它的人。",
+    visit: "阅读",
+    notice: "本列表无意涵盖整个金属媒体，只提供已核实地址的入口。",
+  },
+  outletKind: {
+    webzine: "网络刊物",
+    magazine: "杂志",
+    radio: "电台",
+    podcast: "播客",
+    video: "视频",
   },
   footer: {
     about: "关于本站",

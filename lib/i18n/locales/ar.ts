@@ -124,6 +124,14 @@ export const ar: Dictionary = {
       many: "{n} رأيًا",
       other: "{n} رأي",
     },
+    outlets: {
+      zero: "{n} وسيلة",
+      one: "وسيلة واحدة",
+      two: "وسيلتان",
+      few: "{n} وسائل",
+      many: "{n} وسيلة",
+      other: "{n} وسيلة",
+    },
   },
   nav: {
     home: "الرئيسية",
@@ -138,6 +146,7 @@ export const ar: Dictionary = {
     language: "اللغة",
     chooseLanguage: "اختيار اللغة",
     forums: "المنتديات",
+    press: "الصحافة",
   },
   auth: {
     signIn: "تسجيل الدخول",
@@ -646,6 +655,8 @@ export const ar: Dictionary = {
     membersDescription: "تشكيلة {band}: {count}.",
     membersFromMusicbrainz: "تشكيلة {band} بحسب MusicBrainz.",
     forumsDescription: "آراء القرّاء في الفرق والألبومات المجموعة هنا.",
+    pressDescription:
+      "صحافة مشهد الميتال ووسائله الإعلامية، بلدًا بلدًا، مع رابط كل هيئة تحرير.",
   },
   console: {
     title: "لحظة.",
@@ -700,6 +711,20 @@ export const ar: Dictionary = {
     loadMore: "تحميل المزيد",
     moderationNotice:
       "الآراء يكتبها أصحابها ولهم أن يزيلوها. وتزيل الإدارة ما لا مكان له هنا.",
+  },
+  press: {
+    title: "الصحافة والإعلام",
+    lead: "من يكتب عن هذه الموسيقى: {outlets}، {countries}. نحيل إليهم ولا ننقل شيئًا — فالمقال ملك لمن كتبه.",
+    visit: "اطّلع",
+    notice:
+      "لا تدّعي هذه القائمة تغطية الصحافة الميتالية، وإنما تقدّم مداخل تحقّقنا من عناوينها.",
+  },
+  outletKind: {
+    webzine: "مجلة إلكترونية",
+    magazine: "مجلة",
+    radio: "إذاعة",
+    podcast: "بودكاست",
+    video: "فيديو",
   },
   footer: {
     about: "عن المشروع",

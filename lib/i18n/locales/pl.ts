@@ -96,6 +96,12 @@ export const pl: Dictionary = {
       many: "{n} opinii",
       other: "{n} opinii",
     },
+    outlets: {
+      one: "{n} medium",
+      few: "{n} media",
+      many: "{n} mediów",
+      other: "{n} mediów",
+    },
   },
   nav: {
     home: "Strona główna",
@@ -110,6 +116,7 @@ export const pl: Dictionary = {
     language: "Język",
     chooseLanguage: "Wybierz język",
     forums: "Fora",
+    press: "Prasa",
   },
   auth: {
     signIn: "Zaloguj się",
@@ -632,6 +639,8 @@ export const pl: Dictionary = {
     membersFromMusicbrainz: "Skład zespołu {band} według MusicBrainz.",
     forumsDescription:
       "Opinie czytelników o zebranych tu zespołach i albumach.",
+    pressDescription:
+      "Prasa i media sceny metalowej, kraj po kraju, z odnośnikiem do każdej redakcji.",
   },
   console: {
     title: "Chwileczkę.",
@@ -687,6 +696,20 @@ export const pl: Dictionary = {
     loadMore: "Wczytaj więcej",
     moderationNotice:
       "Opinie piszą ich autorzy i to oni mogą je usunąć. Moderacja usuwa to, co nie ma tu miejsca.",
+  },
+  press: {
+    title: "Prasa i media",
+    lead: "Kto pisze o tej muzyce: {outlets}, {countries}. Odsyłamy do nich i niczego nie przedrukowujemy — tekst należy do tego, kto go napisał.",
+    visit: "Czytaj",
+    notice:
+      "Ta lista nie rości sobie prawa do pokrycia prasy metalowej; podaje punkty wejścia o sprawdzonym adresie.",
+  },
+  outletKind: {
+    webzine: "Webzine",
+    magazine: "Magazyn",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Wideo",
   },
   footer: {
     about: "O projekcie",

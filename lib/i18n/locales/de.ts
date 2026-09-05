@@ -29,6 +29,7 @@ export const de: Dictionary = {
     tracks: { one: "{n} Titel", other: "{n} Titel" },
     members: { one: "{n} Mitglied", other: "{n} Mitglieder" },
     posts: { one: "{n} Meinung", other: "{n} Meinungen" },
+    outlets: { one: "{n} Medium", other: "{n} Medien" },
   },
   nav: {
     home: "Startseite",
@@ -43,6 +44,7 @@ export const de: Dictionary = {
     language: "Sprache",
     chooseLanguage: "Sprache wählen",
     forums: "Foren",
+    press: "Presse",
   },
   auth: {
     signIn: "Anmelden",
@@ -566,6 +568,8 @@ export const de: Dictionary = {
     membersFromMusicbrainz: "Besetzung von {band} laut MusicBrainz.",
     forumsDescription:
       "Meinungen der Lesenden zu den verzeichneten Bands und Alben.",
+    pressDescription:
+      "Presse und Medien der Metal-Szene, Land für Land, mit Link zu jeder Redaktion.",
   },
   console: {
     title: "Einen Moment.",
@@ -623,6 +627,20 @@ export const de: Dictionary = {
     loadMore: "Mehr laden",
     moderationNotice:
       "Meinungen werden von ihren Verfassenden geschrieben, die sie auch entfernen können. Die Moderation entfernt, was hier nichts zu suchen hat.",
+  },
+  press: {
+    title: "Presse und Medien",
+    lead: "Wer über diese Musik schreibt: {outlets}, {countries}. Wir verweisen dorthin und übernehmen nichts — ein Artikel gehört dem, der ihn geschrieben hat.",
+    visit: "Lesen",
+    notice:
+      "Diese Liste erhebt keinen Anspruch, die Metal-Presse abzudecken; sie bietet Einstiege, deren Adresse geprüft wurde.",
+  },
+  outletKind: {
+    webzine: "Webzine",
+    magazine: "Magazin",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Video",
   },
   footer: {
     about: "Über das Projekt",

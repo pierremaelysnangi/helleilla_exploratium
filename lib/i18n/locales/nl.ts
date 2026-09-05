@@ -23,6 +23,7 @@ export const nl: Dictionary = {
     tracks: { one: "{n} nummer", other: "{n} nummers" },
     members: { one: "{n} lid", other: "{n} leden" },
     posts: { one: "{n} mening", other: "{n} meningen" },
+    outlets: { one: "{n} medium", other: "{n} media" },
   },
   nav: {
     home: "Start",
@@ -37,6 +38,7 @@ export const nl: Dictionary = {
     language: "Taal",
     chooseLanguage: "Taal kiezen",
     forums: "Forums",
+    press: "Pers",
   },
   auth: {
     signIn: "Inloggen",
@@ -560,6 +562,8 @@ export const nl: Dictionary = {
     membersFromMusicbrainz: "Bezetting van {band} volgens MusicBrainz.",
     forumsDescription:
       "De meningen van lezers over de bands en albums die hier staan.",
+    pressDescription:
+      "De pers en media van de metalscene, land per land, met een link naar elke redactie.",
   },
   console: {
     title: "Even wachten.",
@@ -616,6 +620,20 @@ export const nl: Dictionary = {
     loadMore: "Meer laden",
     moderationNotice:
       "Meningen zijn van hun schrijvers, die ze kunnen verwijderen. De moderatie verwijdert wat hier niet thuishoort.",
+  },
+  press: {
+    title: "Pers en media",
+    lead: "Wie over deze muziek schrijft: {outlets}, {countries}. We verwijzen door en nemen niets over — een artikel is van wie het schreef.",
+    visit: "Lezen",
+    notice:
+      "Deze lijst pretendeert niet de metalpers te dekken; ze biedt ingangen waarvan het adres is gecontroleerd.",
+  },
+  outletKind: {
+    webzine: "Webzine",
+    magazine: "Tijdschrift",
+    radio: "Radio",
+    podcast: "Podcast",
+    video: "Video",
   },
   footer: {
     about: "Over het project",

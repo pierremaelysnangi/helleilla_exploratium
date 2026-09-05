@@ -43,6 +43,7 @@
     "check:album-types": "tsx --env-file=.env.local scripts/check-album-types.ts",
     "album:remove": "tsx --env-file=.env.local scripts/remove-album.ts",
     "seed:venues": "tsx --env-file=.env.local scripts/seed-venues.ts",
+    "seed:media-outlets": "tsx --env-file=.env.local scripts/seed-media-outlets.ts",
     "check:venue-links": "tsx --env-file=.env.local scripts/check-venue-links.ts"
   },
   "dependencies": {

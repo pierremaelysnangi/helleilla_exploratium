@@ -179,6 +179,18 @@ describe("Parcours catalogue (front métier)", () => {
     expect(res.status).toBe(401);
   });
 
+  it("GET /presse recense les médias par pays", async () => {
+    const res = await fetch(`${BASE_URL}/presse`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain(
+      "<title>Presse et médias | Helleilla Exploratium</title>",
+    );
+    // Le propos de la page tient dans cette phrase : on renvoie, on ne
+    // reprend rien. Si elle disparaît, la page a changé de nature.
+    expect(html).toContain("on ne reprend rien");
+  });
+
   it("GET /albums rend la page catalogue albums", async () => {
     const res = await fetch(`${BASE_URL}/albums`);
     expect(res.status).toBe(200);

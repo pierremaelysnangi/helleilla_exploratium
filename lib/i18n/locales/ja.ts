@@ -26,6 +26,7 @@ export const ja: Dictionary = {
     tracks: { other: "{n} 曲" },
     members: { other: "メンバー {n} 名" },
     posts: { other: "意見 {n} 件" },
+    outlets: { other: "{n} 媒体" },
   },
   nav: {
     home: "ホーム",
@@ -40,6 +41,7 @@ export const ja: Dictionary = {
     language: "言語",
     chooseLanguage: "言語を選択",
     forums: "フォーラム",
+    press: "メディア",
   },
   auth: {
     signIn: "ログイン",
@@ -547,6 +549,8 @@ export const ja: Dictionary = {
     membersDescription: "{band} の編成：{count}。",
     membersFromMusicbrainz: "MusicBrainz による {band} の編成。",
     forumsDescription: "ここに載るバンドとアルバムについての読者の意見。",
+    pressDescription:
+      "メタルシーンのメディアを国別に、各編集部へのリンクつきで。",
   },
   console: {
     title: "少し待って。",
@@ -601,6 +605,20 @@ export const ja: Dictionary = {
     loadMore: "もっと読む",
     moderationNotice:
       "意見は書いた本人のもので、本人が取り消せる。ここにふさわしくないものは運営が取り除く。",
+  },
+  press: {
+    title: "メディア",
+    lead: "この音楽について書く人たち：{outlets}、{countries}。こちらは案内するだけで、何も転載しない。記事は書いた人のものだ。",
+    visit: "読む",
+    notice:
+      "メタルの報道を網羅するつもりはない。住所を確かめた入口を並べただけ。",
+  },
+  outletKind: {
+    webzine: "ウェブジン",
+    magazine: "雑誌",
+    radio: "ラジオ",
+    podcast: "ポッドキャスト",
+    video: "動画",
   },
   footer: {
     about: "このサイトについて",
